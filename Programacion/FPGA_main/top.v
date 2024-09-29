@@ -1,4 +1,10 @@
-module main (
+/*
+    Este module se encarga de generar las señales de SPWM que se enviaran 
+    a cada uno de los submodulos FPGA_modulo. Tambien enviara la señal de disparo para
+    sincronizarlos.  
+*/
+
+module FPGA_main (
     
 );
 /*

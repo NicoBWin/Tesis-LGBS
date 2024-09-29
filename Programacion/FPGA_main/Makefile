@@ -27,7 +27,7 @@ ifeq ($(uname_S), Darwin)
 endif
 
 LIB_SRC = 
-SOURCES = main.v UART/uart_tx.v UART/uart_rx.v $(LIB_SRC)
+SOURCES = top.v UART/uart_tx.v UART/uart_rx.v $(LIB_SRC)
 TBNAME = top_tb
 MODULE_TO_DRAW = top.v
 SOURCES_TB = top_tb.v $(LIB_SRC)
