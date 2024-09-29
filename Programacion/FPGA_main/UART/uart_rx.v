@@ -3,7 +3,7 @@ module uart_rx(
     input wire reset,          // Reset signal
     input wire rx,             // UART receive line
     output reg [7:0] data_out, // 8-bit data output
-    output reg rx_done         // Indicates reception is complete
+    output reg rx_done,         // Indicates reception is complete
     output reg parity_error    // Flag that indicates that there was a parity error
 );
 
@@ -59,7 +59,9 @@ module uart_rx(
                                     rx_done <= 1'b1;
                                     rx_busy <= 1'b0;
                                     if (parity != ^data_out)
-                                        parity_error <= 1'b1
+                                        begin
+                                            parity_error <= 1'b1;
+                                        end
                                 end
                         end
                 end 
