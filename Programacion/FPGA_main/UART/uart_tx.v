@@ -15,17 +15,18 @@ module uart_tx(
 );
 
     // Config
-    parameter CLK_FREQ = 6000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = 9600;     // Desired baud rate
+    parameter CLK_FREQ = 60000000;  // System clock frequency (e.g., 50 MHz)
+    parameter BAUD_RATE = 6000000;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [31:0] clk_count;           // Clock counter
-    reg [10:0] tx_shift_reg;        // STOP, PARITY, DATA, START
-
+    wire [10:0] tx_shift_reg;        // START(0), DATA(8), PARITY(1), STOP(1)
     wire parity;                    // Current parity
+
     assign parity = PARITY ? ~(data_to_tx) :  data_to_tx;  // XOR for even parity, inverted XOR for odd parity
+    assign tx_shift_reg = {1'b1, parity, data_to_tx, 1'b0};  // START(0), DATA(8), PARITY(1), STOP(1)
 
     always @(posedge clk or posedge reset) 
         begin
@@ -35,18 +36,17 @@ module uart_tx(
                     tx_busy <= 1'b0;
                     clk_count <= 0;
                     bit_index <= 0;        // We start from the most significant which is start
-                    tx_shift_reg <= {11{1'b1}}; //Todo 1
                 end 
             else if (start_tx && !tx_busy) 
-                begin
-                    tx_shift_reg <= {1'b1, parity, data_to_tx, 1'b0};  // STOP(1), PARITY(1), DATA(8), START(0) 
+                begin   
                     tx_busy <= 1'b1;
                     clk_count <= 0;
                     bit_index <= 0;
+                    tx <= tx_shift_reg[bit_index];
                 end
             else if (tx_busy) 
                 begin
-                    if (clk_count > CLKS_PER_BIT)
+                    if (clk_count >= CLKS_PER_BIT)
                         begin
                             clk_count <= 0;
                             tx <= tx_shift_reg[bit_index];

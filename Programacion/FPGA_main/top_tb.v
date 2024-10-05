@@ -61,11 +61,10 @@ initial begin
         #10
         reset <= 0;
         #10
-        data_to_tx <= 8'b01100110;
+        data_to_tx <= 8'b11110000; //F0
         start_tx <= 1;
-        #100
-        data_to_tx <= 8'b10101010;
-        #24000000
+        //data_to_tx <= 8'b10101010; //AA
+        #500
 
         $finish;
     end

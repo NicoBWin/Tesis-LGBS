@@ -14,8 +14,8 @@ module uart_rx(
 );
 
     // Config
-    parameter CLK_FREQ = 6000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = 9600;     // Desired baud rate
+    parameter CLK_FREQ = 60000000;  // System clock frequency (e.g., 50 MHz)
+    parameter BAUD_RATE = 6000000;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 
@@ -45,7 +45,7 @@ module uart_rx(
                 end 
             else if (rx_busy) 
                 begin
-                    if (clk_count > CLKS_PER_BIT)
+                    if (clk_count >= CLKS_PER_BIT)
                         begin
                             clk_count <= 0;
                             if (bit_index >= 8)
