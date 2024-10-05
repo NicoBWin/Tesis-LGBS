@@ -16,6 +16,7 @@ always #1 clk = ~clk;
 *****************************
 */
     reg reset;
+    reg rx;
     wire[7:0] data_received;
     wire rx_done;
     wire parity_error;
@@ -29,6 +30,15 @@ always #1 clk = ~clk;
 *   External Modules declarations   *
 *************************************
 */
+    uart_rx receiver(
+        .clk(clk), 
+        .reset(reset), 
+        .rx(rx),
+        .data_received(data_received), 
+        .rx_done(rx_done), 
+        .parity_error(parity_error)
+    );
+
     uart_tx transmitter(
         .clk(clk), 
         .reset(reset), 
@@ -36,15 +46,6 @@ always #1 clk = ~clk;
         .start_tx(start_tx), 
         .tx(tx), 
         .tx_busy(tx_busy)
-    );
-
-    uart_rx receiver(
-        .clk(clk), 
-        .reset(reset), 
-        .rx(tx),
-        .data_received(data_received), 
-        .rx_done(rx_done), 
-        .parity_error(parity_error)
     );
 /*
 ********************************
@@ -56,7 +57,6 @@ initial begin
         $dumpvars(0, top_tb);   // module to dump
         // Space for variable modification in simulation of module
 
-        //Transmit
         reset <= 1; 
         #10
         reset <= 0;
@@ -65,10 +65,10 @@ initial begin
         start_tx <= 1;
         #500
         start_tx <= 0;
-
-        //Reception
-        #600
-
+        #500
+        data_to_tx <= 8'b10101010; //AA
+        start_tx <= 1;
+        #500
         $finish;
     end
 /*

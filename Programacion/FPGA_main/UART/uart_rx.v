@@ -8,7 +8,7 @@ module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,          // Reset signal
     input wire rx,             // UART receive line
-    output reg [7:0] data_received,   // 8-bit data out
+    output wire [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
     output reg parity_error     // Flag that indicates that there was a parity error
 );
@@ -19,60 +19,59 @@ module uart_rx(
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 
+    reg [9:0] rx_shift_reg;         // PARITY, DATA, START
     reg [31:0] clk_count;           // Clock counter
     reg [3:0] bit_index;            // Index for the bits being received
-    reg [8:0] rx_shift_reg;         // PARITY, DATA
     reg rx_busy;                    // Indicates reception is in progress
-    
+    reg parity;
+
+    assign rx_shift_reg = {parity, data_received, 0}
+
     always @(posedge clk or posedge reset) 
         begin
             if (reset) 
                 begin
-                    rx_busy <= 1'b0;
+                    rx_busy <= 0;
                     clk_count <= 0;
                     bit_index <= 0;
-                    rx_done <= 1'b0;
+                    rx_done <= 0;
+                    parity <= 0;
                     parity_error <= 1'b0;
-                    rx_shift_reg <= {9{1'b0}};
+                    rx_shift_reg <= {10{1'b0}};
                 end 
             else if (!rx_busy && !rx) 
                 begin
-                    // Start reception on falling edge of start bit
-                    rx_busy <= 1'b1;
-                    clk_count <= CLKS_PER_BIT / 2;  // To sample in the middle of the bit
+                    rx_busy <= 1;
+                    rx_done <= 0;
+                    clk_count <= CLKS_PER_BIT / 2;  // To sample in the middle of the 1st bit
                     bit_index <= 0;
-                    parity_error <= 1'b0;
+                    parity <= 0;
+                    parity_error <= 0;
                 end 
             else if (rx_busy) 
                 begin
                     if (clk_count >= CLKS_PER_BIT)
                         begin
-                            clk_count <= 0;
-                            if (bit_index >= 8)
+                            if (bit_index > 9)
                                 begin
-                                    rx_done <= 1'b1;
-                                    rx_busy <= 1'b0;
-                                    data_received <= rx_shift_reg;
-                                    if (PARITY != ^data_received)
-                                        begin
-                                            parity_error <= 1'b1;
-                                        end
-                                end
-                            else 
-                                begin
+                                    rx_done <= 1;
+                                    rx_busy <= 0;
                                     rx_shift_reg[bit_index] <= rx;
+                                    if (PARITY != ^rx_shift_reg)
+                                            parity_error <= 1;
+                                end
+                            else
+                                begin
+                                    data_received[bit_index] <= rx;
                                     bit_index <= bit_index + 1;
                                 end
+
+                            clk_count <= 0;
                         end
                     else 
                         begin
                             clk_count <= clk_count + 1;
                         end
                 end 
-            else 
-                begin
-                    rx_done <= 1'b0;
-                    parity_error <= 1'b0;
-                end
         end
 endmodule
