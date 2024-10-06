@@ -8,7 +8,7 @@ module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,          // Reset signal
     input wire rx,             // UART receive line
-    output wire [7:0] data_received,   // 8-bit data out
+    output reg [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
     output reg parity_error     // Flag that indicates that there was a parity error
 );
@@ -25,8 +25,6 @@ module uart_rx(
     reg rx_busy;                    // Indicates reception is in progress
     reg parity;
 
-    assign rx_shift_reg = {parity, data_received, 0}
-
     always @(posedge clk or posedge reset) 
         begin
             if (reset) 
@@ -36,14 +34,15 @@ module uart_rx(
                     bit_index <= 0;
                     rx_done <= 0;
                     parity <= 0;
-                    parity_error <= 1'b0;
+                    parity_error <= 0;
                     rx_shift_reg <= {10{1'b0}};
+                    data_received <= {8{1'b0}};
                 end 
             else if (!rx_busy && !rx) 
                 begin
                     rx_busy <= 1;
                     rx_done <= 0;
-                    clk_count <= CLKS_PER_BIT / 2;  // To sample in the middle of the 1st bit
+                    clk_count <= 0;
                     bit_index <= 0;
                     parity <= 0;
                     parity_error <= 0;
@@ -56,16 +55,15 @@ module uart_rx(
                                 begin
                                     rx_done <= 1;
                                     rx_busy <= 0;
-                                    rx_shift_reg[bit_index] <= rx;
-                                    if (PARITY != ^rx_shift_reg)
+                                    if (PARITY != ^rx_shift_reg[9:1])
                                             parity_error <= 1;
+                                    else 
+                                        data_received <= rx_shift_reg[8:1]; 
                                 end
                             else
-                                begin
-                                    data_received[bit_index] <= rx;
-                                    bit_index <= bit_index + 1;
-                                end
+                                bit_index <= bit_index + 1;
 
+                            rx_shift_reg[bit_index] <= rx;
                             clk_count <= 0;
                         end
                     else 
