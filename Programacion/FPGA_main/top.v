@@ -89,32 +89,29 @@ module top(
 ******************
 */
 
-    reg led;
+    reg led = OFF;
     reg[31:0] counter = 0;
+    reg[31:0] config_counter = 0;
     assign led_green = led; 
 
     always @(posedge clk) begin
 
-        if (counter == 0)
+        config_counter <= config_counter + 1;
+
+        if (config_counter <= 20) begin
             reset <= 1;
-        else if(counter == 5)
-            reset <= 0;
-
-        if (rx_done) begin
-            if (data_received == toggle)
-                if (counter >= 12000000)
-                    begin
-                        if (led == OFF)
-                            led <= ON;
-                        else
-                            led <= OFF;
-
-                        counter <= 0;
-                    end
-                    
-                else
-                    counter <= counter + 1;
         end
+        else if(config_counter <= 50) begin
+            reset <= 0;
+        end
+        else if(config_counter <= 6000000) begin
+            led <= ON;
+        end
+        else if(config_counter <= 2*6000000) begin
+            led <= OFF;
+        end
+        else
+            config_counter <= 0;
     end
 
 endmodule
