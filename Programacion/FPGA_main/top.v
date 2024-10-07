@@ -8,6 +8,8 @@ module top(
     input wire gpio_23,
 
     output wire led_green,
+    output wire led_red,
+    output wire led_blue,
     output wire gpio_25,
     output wire gpio_26,
     output wire gpio_27,
@@ -65,15 +67,6 @@ module top(
 *************************************
 */
 
-    uart_rx receiver(
-        .clk(clk), 
-        .reset(reset), 
-        .rx(rx),
-        .data_received(data_received), 
-        .rx_done(rx_done), 
-        .parity_error(parity_error)
-    );
-
     uart_tx transmitter(
         .clk(clk), 
         .reset(reset), 
@@ -83,35 +76,49 @@ module top(
         .tx_busy(tx_busy)
     );
 
+    uart_rx receiver(
+        .clk(clk), 
+        .reset(reset), 
+        .rx(rx),
+        .data_received(data_received), 
+        .rx_done(rx_done), 
+        .parity_error(parity_error)
+    );
+
 /*
 ******************
 *   Statements   *
 ******************
 */
 
-    reg led = OFF;
+    reg led_r = OFF;
+    reg led_g = OFF;
+    reg led_b = OFF;
     reg[31:0] counter = 0;
     reg[31:0] config_counter = 0;
-    assign led_green = led; 
+
+    assign led_red = led_r;
+    assign led_green = led_g;
+    assign led_blue = led_b;
 
     always @(posedge clk) begin
 
         config_counter <= config_counter + 1;
 
-        if (config_counter <= 20) begin
+        if (config_counter <= 6000000) begin
             reset <= 1;
-        end
-        else if(config_counter <= 50) begin
-            reset <= 0;
-        end
-        else if(config_counter <= 6000000) begin
-            led <= ON;
+            led_g <= OFF;
         end
         else if(config_counter <= 2*6000000) begin
-            led <= OFF;
+            reset <= 0;
+            led_g <= ON;
         end
-        else
+        else if(config_counter <= 40*6000000) begin
             config_counter <= 0;
+        end
+
+        
+            
     end
 
 endmodule
