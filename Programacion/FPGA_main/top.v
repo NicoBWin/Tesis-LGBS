@@ -5,15 +5,15 @@
 */
 
 module top(
-    input wire gpio_23,
+    input wire gpio_25,
 
     output wire led_green,
     output wire led_red,
     output wire led_blue,
-    output wire gpio_25,
+    output wire gpio_23,
     output wire gpio_26,
     output wire gpio_27,
-    output wire gpio_32
+    output wire gpio_32,
 );
 
 /*
@@ -39,7 +39,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b11") // 6 MHz = ~48 MHz / 8 (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b11") // 48 MHz = ~48 MHz / 1 (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )  
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -55,12 +55,10 @@ module top(
     localparam ON = 0;
 
     wire [7:0] data_received;
-    reg [7:0] data_to_tx = toggle;
-
-    reg reset = 0;
     wire start_tx;
-    assign start_tx = 1;
 
+    reg [7:0] data_to_tx = toggle;
+    reg reset = 0;
 /*
 *************************************
 *   External Modules declarations   *
@@ -91,34 +89,74 @@ module top(
 ******************
 */
 
+    parameter INIT  = 3'b001; 
+    parameter UART_SEND = 3'b010; 
+    parameter END_TX = 3'b100;
+    parameter WAIT = 3'b101;
+
     reg led_r = OFF;
     reg led_g = OFF;
     reg led_b = OFF;
+    reg[2:0] state = INIT;
     reg[31:0] counter = 0;
-    reg[31:0] config_counter = 0;
 
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
 
     always @(posedge clk) begin
+        case (state)
 
-        config_counter <= config_counter + 1;
+            INIT: begin
+                reset   <= 1;
+                led_r   <= OFF;
+                led_g   <= OFF;
+                led_b   <= OFF;
+                counter <= counter + 1;
+                if (counter >= 6000000) begin
+                    reset <= 0;
+                    state <= UART_SEND;
+                    counter <= 0;
+                end
+            end
 
-        if (config_counter <= 6000000) begin
-            reset <= 1;
-            led_g <= OFF;
-        end
-        else if(config_counter <= 2*6000000) begin
-            reset <= 0;
-            led_g <= ON;
-        end
-        else if(config_counter <= 40*6000000) begin
-            config_counter <= 0;
-        end
+            UART_SEND: begin
+                led_b   <= ON;
+                start_tx <= 1;
 
-        
-            
+                if (rx_done)
+                    if (data_received == data_to_tx) begin
+                        led_r <= ~led_r;
+                        counter <= 0;
+                    end
+                    else begin
+                        led_r <= OFF;
+                    end
+                else
+                    counter <= counter + 1;
+
+                if (counter >= 10*6000000) begin
+                    start_tx <= 0;
+                    state <= END_TX;
+                    counter <= 0;
+                end
+            end
+
+            END_TX: begin
+                led_b <= OFF;         // Turn off green LED
+                state <= WAIT;        // Move to waiting state
+                counter <= 0;
+            end
+
+            WAIT: begin
+                counter <= counter + 1;
+                if (counter >= 6000000) begin
+                    state <= INIT;    // Restart the cycle
+                    counter <= 0;
+                end
+            end
+
+        endcase
     end
 
 endmodule
