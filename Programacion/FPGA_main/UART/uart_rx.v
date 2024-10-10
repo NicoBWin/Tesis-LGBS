@@ -4,6 +4,13 @@
     recibido no es valido.
 */
 
+/*
+    A cada modulo va a ir un cable ethernet que contiene el tx y rx de cada modulo. Como necesitamos
+    que cada modulo trabaje a minimo 250k y son 11 bits, entonces 250k*11=2.75Mbits/seg minimo. Tener
+    en cuenta que las palabras de 11 bits contienen en sus datos los bits para el ECC. Al menos 16 codigos.
+    necesitamos (4bits de data).
+*/
+
 module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,          // Reset signal
