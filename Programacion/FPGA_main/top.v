@@ -13,7 +13,7 @@ module top(
     output wire gpio_23,
     output wire gpio_26,
     output wire gpio_27,
-    output wire gpio_32,
+    output wire gpio_32
 );
 
 /*
@@ -39,7 +39,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz = ~48 MHz / 1 (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz = ~48 MHz / 1 (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )  
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -48,16 +48,16 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b10101010;
+    localparam turn_on = 8'b11101110;
     localparam turn_off = 8'b01010101;
     localparam toggle = 8'b11000011;
     localparam OFF = 1;
     localparam ON = 0;
 
     wire [7:0] data_received;
-    wire start_tx;
+    reg start_tx;
 
-    reg [7:0] data_to_tx = toggle;
+    reg [7:0] data_to_tx = turn_on;
     reg reset = 0;
 /*
 *************************************
@@ -90,7 +90,8 @@ module top(
 */
 
     parameter INIT  = 3'b001; 
-    parameter UART_SEND = 3'b010; 
+    parameter UART_SEND = 3'b010;
+    parameter WAIT = 3'b011;  
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -111,7 +112,7 @@ module top(
                 led_g   <= OFF;
                 led_b   <= OFF;
                 counter <= counter + 1;
-                if (counter >= 48000000) begin
+                if (counter >= 24000000) begin
                     reset <= 0;
                     state <= UART_SEND;
                     counter <= 0;
@@ -131,6 +132,21 @@ module top(
                     else begin
                         led_r <= OFF;
                     end
+                
+                if (counter >= 96000000) begin
+                    state <= WAIT;
+                    counter <= 0;
+                end
+            end
+
+            WAIT: begin
+                led_b   <= OFF;
+                start_tx <= 0;
+                counter <= counter + 1;
+                if (counter >= 48000000) begin
+                    state <= UART_SEND;
+                    counter <= 0;
+                end
             end
 
         endcase
