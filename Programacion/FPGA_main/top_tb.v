@@ -61,13 +61,13 @@ initial begin
         #10
         reset <= 0;
         #10
-        data_to_tx <= 8'b11110000; //F0
+        data_to_tx <= 8'b10110011; //B2
         start_tx <= 1;
         #500
         start_tx <= 0;
 
         //Reception
-        #600
+        #3000
 
         $finish;
     end
