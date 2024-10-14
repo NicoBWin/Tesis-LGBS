@@ -39,8 +39,8 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz = ~48 MHz / 1 (0b00=1, 0b01=2, 0b10=4, 0b11=8)
-    )  
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
 /*
@@ -57,7 +57,7 @@ module top(
     wire [7:0] data_received;
     reg start_tx;
 
-    reg [7:0] data_to_tx = turn_on;
+    reg [7:0] data_to_tx = toggle;
     reg reset = 0;
 /*
 *************************************
@@ -105,7 +105,6 @@ module top(
 
     always @(posedge clk) begin
         case (state)
-
             INIT: begin
                 reset   <= 1;
                 led_r   <= OFF;

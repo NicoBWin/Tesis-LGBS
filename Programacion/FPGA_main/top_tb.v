@@ -66,9 +66,14 @@ initial begin
         #500
         start_tx <= 0;
 
-        //Reception
-        #3000
+        #1500
 
+        data_to_tx <= 8'b00010010; //12
+        #100
+        start_tx <= 1;
+
+        #1500
+        
         $finish;
     end
 /*
