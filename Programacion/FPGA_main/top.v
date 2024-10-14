@@ -122,7 +122,7 @@ module top(
                 led_b   <= ON;
                 start_tx <= 1;
                 counter <= counter + 1;
-                
+
                 if (rx_done)
                     if (data_received == data_to_tx) begin
                         led_r <= ON;
@@ -147,7 +147,6 @@ module top(
                     counter <= 0;
                 end
             end
-
         endcase
     end
 
