@@ -64,6 +64,7 @@ module top(
     reg start_tx;
     reg [7:0] data_to_tx = turn_on;
     reg reset = 0;
+    
 /*
 *************************************
 *   External Modules declarations   *
@@ -89,8 +90,8 @@ module top(
     phase_generator spwm_gen (
         .clk(clk),
         .reset(reset),
-        .sine_freq(10000),          // Set sine wave frequency to 10 kHz
-        .triangular_freq(100000),   // Set triangular wave frequency to 100 kHz
+        .sine_freq(26'd24000),          // Set sine wave frequency to 10 kHz
+        .triangular_freq(26'd240000),   // Set triangular wave frequency to 100 kHz
         .phase_a(phase_a),          // Connect phase_a output
         .phase_b(phase_b),          // Connect phase_b output
         .phase_c(phase_c)           // Connect phase_c output

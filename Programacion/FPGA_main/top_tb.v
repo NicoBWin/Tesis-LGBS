@@ -24,14 +24,17 @@ always #1 clk = ~clk;
     reg start_tx;
     wire tx;
     wire tx_busy;
+
+    wire phase_a;
+    wire phase_b;
+    wire phase_c;
 /*
 *************************************
 *   External Modules declarations   *
 *************************************
 */
     uart_tx transmitter(
-        .clk(clk), 
-        .reset(reset), 
+        .clk(clk),  
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
         .tx(tx), 
@@ -40,11 +43,20 @@ always #1 clk = ~clk;
 
     uart_rx receiver(
         .clk(clk), 
-        .reset(reset), 
         .rx(tx),
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error)
+    );
+
+    phase_generator spwm_gen (
+        .clk(clk),
+        .reset(reset),
+        .sine_freq(26'd24000),          
+        .triangular_freq(26'd24000),   
+        .phase_a(phase_a),          // Connect phase_a output
+        .phase_b(phase_b),          // Connect phase_b output
+        .phase_c(phase_c)           // Connect phase_c output
     );
 /*
 ********************************
@@ -72,7 +84,7 @@ initial begin
         #100
         start_tx <= 1;
 
-        #1500
+        #300000
         
         $finish;
     end
