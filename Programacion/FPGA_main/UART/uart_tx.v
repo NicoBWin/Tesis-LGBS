@@ -7,7 +7,6 @@
 
 module uart_tx(
     input wire clk,            // Clock signal
-    input wire reset,          // Reset signal
     input wire [7:0] data_to_tx,  // 8-bit data in
     input wire start_tx,       // Start transmission
     output reg tx,             // UART transmit line

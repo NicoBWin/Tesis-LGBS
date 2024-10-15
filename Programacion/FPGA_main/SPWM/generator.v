@@ -1,41 +1,32 @@
 
 
-module generator #(parameter SIGNAL_SAMPLE_BITS = 32)(
+module generator #(parameter SIGNAL_SAMPLE_BITS = 8)(
     input wire clk,                                     // Clock signal
     input wire reset,                                   // Reset signal
-    input wire [SIGNAL_SAMPLE_BITS-1:0] signal,          // signal to reproduce
     input wire [19:0] frecuency,                         // Signal frequency (max: 1MHz)
+    input wire [SIGNAL_SAMPLE_BITS-1:0] signal,          // signal to reproduce
+    input wire [SIGNAL_SAMPLE_BITS-1:0] initial_phase,
 
     output reg[SIGNAL_SAMPLE_BITS-1:0] current_value    // Current signal value
 );
 
     // Config
-    parameter signal_sample_size = (2 << SIGNAL_SAMPLE_BITS) - 1;
-    reg [SIGNAL_SAMPLE_BITS-1:0] clks_per_sample = signal_sample_size / frecuency
-
-    reg [SIGNAL_SAMPLE_BITS-1:0] signal_index = 0;
-    reg [SIGNAL_SAMPLE_BITS-1:0] clks_counter = 0;
+    parameter CLK_FREQ = 24000000;
+    wire [SIGNAL_SAMPLE_BITS-1:0] next_sample_count = CLK_FREQ / frecuency;
+    reg [SIGNAL_SAMPLE_BITS-1:0] signal_index = initial_phase;
+    reg [SIGNAL_SAMPLE_BITS-1:0] clk_counter = 0;
     
-    always @(posedge clk or posedge reset) 
-        begin
-            if (reset) 
-            begin
+    always @(posedge clk) begin
+            if (reset) begin
                 signal_index <= 0;
-                clks_counter <= 0;
+                clk_counter <= 0;
             end
-        
-        if (clks_counter >= clks_per_sample) 
-        begin
-            current_value <= signal[signal_index];
-            if (signal_index + 1 > signal_sample_size) begin
-                signal_index <= 0;
+            else if (clk_counter >= next_sample_count) begin
+                current_value <= signal[signal_index];
+                signal_index <= signal_index + 1;
             end
             else
-                signal_index <= signal_index + 1;
-        end
-        else
-            clks_counter = clks_counter + 1;
-
+                clk_counter <= clk_counter + 1;
         end
 
 endmodule

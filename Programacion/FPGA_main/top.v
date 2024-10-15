@@ -13,7 +13,8 @@ module top(
     output wire gpio_23,
     output wire gpio_26,
     output wire gpio_27,
-    output wire gpio_32
+    output wire gpio_32,
+    output wire gpio_34
 );
 
 /*
@@ -24,15 +25,16 @@ module top(
 
     wire tx;
     wire rx;
-    wire tx_busy;
-    wire rx_done;
-    wire parity_error;
+    wire phase_a;
+    wire phase_b;
+    wire phase_c;
     
     assign tx = gpio_23;
     assign rx = gpio_25;
-    assign tx_busy = gpio_26;
-    assign rx_done = gpio_27;
-    assign parity_error = gpio_32;
+    assign phase_a = gpio_27;
+    assign phase_b = gpio_32;
+    assign phase_c = gpio_34;
+
 /*
 *********************
 *   HFClock setup   *
@@ -55,9 +57,12 @@ module top(
     localparam ON = 0;
 
     wire [7:0] data_received;
-    reg start_tx;
+    wire tx_busy;
+    wire rx_done;
+    wire parity_error;
 
-    reg [7:0] data_to_tx = toggle;
+    reg start_tx;
+    reg [7:0] data_to_tx = turn_on;
     reg reset = 0;
 /*
 *************************************
@@ -67,7 +72,6 @@ module top(
     
     uart_tx transmitter(
         .clk(clk), 
-        .reset(reset), 
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
         .tx(tx), 
@@ -76,11 +80,20 @@ module top(
 
     uart_rx receiver(
         .clk(clk), 
-        .reset(reset), 
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error)
+    );
+
+    phase_generator spwm_gen (
+        .clk(clk),
+        .reset(reset),
+        .sine_freq(10000),          // Set sine wave frequency to 10 kHz
+        .triangular_freq(100000),   // Set triangular wave frequency to 100 kHz
+        .phase_a(phase_a),          // Connect phase_a output
+        .phase_b(phase_b),          // Connect phase_b output
+        .phase_c(phase_c)           // Connect phase_c output
     );
 
 /*
@@ -119,17 +132,18 @@ module top(
             end
 
             UART_SEND: begin
-                led_b   <= ON;
                 start_tx <= 1;
                 counter <= counter + 1;
 
                 if (rx_done)
                     if (data_received == data_to_tx) begin
                         led_r <= ON;
+                        led_b <= OFF;
                         counter <= 0;
                     end
                     else begin
                         led_r <= OFF;
+                        led_b <= ON;
                     end
                 
                 if (counter >= 96000000) begin
