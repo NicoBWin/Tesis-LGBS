@@ -52,8 +52,8 @@ always #1 clk = ~clk;
     phase_generator spwm_gen (
         .clk(clk),
         .reset(reset),
-        .sine_freq(26'd24000),          
-        .triangular_freq(26'd24000),   
+        .sine_freq(26'd100),          
+        .triangular_freq(26'd1000000),   
         .phase_a(phase_a),          // Connect phase_a output
         .phase_b(phase_b),          // Connect phase_b output
         .phase_c(phase_c)           // Connect phase_c output
@@ -84,7 +84,7 @@ initial begin
         #100
         start_tx <= 1;
 
-        #300000
+        #500
         
         $finish;
     end
