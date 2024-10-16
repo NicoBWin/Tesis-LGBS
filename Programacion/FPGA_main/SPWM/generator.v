@@ -14,7 +14,7 @@ module generator #(parameter SIGNAL_SAMPLE_BITS = 8)(
     parameter CLK_FREQ = 24000000;
     parameter FIXED_POINT_SCALE = 65536;
 
-    wire [47:0] scaled_sample_count = CLK_FREQ * FIXED_POINT_SCALE / (frecuency * 2048);
+    wire [47:0] scaled_sample_count = CLK_FREQ * FIXED_POINT_SCALE / (frecuency * 256);
     wire [31:0] next_sample_count = scaled_sample_count[47:16];     //Tomamos lo que vendria a ser la parte entera
 
     reg [SIGNAL_SAMPLE_BITS-1:0] signal_index;
