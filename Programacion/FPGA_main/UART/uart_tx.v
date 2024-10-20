@@ -5,6 +5,8 @@
     hasta que termine la transmision que se pone en 0.
 */
 
+`define "UART/baudgen.vh"
+
 module uart_tx(
     input wire clk,            // Clock signal
     input wire [7:0] data_to_tx,  // 8-bit data in
@@ -15,10 +17,8 @@ module uart_tx(
 
     // Config
     parameter CLK_FREQ = 24000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = 8000000;     // Desired baud rate
+    parameter BAUD_RATE = `BAUD8M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
-
-    localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 
     // States
     localparam INIT = 2'b00;
@@ -26,22 +26,26 @@ module uart_tx(
     localparam TX   = 2'b10;
 
     reg [3:0] bit_index;            // Index for the bits being sent
-    reg [31:0] clk_count;           // Clock counter
     reg [1:0] state = INIT;
 
     wire parity;                    // Current parity
+    wire baud_clk;
     wire [9:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
 
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
     assign to_transmit = {1'b1, parity, data_to_tx};   
 
-    always @(posedge clk)
+    clk_divider baudrate_gen #(BAUD_RATE)(
+        .clk_in(clk)
+        .clk_out(baud_clk)
+    );
+
+    always @(posedge baud_clk)
         begin
             case (state)
                 INIT: begin
                     tx <= 1;
                     tx_busy <= 0;
-                    clk_count <= 0;
                     bit_index <= 0;
                     state <= IDLE;
                 end
@@ -50,26 +54,18 @@ module uart_tx(
                     if (start_tx) begin
                         tx_busy <= 1;
                         bit_index <= 0;
-                        clk_count <= 0;
                         tx <= 0;
                         state <= TX;
                     end
                 end
 
                 TX: begin 
-                    if (clk_count >= CLKS_PER_BIT)
-                        begin
-                            if (bit_index >= 10) begin 
-                                state <= INIT;
-                            end
-                            else begin
-                                bit_index <= bit_index + 1;
-                                tx <= to_transmit[bit_index];
-                                clk_count <= 0;
-                            end
-                        end
+                    if (bit_index >= 10) begin 
+                        state <= INIT;
+                    end
                     else begin
-                        clk_count <= clk_count + 1;
+                        bit_index <= bit_index + 1;
+                        tx <= to_transmit[bit_index];
                     end
                 end
             endcase

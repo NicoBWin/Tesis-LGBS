@@ -4,8 +4,6 @@
     sincronizarlos.  
 */
 
-`include "UART/baudgen.vh"
-
 module top(
     input wire gpio_25,
 
@@ -77,7 +75,8 @@ module top(
         .clk(clk), 
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
-        .tx(tx)
+        .tx(tx), 
+        .tx_busy(tx_busy)
     );
 
     uart_rx receiver(
@@ -88,11 +87,8 @@ module top(
         .parity_error(parity_error)
     );
 
-    defparam transmitter.BAUD_RATE = `BAUD8M;
-    defparam receiver.BAUD_RATE = `BAUD8M;
-
-    defparam transmitter.PARITY = 0;
-    defparam receiver.PARITY = 0;
+    transmitter.PARITY = 0;
+    receiver.PARITY = 0;
 
 /*
 ******************
