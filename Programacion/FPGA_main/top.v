@@ -97,6 +97,14 @@ module top(
         .phase_c(phase_c)           // Connect phase_c output
     );
 
+    defparam transmitter.CLK_FREQ = 24000000;
+    defparam transmitter.BAUD_RATE = 8000000;
+    defparam transmitter.PARITY = 0;
+
+    defparam receiver.CLK_FREQ = 24000000;
+    defparam receiver.BAUD_RATE = 8000000;
+    defparam receiver.PARITY = 0;
+
 /*
 ******************
 *   Statements   *
