@@ -36,7 +36,7 @@ module uart_tx(
     assign to_transmit = {1'b1, parity, data_to_tx};   
 
     clk_divider baudrate_gen #(BAUD_RATE)(
-        .clk_in(clk)
+        .clk_in(clk),
         .clk_out(baud_clk)
     );
 

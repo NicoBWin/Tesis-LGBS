@@ -11,6 +11,8 @@
     necesitamos (4bits de data).
 */
 
+`define "UART/baudgen.vh"
+
 module uart_rx(
     input wire clk,            // Clock signal
     input wire rx,             // UART receive line
@@ -21,28 +23,31 @@ module uart_rx(
 
     // Config
     parameter CLK_FREQ = 24000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = 8000000;     // Desired baud rate
+    parameter BAUD_RATE = `BAUD8M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
-    localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
     
     // States
     localparam INIT = 2'b00;
     localparam IDLE = 2'b01;
     localparam RX   = 2'b10;
 
+    wire baud_clk;
     reg [9:0] rx_shift_reg;         // PARITY, DATA, START
-    reg [31:0] clk_count;           // Clock counter
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
 
     assign data_received = rx_shift_reg[8:1];
     assign parity_error = PARITY ? ~(^rx_shift_reg[9:1]) : (^rx_shift_reg[9:1]);
+    
+    clk_divider baudrate_gen #(BAUD_RATE)(
+        .clk_in(clk),
+        .clk_out(baud_clk)
+    );
 
-    always @(posedge clk) 
+    always @(posedge baud_clk) 
         begin
             case (state)
                 INIT: begin
-                    clk_count <= 0;
                     bit_index <= 0;
                     rx_done <= 0;
                     rx_shift_reg <= {10{1'b0}};
@@ -52,7 +57,6 @@ module uart_rx(
                 IDLE: begin
                     if (!rx) begin
                         rx_done <= 0;
-                        clk_count <= 0;
                         bit_index <= 1;
                         rx_shift_reg[0] <= 0;
                         state <= RX;
@@ -60,20 +64,13 @@ module uart_rx(
                 end
 
                 RX: begin 
-                    if (clk_count >= CLKS_PER_BIT)
-                        begin
-                            if (bit_index >= 10) begin
-                                state <= IDLE;
-                                rx_done <= 1;
-                            end
-                            else begin
-                                bit_index <= bit_index + 1;
-                                rx_shift_reg[bit_index] <= rx;
-                                clk_count <= 0;
-                            end
-                        end
+                    if (bit_index >= 10) begin
+                        state <= IDLE;
+                        rx_done <= 1;
+                    end
                     else begin
-                        clk_count <= clk_count + 1;
+                        bit_index <= bit_index + 1;
+                        rx_shift_reg[bit_index] <= rx;
                     end
                 end
             endcase
