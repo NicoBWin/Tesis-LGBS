@@ -5,73 +5,36 @@
     hasta que termine la transmision que se pone en 0.
 */
 
+`include "baudgen.vh"
+
 module uart_tx(
     input wire clk,            // Clock signal
     input wire [7:0] data_to_tx,  // 8-bit data in
     input wire start_tx,       // Start transmission
-    output reg tx,             // UART transmit line
-    output reg tx_busy         // Indicates transmission is in progress
+    output wire tx,             // UART transmit line
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = 8000000;     // Desired baud rate
+    parameter BAUD_RATE = `B8M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
 
-    localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
-
-    // States
-    localparam INIT = 2'b00;
-    localparam IDLE = 2'b01;
-    localparam TX   = 2'b10;
-
-    reg [3:0] bit_index;            // Index for the bits being sent
-    reg [31:0] clk_count;           // Clock counter
-    reg [1:0] state = INIT;
-
     wire parity;                    // Current parity
-    wire [9:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
+    wire clk_baud;
 
+    reg [10:0] to_transmit = {1'b1, parity, data_to_tx, 1'b0};
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
-    assign to_transmit = {1'b1, parity, data_to_tx};   
+    assign tx = (start_tx) ? to_transmit[0] : 1;
 
-    always @(posedge clk)
-        begin
-            case (state)
-                INIT: begin
-                    tx <= 1;
-                    tx_busy <= 0;
-                    clk_count <= 0;
-                    bit_index <= 0;
-                    state <= IDLE;
-                end
+    divider #(`B115200)
+        BAUD0 (
+            .clk_in(clk),
+            .clk_out(clk_baud)
+        );
 
-                IDLE: begin
-                    if (start_tx) begin
-                        tx_busy <= 1;
-                        bit_index <= 0;
-                        clk_count <= 0;
-                        tx <= 0;
-                        state <= TX;
-                    end
-                end
+    always @(posedge clk_baud)
+        if (start_tx)
+            to_transmit <= {to_transmit[0], to_transmit[10:1]};
+        else
+            to_transmit <= {1'b1, parity, data_to_tx, 1'b0};
 
-                TX: begin 
-                    if (clk_count >= CLKS_PER_BIT)
-                        begin
-                            if (bit_index >= 10) begin 
-                                state <= INIT;
-                            end
-                            else begin
-                                bit_index <= bit_index + 1;
-                                tx <= to_transmit[bit_index];
-                                clk_count <= 0;
-                            end
-                        end
-                    else begin
-                        clk_count <= clk_count + 1;
-                    end
-                end
-            endcase
-        end
 endmodule
