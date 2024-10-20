@@ -87,8 +87,8 @@ module top(
         .parity_error(parity_error)
     );
 
-    transmitter.PARITY = 0;
-    receiver.PARITY = 0;
+    defparam transmitter.PARITY = 0;
+    defparam receiver.PARITY = 0;
 
 /*
 ******************
