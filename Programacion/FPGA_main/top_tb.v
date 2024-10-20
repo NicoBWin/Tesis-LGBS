@@ -37,8 +37,7 @@ always #1 clk = ~clk;
         .clk(clk),  
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
-        .tx(tx), 
-        .tx_busy(tx_busy)
+        .tx(tx)
     );
 
     uart_rx receiver(
@@ -49,15 +48,6 @@ always #1 clk = ~clk;
         .parity_error(parity_error)
     );
 
-    phase_generator spwm_gen (
-        .clk(clk),
-        .reset(reset),
-        .sine_freq(26'd100),          
-        .triangular_freq(26'd1000000),   
-        .phase_a(phase_a),          // Connect phase_a output
-        .phase_b(phase_b),          // Connect phase_b output
-        .phase_c(phase_c)           // Connect phase_c output
-    );
 /*
 ********************************
 *   Initial simulation setup   *
@@ -66,7 +56,6 @@ always #1 clk = ~clk;
 initial begin
         $dumpfile("top_tb.vcd");
         $dumpvars(0, top_tb);   // module to dump
-        // Space for variable modification in simulation of module
 
         //Transmit
         reset <= 1; 

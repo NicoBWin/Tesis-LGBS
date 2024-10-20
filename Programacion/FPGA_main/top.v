@@ -4,6 +4,8 @@
     sincronizarlos.  
 */
 
+`include "UART/baudgen.vh"
+
 module top(
     input wire gpio_25,
 
@@ -75,8 +77,7 @@ module top(
         .clk(clk), 
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
-        .tx(tx), 
-        .tx_busy(tx_busy)
+        .tx(tx)
     );
 
     uart_rx receiver(
@@ -87,22 +88,10 @@ module top(
         .parity_error(parity_error)
     );
 
-    phase_generator spwm_gen (
-        .clk(clk),
-        .reset(reset),
-        .sine_freq(26'd24000),          // Set sine wave frequency to 10 kHz
-        .triangular_freq(26'd240000),   // Set triangular wave frequency to 100 kHz
-        .phase_a(phase_a),          // Connect phase_a output
-        .phase_b(phase_b),          // Connect phase_b output
-        .phase_c(phase_c)           // Connect phase_c output
-    );
+    defparam transmitter.BAUD_RATE = `BAUD8M;
+    defparam receiver.BAUD_RATE = `BAUD8M;
 
-    defparam transmitter.CLK_FREQ = 24000000;
-    defparam transmitter.BAUD_RATE = 8000000;
     defparam transmitter.PARITY = 0;
-
-    defparam receiver.CLK_FREQ = 24000000;
-    defparam receiver.BAUD_RATE = 8000000;
     defparam receiver.PARITY = 0;
 
 /*

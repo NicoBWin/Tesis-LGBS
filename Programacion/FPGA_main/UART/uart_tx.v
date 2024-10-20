@@ -5,31 +5,32 @@
     hasta que termine la transmision que se pone en 0.
 */
 
-`include "baudgen.vh"
+`include "UART/baudgen.vh"
 
 module uart_tx(
-    input wire clk,            // Clock signal
-    input wire [7:0] data_to_tx,  // 8-bit data in
-    input wire start_tx,       // Start transmission
-    output wire tx,             // UART transmit line
+    input wire clk,                 // Clock signal
+    input wire start_tx,            // Start transmission
+    input wire [7:0] data_to_tx,    // 8-bit data in
+    output wire tx,                 // UART transmit line
+    output wire tx_busy
 );
 
     // Config
-    parameter BAUD_RATE = `B8M;     // Desired baud rate
-    parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
+    parameter BAUD_RATE = `BAUD8M;      // Desired baud rate
+    parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
-    wire parity;                    // Current parity
+    wire parity;                        // Current parity
     wire clk_baud;
 
-    reg [10:0] to_transmit = {1'b1, parity, data_to_tx, 1'b0};
-    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
+    reg [10:0] to_transmit;
+    
+    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;     // XOR for even parity, inverted XOR for odd parity
     assign tx = (start_tx) ? to_transmit[0] : 1;
 
-    divider #(`B115200)
-        BAUD0 (
-            .clk_in(clk),
-            .clk_out(clk_baud)
-        );
+    clk_divider #(BAUD_RATE) BAUD0 (
+        .clk_in(clk),
+        .clk_out(clk_baud)
+    );
 
     always @(posedge clk_baud)
         if (start_tx)
