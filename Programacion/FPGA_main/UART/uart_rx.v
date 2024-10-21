@@ -15,6 +15,7 @@
 
 module uart_rx(
     input wire clk,            // Clock signal
+    input wire reset,
     input wire rx,             // UART receive line
     output wire [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
@@ -40,6 +41,7 @@ module uart_rx(
     
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
+        .reset(reset),
         .clk_out(baud_clk)
     );
 

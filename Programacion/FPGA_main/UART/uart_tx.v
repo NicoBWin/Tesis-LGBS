@@ -9,9 +9,10 @@
 
 module uart_tx(
     input wire clk,            // Clock signal
+    input wire reset,
     input wire [7:0] data_to_tx,  // 8-bit data in
     input wire start_tx,       // Start transmission
-    output reg tx,             // UART transmit line
+    output wire tx,             // UART transmit line
     output reg tx_busy         // Indicates transmission is in progress
 );
 
@@ -33,9 +34,11 @@ module uart_tx(
 
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
     assign to_transmit = {1'b1, parity, data_to_tx};   
+    assign tx = tx_busy ? to_transmit[0] : 1;
 
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
+        .reset(reset),
         .clk_out(baud_clk)
     );
 
@@ -43,7 +46,6 @@ module uart_tx(
         begin
             case (state)
                 INIT: begin
-                    tx <= 1;
                     tx_busy <= 0;
                     bit_index <= 0;
                     state <= IDLE;
@@ -53,7 +55,6 @@ module uart_tx(
                     if (start_tx) begin
                         tx_busy <= 1;
                         bit_index <= 0;
-                        tx <= 0;
                         state <= TX;
                     end
                 end

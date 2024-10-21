@@ -80,7 +80,8 @@ module top(
 */
     
     uart_tx transmitter(
-        .clk(clk), 
+        .clk(clk),
+        .reset(reset),
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
         .tx(tx), 
@@ -88,7 +89,8 @@ module top(
     );
 
     uart_rx receiver(
-        .clk(clk), 
+        .clk(clk),
+        .reset(reset),
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
