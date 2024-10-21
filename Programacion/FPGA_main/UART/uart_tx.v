@@ -5,7 +5,7 @@
     hasta que termine la transmision que se pone en 0.
 */
 
-`define "UART/baudgen.vh"
+`include "UART/baudgen.vh"
 
 module uart_tx(
     input wire clk,            // Clock signal
@@ -16,9 +16,9 @@ module uart_tx(
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;  // System clock frequency (e.g., 50 MHz)
-    parameter BAUD_RATE = `BAUD8M;     // Desired baud rate
-    parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
+    parameter CLK_FREQ = 24000000;      // System clock frequency (e.g., 50 MHz)
+    parameter BAUD_RATE = `BAUD8M;      // Desired baud rate
+    parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
     // States
     localparam INIT = 2'b00;
@@ -35,7 +35,7 @@ module uart_tx(
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
     assign to_transmit = {1'b1, parity, data_to_tx};   
 
-    clk_divider baudrate_gen #(BAUD_RATE)(
+    clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .clk_out(baud_clk)
     );

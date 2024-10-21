@@ -4,6 +4,8 @@
     sincronizarlos.  
 */
 
+`include "UART/baudgen.vh"
+
 module top(
     input wire gpio_25,
 

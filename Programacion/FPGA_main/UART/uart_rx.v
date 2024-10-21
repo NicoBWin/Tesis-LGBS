@@ -11,7 +11,7 @@
     necesitamos (4bits de data).
 */
 
-`define "UART/baudgen.vh"
+`include "UART/baudgen.vh"
 
 module uart_rx(
     input wire clk,            // Clock signal
@@ -39,7 +39,7 @@ module uart_rx(
     assign data_received = rx_shift_reg[8:1];
     assign parity_error = PARITY ? ~(^rx_shift_reg[9:1]) : (^rx_shift_reg[9:1]);
     
-    clk_divider baudrate_gen #(BAUD_RATE)(
+    clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .clk_out(baud_clk)
     );
