@@ -90,6 +90,9 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
+    defparam transmitter.BAUD_RATE = `BAUD8M;
+    defparam receiver.BAUD_RATE = `BAUD8M;
+
 /*
 ******************
 *   Statements   *
