@@ -73,7 +73,7 @@ initial begin
         #100
         start_tx <= 1;
 
-        #500
+        #5000
         
         $finish;
     end
