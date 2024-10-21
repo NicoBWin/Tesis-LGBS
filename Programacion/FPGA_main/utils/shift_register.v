@@ -1,11 +1,12 @@
-module shift_registers_piso (
+module shift_registers_piso #(parameter WIDTH = 32) 
+(
     input clk,                // Clock signal
     input enable,              // Clock enable signal
     input load,               // Parallel load enable
     input [WIDTH-1:0] PI,     // Parallel input data
     output SO                 // Serial output
 );
-    parameter WIDTH = 32;      // Shift register width
+    parameter FILL_VAL = 1'b1;      // Shift register width
 
     reg [WIDTH-1:0] shreg;     // Shift register storage
 
@@ -14,10 +15,10 @@ module shift_registers_piso (
             if (load) 
                 shreg = PI;    // Load parallel data into shift register
             else
-                shreg = {shreg[WIDTH-2:0], 1'b0};  // Shift right, serial out
+                shreg = {FILL_VAL, shreg[WIDTH-2:0]};  // Shift right, serial out
         end
     end
 
-    assign SO = shreg[WIDTH-1]; // Serial output (MSB of the shift register)
+    assign SO = shreg[0]; // Serial output (LSB of the shift register)
 
 endmodule
