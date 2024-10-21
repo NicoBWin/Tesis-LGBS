@@ -3,7 +3,7 @@
 
 module triangular_generator(
     input wire clk,                    // Clock signal
-    output wire [5:0] current_value    // Current signal value
+    output reg [5:0] current_value    // Current signal value
 );
 
     parameter INITIAL_VALUE = 0;
@@ -14,10 +14,10 @@ module triangular_generator(
     
     always @(posedge clk) begin
         if (curr_dir == `UP) begin
-            current_value = current_value + 1;
+            current_value <= current_value + 1;
         end
         else
-            current_value = current_value - 1;
+            current_value <= current_value - 1;
     end
 
 endmodule

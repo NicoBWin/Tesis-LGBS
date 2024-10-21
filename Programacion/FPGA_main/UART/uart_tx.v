@@ -16,7 +16,6 @@ module uart_tx(
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;      // System clock frequency (e.g., 50 MHz)
     parameter BAUD_RATE = `BAUD8M;      // Desired baud rate
     parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
