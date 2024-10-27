@@ -4,6 +4,7 @@ module ADC(
     input wire clk,            
     input wire reset,
     input wire read,
+    input wire recalibrate,
 
     // Control reg
     input wire sdo,
@@ -59,7 +60,7 @@ module ADC(
         begin
             if(reset) begin
                 state <= INIT;
-            end 
+            end
             else begin
                 case (state)
                     INIT: begin
@@ -81,6 +82,9 @@ module ADC(
                     IDLE: begin
                         if (read) begin
                             state <= RECEIVE;
+                        end
+                        else if (recalibrate) begin
+                            state <= CALIBRATE;
                         end
                     end
 
