@@ -4,6 +4,8 @@
     sincronizarlos.  
 */
 
+`include "UART/baudgen.vh"
+
 module top(
     input wire gpio_25,
 
@@ -14,7 +16,14 @@ module top(
     output wire gpio_26,
     output wire gpio_27,
     output wire gpio_32,
-    output wire gpio_34
+    output wire gpio_34,
+
+    //Error counter (5 bits)
+    output wire gpio_43,
+    output wire gpio_36,
+    output wire gpio_42,
+    output wire gpio_38,
+    output wire gpio_28
 );
 
 /*
@@ -34,14 +43,13 @@ module top(
     assign phase_a = gpio_27;
     assign phase_b = gpio_32;
     assign phase_c = gpio_34;
-
 /*
 *********************
 *   HFClock setup   *
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -72,7 +80,8 @@ module top(
 */
     
     uart_tx transmitter(
-        .clk(clk), 
+        .clk(clk),
+        .reset(reset),
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
         .tx(tx), 
@@ -80,7 +89,8 @@ module top(
     );
 
     uart_rx receiver(
-        .clk(clk), 
+        .clk(clk),
+        .reset(reset),
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
@@ -90,8 +100,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD8M;
-    defparam receiver.BAUD_RATE = `BAUD8M;
+    defparam transmitter.BAUD_RATE = `BAUD24M;
+    defparam receiver.BAUD_RATE = `BAUD24M;
 
 /*
 ******************
@@ -108,10 +118,17 @@ module top(
     reg led_b = OFF;
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
+    reg[5:0] error_counter = 0;
 
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
+
+    assign gpio_43 = error_counter[0];
+    assign gpio_36 = error_counter[1];
+    assign gpio_42 = error_counter[2];
+    assign gpio_38 = error_counter[3];
+    assign gpio_28 = error_counter[4];
 
     always @(posedge clk) begin
         case (state)
@@ -121,6 +138,7 @@ module top(
                 led_g   <= OFF;
                 led_b   <= OFF;
                 counter <= counter + 1;
+                error_counter <= 0;
                 if (counter >= 24000000) begin
                     reset <= 0;
                     state <= UART_SEND;
@@ -136,9 +154,9 @@ module top(
                     if (data_received == data_to_tx) begin
                         led_r <= ON;
                         led_b <= OFF;
-                        counter <= 0;
                     end
                     else begin
+                        error_counter <= error_counter + 1;
                         led_r <= OFF;
                         led_b <= ON;
                     end

@@ -1,4 +1,6 @@
-`timescale 1ns/1ns
+`timescale 10ns/10ns
+
+`include "UART/baudgen.vh"
 
 module top_tb;
 
@@ -34,19 +36,27 @@ always #1 clk = ~clk;
 *************************************
 */
     uart_tx transmitter(
-        .clk(clk),  
+        .clk(clk),
+        .reset(reset),  
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
         .tx(tx)
     );
 
     uart_rx receiver(
-        .clk(clk), 
+        .clk(clk),
+        .reset(reset), 
         .rx(tx),
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error)
     );
+
+    defparam transmitter.PARITY = 0;
+    defparam receiver.PARITY = 0;
+
+    defparam transmitter.BAUD_RATE = `BAUD24M;
+    defparam receiver.BAUD_RATE = `BAUD24M;
 
 /*
 ********************************
@@ -73,7 +83,7 @@ initial begin
         #100
         start_tx <= 1;
 
-        #500
+        #5000
         
         $finish;
     end

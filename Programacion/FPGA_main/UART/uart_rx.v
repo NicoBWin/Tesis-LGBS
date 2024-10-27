@@ -11,10 +11,11 @@
     necesitamos (4bits de data).
 */
 
-`define "UART/baudgen.vh"
+`include "UART/baudgen.vh"
 
 module uart_rx(
     input wire clk,            // Clock signal
+    input wire reset,
     input wire rx,             // UART receive line
     output wire [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
@@ -22,7 +23,6 @@ module uart_rx(
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;  // System clock frequency (e.g., 50 MHz)
     parameter BAUD_RATE = `BAUD8M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
@@ -39,8 +39,9 @@ module uart_rx(
     assign data_received = rx_shift_reg[8:1];
     assign parity_error = PARITY ? ~(^rx_shift_reg[9:1]) : (^rx_shift_reg[9:1]);
     
-    clk_divider baudrate_gen #(BAUD_RATE)(
+    clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
+        .reset(reset),
         .clk_out(baud_clk)
     );
 
