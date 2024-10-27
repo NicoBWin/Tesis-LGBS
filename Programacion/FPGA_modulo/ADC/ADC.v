@@ -80,11 +80,11 @@ module ADC(
                     end
 
                     IDLE: begin
-                        if (read) begin
-                            state <= RECEIVE;
-                        end
-                        else if (recalibrate) begin
+                        if (recalibrate) begin
                             state <= CALIBRATE;
+                        end
+                        else if (read) begin
+                            state <= RECEIVE;
                         end
                     end
 
