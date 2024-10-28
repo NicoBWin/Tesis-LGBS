@@ -25,29 +25,20 @@ module uart_tx(
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
 
+    reg [10:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
-    reg load;
 
     wire parity;                    // Current parity
     wire baud_clk;
-    wire [10:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
-
+    
+    assign tx = to_transmit[0];
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
-    assign to_transmit = {1'b1, parity, data_to_tx, 1'b0};   
 
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .reset(reset),
         .clk_out(baud_clk)
-    );
-
-    shift_registers_piso #(.WIDTH=11) shifter(
-        .clk(baud_clk),
-        .enable(tx_busy),
-        .load(load);
-        .PI(to_transmit),
-        .SO(tx)
     );
 
     always @(posedge baud_clk)
@@ -56,7 +47,7 @@ module uart_tx(
                 INIT: begin
                     tx_busy <= 0;
                     bit_index <= 0;
-                    load <= 0;
+                    to_transmit <= 11'b11111111111;
                     state <= IDLE;
                 end
 
@@ -64,14 +55,12 @@ module uart_tx(
                     if (start_tx) begin
                         tx_busy <= 1;
                         bit_index <= 0;
-                        load <= 1;
                         state <= TX;
                     end
                 end
 
                 TX: begin
-                    load <= 0;
-
+                    to_transmit <= {1'b1, to_transmit[10:1]};
                     if (bit_index >= 10) begin 
                         state <= INIT;
                     end
