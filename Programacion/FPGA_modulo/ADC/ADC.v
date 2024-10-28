@@ -72,14 +72,16 @@ module ADC(
                     end
 
                     CALIBRATE: begin
-                        calibrate_reset <= 0;
                         cs <= 0;
+                        calibrate_reset <= 0;
                         if (c_counter >= CALIBRATE_COUNT-1) begin
                             state <= IDLE;  //Calibration done
                         end
                     end
 
                     IDLE: begin
+                        receive_reset <= 1;
+                        calibrate_reset <= 1;
                         if (recalibrate) begin
                             state <= CALIBRATE;
                         end
