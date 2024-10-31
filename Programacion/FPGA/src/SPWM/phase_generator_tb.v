@@ -15,7 +15,7 @@ always #1 clk = ~clk;
 *   Variable declarations   *
 *****************************
 */  
-    localparam precision = 9;
+    localparam precision = 4'd9;
 
     reg reset;
 
@@ -31,10 +31,10 @@ always #1 clk = ~clk;
 *   External Modules declarations   *
 *************************************
 */
-    phase_generator #(parameter BITS_PRECISION = precision) gen(
-        .clk(clk)
-        .reset(reset)
-        .phase_a_sin(sin_a),
+    phase_generator #(precision) gen(
+        .clk(clk),
+        .reset(reset),
+        .phase_a_sine(sin_a),
         .phase_b_sine(sin_b),
         .phase_c_sine(sin_c),
         .phase_a_pwm(out_a),

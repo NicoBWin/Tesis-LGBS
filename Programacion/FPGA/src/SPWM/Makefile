@@ -28,9 +28,9 @@ endif
 
 LIB_SRC = ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v
 SOURCES = top.v $(LIB_SRC)
-TBNAME = adc_tb
+TBNAME = phase_generator_tb
 MODULE_TO_DRAW = top.v
-SOURCES_TB = adc_tb.v $(LIB_SRC)
+SOURCES_TB = phase_generator_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 
