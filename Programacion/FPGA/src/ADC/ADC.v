@@ -1,4 +1,4 @@
-`define "ADC/ADC.vh"
+`include "ADC.vh"
 
 module ADC(
     input wire clk,            
@@ -8,7 +8,7 @@ module ADC(
 
     // Control reg
     input wire sdo,
-    output wire cs,
+    output reg cs,
     output wire sclk,
 
     output reg [11:0] value
@@ -29,27 +29,28 @@ module ADC(
     // Local variables
     reg [1:0] state = INIT;
     reg [11:0] signal_val = 0; 
-    reg inner_clk;
     reg calibrate_reset;
     reg receive_reset;
 
+    wire inner_clk;
     wire[$clog2(RECEIVE_COUNT)-1:0] r_counter;
     wire[$clog2(CALIBRATE_COUNT)-1:0] c_counter;
 
     // Modules
-    clk_divider inner_freq #(BAUD_DIV=COMM_RATE)(
+    clk_divider #(COMM_RATE) inner_freq(
         .clk_in(clk),
+        .reset(reset),
         .clk_out(inner_clk)
     );
 
-    up_counter receive_counter #(MAX_COUNT=RECEIVE_COUNT)(
-        .clk(inner_clk),
+    up_counter #(RECEIVE_COUNT) receive_counter (
+        .clk_in(inner_clk),
         .reset(receive_reset),
         .counter(r_counter)
     );
 
-    up_counter calibrate_counter #(MAX_COUNT=CALIBRATE_COUNT)(
-        .clk(inner_clk),
+    up_counter #(CALIBRATE_COUNT) calibrate_counter(
+        .clk_in(inner_clk),
         .reset(calibrate_reset),
         .counter(c_counter)
     );

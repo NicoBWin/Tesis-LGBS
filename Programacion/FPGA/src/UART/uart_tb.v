@@ -1,6 +1,6 @@
 `timescale 10ns/10ns
 
-`include "UART/baudgen.vh"
+`include "baudgen.vh"
 
 module top_tb;
 
