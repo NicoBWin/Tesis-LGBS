@@ -11,7 +11,7 @@ module ADC(
     output reg cs,
     output wire sclk,
 
-    output reg [11:0] value
+    output wire [11:0] value
 );
 
     // Config
@@ -56,6 +56,7 @@ module ADC(
     );
 
     assign sclk = inner_clk;
+    assign value = signal_val;
 
     always @(negedge inner_clk)
         begin
@@ -98,7 +99,6 @@ module ADC(
                             signal_val <= {signal_val[10:0], sdo};
                             if (r_counter >= RECEIVE_COUNT-1) begin
                                 state <= IDLE;
-                                value <= signal_val;
                             end
                         end
                     end
