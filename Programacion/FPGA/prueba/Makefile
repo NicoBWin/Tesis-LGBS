@@ -27,9 +27,9 @@ ifeq ($(uname_S), Darwin)
 endif
 
 LIB_SRC = ../src/ADC/ADC.v ../src/SPWM/phase_generator.v ../src/SPWM/triangular_gen.v ../src/UART/uart_rx.v ../src/UART/uart_tx.v ../src/utils/counter.v ../src/utils/shift_register.v ../src/utils/up_counter.v
-SOURCES = top.v $(LIB_SRC)
+SOURCES = top_slave.v $(LIB_SRC)
 TBNAME = top_tb
-MODULE_TO_DRAW = top.v
+MODULE_TO_DRAW = top_slave.v
 SOURCES_TB = top_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
