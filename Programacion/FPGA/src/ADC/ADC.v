@@ -66,7 +66,6 @@ module ADC(
             else begin
                 case (state)
                     INIT: begin
-                        value <= 12'b0;
                         cs <= 1;
                         calibrate_reset <= 1; //Mantenemos el contador de calibracion en 0
                         receive_reset <= 1;

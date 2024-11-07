@@ -1,5 +1,5 @@
 
-`include "UART/baudgen.vh"
+`include "../src/UART/baudgen.vh"
 
 /*
     Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
@@ -7,26 +7,26 @@
     refleja en 12 pines del main.
 */
 
-module top_slave(
+module top(
     input wire gpio_23,
     input wire gpio_25,
 
-    input wire gpio_34;
-    input wire gpio_43;
-    input wire gpio_36;
-    input wire gpio_42;
-    input wire gpio_38;
-    input wire gpio_28;
+    input wire gpio_34,
+    input wire gpio_43,
+    input wire gpio_36,
+    input wire gpio_42,
+    input wire gpio_38,
+    input wire gpio_28,
 
-    output wire gpio_10;
+    output wire gpio_10,
 
-    output wire gpio_12;
-    output wire gpio_21;
-    output wire gpio_13;
+    output wire gpio_12,
+    output wire gpio_21,
+    output wire gpio_13,
 
-    output wire gpio_47;
-    output wire gpio_46;
-    output wire gpio_2;
+    output wire gpio_47,
+    output wire gpio_46,
+    output wire gpio_2
 );
 
 /*
@@ -109,8 +109,8 @@ module top_slave(
     // ADC
     reg read_adc = 0;
     reg recalibrate = 0;
-    reg [11:0] adc_value_1;
-    reg [11:0] adc_value_2;
+    wire [11:0] adc_value_1;
+    wire [11:0] adc_value_2;
 
     
 /*

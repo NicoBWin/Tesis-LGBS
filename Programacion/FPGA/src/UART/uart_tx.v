@@ -5,7 +5,7 @@
     hasta que termine la transmision que se pone en 0.
 */
 
-`include "UART/baudgen.vh"
+`include "baudgen.vh"
 
 module uart_tx(
     input wire clk,            // Clock signal

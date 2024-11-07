@@ -9,7 +9,7 @@ else
 endif
 
 ifeq ($(uname_S), Windows)	
-    APIOPKGFOLDER = $${USERPROFILE}\.apio
+    APIOPKGFOLDER = C:\Users\Damian\.apio
 	OSSCAD_LIB_IVL = "$(APIOPKGFOLDER)\packages\tools-oss-cad-suite\lib\ivl"
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)\packages\tools-oss-cad-suite\share\yosys\ice40\cells_sim.v"
 endif
@@ -26,15 +26,16 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ../src/ADC/ADC.v ../src/SPWM/phase_generator.v ../src/SPWM/triangular_gen.v ../src/UART/uart_rx.v ../src/UART/uart_tx.v ../src/utils/counter.v ../src/utils/shift_register.v ../src/utils/up_counter.v
-SOURCES = top_slave.v $(LIB_SRC)
+LIB_SRC = ../src/ADC/ADC.v ../src/UART/uart_rx.v ../src/UART/uart_tx.v  ../src/utils/up_counter.v ../src/utils/clk_divider.v
+CONST_SRC = -I ../src/ADC -I ../src/UART -I ../src/utils
+SOURCES = top.v $(LIB_SRC)
 TBNAME = top_tb
-MODULE_TO_DRAW = top_slave.v
+MODULE_TO_DRAW = top.v
 SOURCES_TB = top_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 
-IVERILOG = apio raw 'iverilog
+IVERILOG = apio raw 'iverilog $(CONST_SRC)
 YOSYS = apio raw 'yosys
 ICE40 = apio raw 'nextpnr-ice40
 ICEPROG = apio raw 'iceprog

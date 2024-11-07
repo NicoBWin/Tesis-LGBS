@@ -9,7 +9,7 @@ else
 endif
 
 ifeq ($(uname_S), Windows)	
-    APIOPKGFOLDER = $${USERPROFILE}\.apio
+    APIOPKGFOLDER = $(USERPROFILE)\.apio
 	OSSCAD_LIB_IVL = "$(APIOPKGFOLDER)\packages\tools-oss-cad-suite\lib\ivl"
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)\packages\tools-oss-cad-suite\share\yosys\ice40\cells_sim.v"
 endif
@@ -26,11 +26,11 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ADC.v ../utils/clk_divider.v ../utils/up_counter.v
-SOURCES = top.v $(LIB_SRC)
+LIB_SRC = ./ADC.v ../utils/clk_divider.v ../utils/up_counter.v
+SOURCES = ./top.v $(LIB_SRC)
 TBNAME = adc_tb
 MODULE_TO_DRAW = top.v
-SOURCES_TB = adc_tb.v $(LIB_SRC)
+SOURCES_TB = ./adc_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 
