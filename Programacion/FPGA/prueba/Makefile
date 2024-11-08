@@ -15,7 +15,8 @@ ifeq ($(uname_S), Windows)
 endif
 
 ifeq ($(uname_S), Linux)
-    APIOPKGFOLDER = $${HOME}/.apio	# Direccion a la carpeta .apio (usualmente en la carpeta del usuario)
+	# Direccion a la carpeta .apio (usualmente en la carpeta del usuario)
+    APIOPKGFOLDER = $${HOME}/.apio
 	OSSCAD_LIB_IVL = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/lib/ivl"
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
@@ -26,7 +27,7 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ../src/ADC/ADC.v ../src/UART/uart_rx.v ../src/UART/uart_tx.v  ../src/utils/up_counter.v ../src/utils/clk_divider.v
+LIB_SRC = ../src/ADC/ADC.v ../src/UART/uart_rx.v ../src/UART/uart_tx.v ../src/utils/up_counter.v ../src/utils/clk_divider.v
 CONST_SRC = -I ../src/ADC -I ../src/UART -I ../src/utils
 SOURCES = top.v $(LIB_SRC)
 TBNAME = top_tb
