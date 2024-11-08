@@ -11,12 +11,12 @@ module ADC(
     output reg cs,
     output wire sclk,
 
-    output wire [11:0] value
+    output wire [11:0] value,
 );
 
     // Config
     parameter CLK_FREQ = 24000000;
-    parameter COMM_RATE = `SAMPLE1M2;
+    parameter COMM_RATE = `SAMPLE240K_CLK24M;
     localparam RECEIVE_COUNT = 14;
     localparam CALIBRATE_COUNT = 32;
 

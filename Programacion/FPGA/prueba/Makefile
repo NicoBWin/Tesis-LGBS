@@ -70,7 +70,7 @@ time: hardware.asc
 prog: hardware.bin
 	$(ICEPROG) -d i:0x0403:0x6014 hardware.bin'
 
-sim: $(SOURCES)
+sim: $(SOURCES_TB) $(SOURCES_LIB)
 	$(IVERILOG) -B $(OSSCAD_LIB_IVL) -o $(TBNAME).out -D VCD_OUTPUT=$(TBNAME) -D NO_ICE40_DEFAULT_ASSIGNMENTS $(OSSCAD_ICE40_PREDEFMODULES) $(SOURCES_TB)'
 	$(VVP) $(TBNAME).out'
 
