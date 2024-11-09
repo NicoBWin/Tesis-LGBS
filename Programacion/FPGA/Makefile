@@ -29,7 +29,7 @@ endif
 
 LIB_SRC = ./ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v
 CONST_SRC = -I ./src/
-SOURCES = ./top.v $(LIB_SRC)
+SOURCES = ./tops/top.v $(LIB_SRC)
 TBNAME = adc_tb
 MODULE_TO_DRAW = top.v
 SOURCES_TB = ./adc_tb.v $(LIB_SRC)
