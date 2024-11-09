@@ -27,7 +27,7 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ./ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v
+LIB_SRC = ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v
 CONST_SRC = -I ./src/
 SOURCES = ./tops/top.v $(LIB_SRC)
 TBNAME = adc_tb
