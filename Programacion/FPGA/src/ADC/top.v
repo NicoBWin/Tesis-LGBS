@@ -4,12 +4,15 @@
 module top(
     output wire gpio_28,
     output wire gpio_12,
-    output wire gpio_21,
+    input wire gpio_21,
     output wire gpio_13,
 
     output wire led_red,
     output wire led_green,
-    output wire led_blue
+    output wire led_blue,
+
+    output wire gpio_34,
+    output wire gpio_36
 );
 
 /*
@@ -68,6 +71,7 @@ module top(
     // ADC
     reg read_adc = 0;
     reg recalibrate = 0;
+    wire read_done;
     wire [11:0] adc_value_1;
 
     
@@ -94,7 +98,10 @@ module top(
         .sdo(sdo_1),
         .cs(cs_1),
         .sclk(sclk_1),
-        .value(adc_value_1)
+        .value(adc_value_1),
+        .read_done(read_done),
+        .state_0(gpio_34),
+        .state_1(gpio_36)
     );
 
     defparam transmitter.PARITY = 0;
@@ -119,21 +126,21 @@ module top(
             INIT: begin
                 reset   <= 1;
                 counter <= counter + 1;
+                led_g <= ON;
 
                 // 1 sec
-                if (counter >= 48000000) begin
+                if (counter >= 24000000) begin
                     reset <= 0;
                     counter <= 0;
                     read_adc <= 1;
+                    led_g <= OFF;
                     state <= WAIT_ADC;
-                    led_g <= ON;
                 end
             end
 
             WAIT_ADC: begin
-                if (cs_1 == 1) begin
+                if (read_done) begin
                     state <= SEND_BACK;
-                    led_g <= OFF;
                     led_b <= ON;
                 end
             end
@@ -142,18 +149,25 @@ module top(
                 
                 if (!tx_busy) begin
                     if (curr_pack == 0) begin
-                        data_to_tx <= {5'b0, adc_value_1[11:8]};
+                        data_to_tx <= {4'b0, adc_value_1[11:8]};
                         curr_pack <= 1;
                     end
                     else begin
                         data_to_tx <= adc_value_1[7:0];
                         curr_pack <= 0;
                     end
-
                     start_tx <= 1;
                 end
                 else begin
                     start_tx <= 0;
+                end
+
+                // 1 sec
+                counter <= counter + 1;
+                if (counter >= 24000000) begin
+                    state <= INIT;
+                    led_b <= OFF;
+                    counter <= 0;
                 end
             end
 

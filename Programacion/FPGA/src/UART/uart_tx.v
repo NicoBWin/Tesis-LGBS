@@ -25,7 +25,7 @@ module uart_tx(
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
 
-    reg [10:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
+    reg [11:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
 
@@ -55,6 +55,7 @@ module uart_tx(
                     if (start_tx) begin
                         tx_busy <= 1;
                         bit_index <= 0;
+                        to_transmit <= {1'b1, parity, data_to_tx, 1'b0};
                         state <= TX;
                     end
                 end
