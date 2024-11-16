@@ -1,4 +1,4 @@
-`include "ADC.vh"
+`include "./src/ADC/ADC.vh"
 
 module ADC(
     input wire clk,            

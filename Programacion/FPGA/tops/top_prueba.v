@@ -1,5 +1,5 @@
 
-`include "../src/UART/baudgen.vh"
+`include "./src/UART/baudgen.vh"
 
 /*
     Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
@@ -144,7 +144,6 @@ module top(
     parameter CHECK = 3'b100;
     parameter SEND_BACK = 3'b101;
     parameter WAITING = 3'b110;
-    parameter  = 3'b110;
 
     localparam READ_ADC = 8'b10011011;
     localparam ACK = 8'b00110011;

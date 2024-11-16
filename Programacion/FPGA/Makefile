@@ -27,12 +27,12 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v
-CONST_SRC = -I ./src/
-SOURCES = ./tops/top.v $(LIB_SRC)
-TBNAME = adc_tb
-MODULE_TO_DRAW = top.v
-SOURCES_TB = ./adc_tb.v $(LIB_SRC)
+LIB_SRC = ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
+CONST_SRC = -I ./src/ADC/ADC.vh
+SOURCES = ./tops/top_prueba.v $(LIB_SRC)
+TBNAME = top_tb
+MODULE_TO_DRAW = top_prueba.v
+SOURCES_TB = ./top_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 

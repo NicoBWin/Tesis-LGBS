@@ -4,7 +4,7 @@
     sincronizarlos.  
 */
 
-`include "UART/baudgen.vh"
+`include "./src/UART/baudgen.vh"
 
 module top(
     input wire gpio_25,
@@ -100,8 +100,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD24M;
-    defparam receiver.BAUD_RATE = `BAUD24M;
+    defparam transmitter.BAUD_RATE = `BAUD8M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD8M_CLK24M;
 
 /*
 ******************
