@@ -28,15 +28,14 @@ ifeq ($(uname_S), Darwin)
 endif
 
 LIB_SRC = ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
-CONST_SRC = -I ./src/ADC/ADC.vh
-SOURCES = ./tops/top_prueba.v $(LIB_SRC)
+SOURCES = ./tops/top_UART.v $(LIB_SRC)
 TBNAME = top_tb
-MODULE_TO_DRAW = top_prueba.v
+MODULE_TO_DRAW = top_UART.v
 SOURCES_TB = ./top_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 
-IVERILOG = apio raw 'iverilog $(CONST_SRC)
+IVERILOG = apio raw 'iverilog
 YOSYS = apio raw 'yosys
 ICE40 = apio raw 'nextpnr-ice40
 ICEPROG = apio raw 'iceprog

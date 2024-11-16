@@ -49,7 +49,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -118,7 +118,7 @@ module top(
     reg led_b = OFF;
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
-    reg[5:0] error_counter = 0;
+    reg[4:0] error_counter = 0;
 
     assign led_red = led_r;
     assign led_green = led_g;
@@ -152,13 +152,13 @@ module top(
 
                 if (rx_done)
                     if (data_received == data_to_tx) begin
-                        led_r <= ON;
-                        led_b <= OFF;
+                        led_r <= OFF;
+                        led_b <= ON;
                     end
                     else begin
                         error_counter <= error_counter + 1;
-                        led_r <= OFF;
-                        led_b <= ON;
+                        led_r <= ON;
+                        led_b <= OFF;
                     end
                 
                 if (counter >= 96000000) begin
@@ -168,7 +168,8 @@ module top(
             end
 
             WAIT: begin
-                led_b   <= OFF;
+                led_r <= OFF;
+                led_b <= OFF;
                 start_tx <= 0;
                 counter <= counter + 1;
                 if (counter >= 48000000) begin
