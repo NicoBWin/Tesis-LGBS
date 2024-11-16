@@ -29,9 +29,9 @@ endif
 
 LIB_SRC = ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
 SOURCES = ./tops/top_UART.v $(LIB_SRC)
-TBNAME = top_tb
+TBNAME = uart_tb
 MODULE_TO_DRAW = top_UART.v
-SOURCES_TB = ./top_tb.v $(LIB_SRC)
+SOURCES_TB = ./tops/uart_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 

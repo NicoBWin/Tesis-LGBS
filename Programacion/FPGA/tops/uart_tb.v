@@ -1,6 +1,6 @@
 `timescale 10ns/10ns
 
-`include "baudgen.vh"
+`include "./src/UART/baudgen.vh"
 
 module top_tb;
 
@@ -68,7 +68,7 @@ initial begin
         #10
         reset <= 0;
         #10
-        data_to_tx <= 8'b10110011; //B2
+        data_to_tx <= 8'b10110011; //B3
         start_tx <= 1;
         #500
         start_tx <= 0;
