@@ -1,8 +1,8 @@
 
-`include "../UART/baudgen.vh"
+`include "../src/UART/baudgen.vh"
 
 module top(
-    output wire gpio_28,
+    output wire gpio_10,
     output wire gpio_12,
     input wire gpio_21,
     output wire gpio_13,
@@ -26,7 +26,7 @@ module top(
     wire sdo_1;
     wire sclk_1;
 
-    assign tx = gpio_28;
+    assign tx = gpio_10;
     assign cs_1 = gpio_12;
     assign sdo_1 = gpio_21;
     assign sclk_1 = gpio_13;

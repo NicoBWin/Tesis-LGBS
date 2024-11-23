@@ -9,11 +9,15 @@
 
 module top(
     input wire gpio_23,
-    input wire gpio_25,
+    output wire gpio_25,
 
     input wire gpio_42,
     input wire gpio_38,
     input wire gpio_28,
+
+    output wire led_red,
+    output wire led_green,
+    output wire led_blue,
 
     output wire gpio_10,
 
@@ -39,9 +43,9 @@ module top(
     wire sdo_1;
     wire sclk_1;
 
-    assign tx = gpio_42;
-    assign rx = gpio_38;
-    assign shoot = gpio_28;
+    assign tx = gpio_10;
+    assign rx = gpio_23;
+    assign shoot = gpio_25;
 
     assign cs_1 = gpio_12;
     assign sdo_1 = gpio_21;
@@ -53,7 +57,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -128,8 +132,8 @@ module top(
 
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
-    //defparam transmitter.BAUD_RATE = `BAUD24M;
-    //defparam receiver.BAUD_RATE = `BAUD24M;
+    defparam transmitter.BAUD_RATE = `BAUD8M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD8M_CLK24M;
 
 /*
 ******************
@@ -157,7 +161,7 @@ module top(
                 counter <= counter + 1;
 
                 // 1 sec
-                if (counter >= 48000000) begin
+                if (counter >= 24000000) begin
                     reset <= 0;
                     counter <= 0;
                     state <= IDLE;

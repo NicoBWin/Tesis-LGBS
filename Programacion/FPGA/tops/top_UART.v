@@ -7,23 +7,21 @@
 `include "./src/UART/baudgen.vh"
 
 module top(
+    input wire gpio_23,
     input wire gpio_25,
+    output wire gpio_10,
 
-    output wire led_green,
+    output wire gpio_12,
+    output wire gpio_21,
+    output wire gpio_13,
+
     output wire led_red,
+    output wire led_green,
     output wire led_blue,
-    output wire gpio_23,
-    output wire gpio_26,
-    output wire gpio_27,
-    output wire gpio_32,
-    output wire gpio_34,
 
-    //Error counter (5 bits)
-    output wire gpio_43,
-    output wire gpio_36,
-    output wire gpio_42,
-    output wire gpio_38,
-    output wire gpio_28
+    output wire gpio_47,
+    output wire gpio_46,
+    output wire gpio_2
 );
 
 /*
@@ -34,22 +32,25 @@ module top(
 
     wire tx;
     wire rx;
-    wire phase_a;
-    wire phase_b;
-    wire phase_c;
-    
-    assign tx = gpio_23;
-    assign rx = gpio_25;
-    assign phase_a = gpio_27;
-    assign phase_b = gpio_32;
-    assign phase_c = gpio_34;
+    wire shoot;
+    wire cs_1;
+    wire sdo_1;
+    wire sclk_1;
+
+    assign tx = gpio_10;
+    assign rx = gpio_23;
+    assign shoot = gpio_25;
+
+    assign cs_1 = gpio_12;
+    assign sdo_1 = gpio_21;
+    assign sclk_1 = gpio_13;
 /*
 *********************
 *   HFClock setup   *
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 24 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -61,16 +62,16 @@ module top(
     localparam turn_on = 8'b11101110;
     localparam turn_off = 8'b01010101;
     localparam toggle = 8'b11000011;
+    localparam ack = 8'b00110011;
     localparam OFF = 1;
     localparam ON = 0;
 
     wire [7:0] data_received;
     wire tx_busy;
     wire rx_done;
-    wire parity_error;
 
     reg start_tx;
-    reg [7:0] data_to_tx = turn_on;
+    reg [7:0] data_to_tx = ack;
     reg reset = 0;
     
 /*
@@ -118,17 +119,10 @@ module top(
     reg led_b = OFF;
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
-    reg[4:0] error_counter = 0;
 
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
-
-    assign gpio_43 = error_counter[0];
-    assign gpio_36 = error_counter[1];
-    assign gpio_42 = error_counter[2];
-    assign gpio_38 = error_counter[3];
-    assign gpio_28 = error_counter[4];
 
     always @(posedge clk) begin
         case (state)
@@ -138,7 +132,8 @@ module top(
                 led_g   <= OFF;
                 led_b   <= OFF;
                 counter <= counter + 1;
-                error_counter <= 0;
+                shoot <= 0;
+
                 if (counter >= 24000000) begin
                     reset <= 0;
                     state <= UART_SEND;
@@ -149,31 +144,29 @@ module top(
             UART_SEND: begin
                 start_tx <= 1;
                 counter <= counter + 1;
+                led_r <= ON;
 
-                if (rx_done)
+                if (rx_done) begin
                     if (data_received == data_to_tx) begin
                         led_r <= OFF;
                         led_b <= ON;
                     end
                     else begin
-                        error_counter <= error_counter + 1;
-                        led_r <= ON;
                         led_b <= OFF;
                     end
-                
-                if (counter >= 96000000) begin
-                    state <= WAIT;
+                end
+
+                if (counter >= 48000000) begin
+                    state <= INIT;
                     counter <= 0;
                 end
             end
 
             WAIT: begin
-                led_r <= OFF;
-                led_b <= OFF;
                 start_tx <= 0;
                 counter <= counter + 1;
-                if (counter >= 48000000) begin
-                    state <= UART_SEND;
+                if (counter >= 10) begin
+                    state <= INIT;
                     counter <= 0;
                 end
             end

@@ -18,6 +18,10 @@ module top(
     input wire gpio_38,
     input wire gpio_28,
 
+    output wire led_red,
+    output wire led_green,
+    output wire led_blue,
+
     output wire gpio_10,
 
     output wire gpio_12,
