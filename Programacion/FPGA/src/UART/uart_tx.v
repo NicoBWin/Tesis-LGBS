@@ -17,15 +17,16 @@ module uart_tx(
 );
 
     // Config
-    parameter BAUD_RATE = `BAUD8M_CLK24M;      // Desired baud rate
+    parameter BAUD_RATE = `BAUD6M_CLK24M;      // Desired baud rate
     parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
     // States
     localparam INIT = 2'b00;
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
+    localparam WARM_TX = 2'b11;
 
-    reg [9:0] to_transmit;         // STOP(1), PARITY(1), DATA(8)
+    reg [11:0] to_transmit;         // STOP(2), PARITY(1), DATA(8), START(0)
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
 
@@ -43,32 +44,42 @@ module uart_tx(
 
     always @(posedge baud_clk)
         begin
-            case (state)
-                INIT: begin
-                    tx_busy <= 0;
-                    bit_index <= 0;
-                    to_transmit <= 10'b1111111111;
-                    state <= IDLE;
-                end
+            if(reset) begin
+                state <= INIT;
+            end
+            else
+                case (state)
+                    INIT: begin
+                        tx_busy <= 0;
+                        bit_index <= 0;
+                        to_transmit <= 12'b111111111111;
+                        state <= IDLE;
+                    end
 
-                IDLE: begin
-                    if (start_tx) begin
-                        tx_busy <= 1;
-                        bit_index <= 1;
-                        to_transmit <= {parity, data_to_tx, 1'b0};
+                    IDLE: begin
+                        if (start_tx) begin
+                            tx_busy <= 1;
+                            to_transmit <= {2'b11, parity, data_to_tx, 1'b0};
+                            state <= WARM_TX;
+                        end
+                    end
+
+                    WARM_TX: begin
                         state <= TX;
+                        bit_index <= 1;
+                        to_transmit <= {1'b1, to_transmit[10:1]};
                     end
-                end
 
-                TX: begin
-                    to_transmit <= {1'b1, to_transmit[10:1]};
-                    if (bit_index >= 9) begin 
-                        state <= INIT;
+                    TX: begin
+                        to_transmit <= {1'b1, to_transmit[10:1]};
+                        if (bit_index >= 11) begin 
+                            state <= IDLE;
+                            tx_busy <= 0;
+                        end
+                        else begin
+                            bit_index <= bit_index + 1;
+                        end
                     end
-                    else begin
-                        bit_index <= bit_index + 1;
-                    end
-                end
-            endcase
+                endcase
         end
 endmodule

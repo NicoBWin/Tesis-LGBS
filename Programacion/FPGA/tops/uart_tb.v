@@ -1,4 +1,4 @@
-`timescale 10ns/10ns
+`timescale 1ns/1ns
 
 `include "./src/UART/baudgen.vh"
 
@@ -51,8 +51,8 @@ always #1 clk = ~clk;
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD8M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD8M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
 
 /*
 ********************************
@@ -70,16 +70,22 @@ initial begin
         #10
         data_to_tx <= 8'b10110011; //B3
         start_tx <= 1;
-        #500
-        start_tx <= 0;
-
-        #1500
+        #10
 
         data_to_tx <= 8'b00010010; //12
-        #100
-        start_tx <= 1;
+        #500
 
-        #5000
+        data_to_tx <= 8'b00110011; //33
+        #500
+
+        data_to_tx <= 8'b10011111; //9F
+        #500
+
+        data_to_tx <= 8'b11111111; //FF
+        #500
+
+        data_to_tx <= 8'b00000000; //00
+        #500
         
         $finish;
     end

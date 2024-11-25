@@ -59,10 +59,10 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b11101110;
-    localparam turn_off = 8'b01010101;
-    localparam toggle = 8'b11000011;
-    localparam ack = 8'b00110011;
+    localparam turn_on = 8'b01101110; //5E
+    localparam turn_off = 8'b01010101; //55
+    localparam toggle = 8'b11000011; 
+    localparam ack = 8'b01101011;
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -71,7 +71,7 @@ module top(
     wire rx_done;
 
     reg start_tx;
-    reg [7:0] data_to_tx = ack;
+    reg [7:0] data_to_tx;
     reg reset = 0;
     
 /*
@@ -101,8 +101,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD8M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD8M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
 
 /*
 ******************
@@ -111,7 +111,8 @@ module top(
 */
 
     parameter INIT  = 3'b001; 
-    parameter UART_SEND = 3'b010;
+    parameter UART_SEND_ON = 3'b010;
+    parameter UART_SEND_OFF = 3'b111;
     parameter WAIT = 3'b011;  
 
     reg led_r = OFF;
@@ -132,44 +133,48 @@ module top(
                 led_g   <= OFF;
                 led_b   <= OFF;
                 counter <= counter + 1;
-                shoot <= 0;
-
+                /*  
+                    Los errores de TX se estan produciendo en la transicion
+                    entre el cambio de data mientras start_tx es 1.
+                */
                 if (counter >= 24000000) begin
                     reset <= 0;
-                    state <= UART_SEND;
+                    state <= UART_SEND_ON;
+                    data_to_tx <= turn_on;
                     counter <= 0;
                 end
             end
 
-            UART_SEND: begin
+            UART_SEND_ON: begin
                 start_tx <= 1;
                 counter <= counter + 1;
-                led_r <= ON;
-
-                if (rx_done) begin
-                    if (data_received == data_to_tx) begin
-                        led_r <= OFF;
-                        led_b <= ON;
-                    end
-                    else begin
-                        led_b <= OFF;
-                    end
-                end
+                led_g <= ON;
+                led_r <= OFF;
+                data_to_tx <= turn_on;
 
                 if (counter >= 48000000) begin
-                    state <= INIT;
+                    state <= UART_SEND_OFF;
+                    start_tx <= 0;
+                    data_to_tx <= turn_off;
                     counter <= 0;
                 end
             end
 
-            WAIT: begin
-                start_tx <= 0;
+            UART_SEND_OFF: begin
+                start_tx <= 1;
                 counter <= counter + 1;
-                if (counter >= 10) begin
-                    state <= INIT;
+                led_g <= OFF;
+                led_r <= ON;
+                data_to_tx <= turn_off;
+
+                if (counter >= 48000000) begin
+                    state <= UART_SEND_ON;
+                    data_to_tx <= turn_on;
+                    start_tx <= 0;
                     counter <= 0;
                 end
             end
+            
         endcase
     end
 
