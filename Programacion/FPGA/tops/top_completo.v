@@ -18,6 +18,10 @@ module top(
     input wire gpio_38,
     input wire gpio_28,
 
+    output wire led_red,
+    output wire led_green,
+    output wire led_blue,
+
     output wire gpio_10,
 
     output wire gpio_12,
@@ -63,12 +67,12 @@ module top(
     assign phase_b_down = gpio_38;
     assign phase_c_down = gpio_28;
 
-    assign gpio_12 = cs_1;
-    assign gpio_21 = sdo_1;
-    assign gpio_13 = sclk_1;
-    assign gpio_47 = cs_2;
-    assign gpio_46 = sdo_2;
-    assign gpio_2 = sclk_2;
+    assign cs_1 = gpio_12;
+    assign sdo_1 = gpio_21;
+    assign sclk_1 = gpio_13;
+    assign cs_2 = gpio_47;
+    assign sdo_2 = gpio_46;
+    assign sclk_2 = gpio_2;
 /*
 *********************
 *   HFClock setup   *

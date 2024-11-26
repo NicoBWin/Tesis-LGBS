@@ -1,3 +1,4 @@
+//Solamente podemos contar una cantidad par de periodos de clk
 module clk_divider #(parameter BAUD_DIV = 16)
 (   
     input wire clk_in,       // Input clock
@@ -7,7 +8,7 @@ module clk_divider #(parameter BAUD_DIV = 16)
 
     reg [$clog2(BAUD_DIV)-1:0] counter; // Counter to divide the clock
 
-    always @(posedge clk_in) begin
+    always @(posedge clk_in) begin //Antes era negedge esto
         if (reset) begin
             counter <= 0;
             clk_out <= 0;
@@ -17,7 +18,7 @@ module clk_divider #(parameter BAUD_DIV = 16)
             clk_out <= ~clk_out;
         end 
         else begin
-            counter <= counter + 1;
+            counter <= counter + 1;  
         end
     end
 

@@ -1,4 +1,7 @@
+// 24M clk
+`define BAUD4M_CLK24M 3
+`define BAUD6M_CLK24M 2
+`define BAUD12M_CLK24M 1
 
-// 48M clk
-`define BAUD8M 6
-`define BAUD24M 2
+// 12M clk
+`define BAUD6M_CLK12M 1

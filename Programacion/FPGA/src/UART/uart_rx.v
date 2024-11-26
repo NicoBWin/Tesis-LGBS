@@ -11,19 +11,19 @@
     necesitamos (4bits de data).
 */
 
-`include "baudgen.vh"
+`include "./src/UART/baudgen.vh"
 
 module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,
     input wire rx,             // UART receive line
-    output wire [7:0] data_received,   // 8-bit data out
+    output reg [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
     output wire parity_error     // Flag that indicates that there was a parity error
 );
 
     // Config
-    parameter BAUD_RATE = `BAUD8M;     // Desired baud rate
+    parameter BAUD_RATE = `BAUD6M_CLK24M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
@@ -32,12 +32,12 @@ module uart_rx(
     localparam RX   = 2'b10;
 
     wire baud_clk;
-    reg [9:0] rx_shift_reg;         // PARITY, DATA, START
+    reg [8:0] rx_shift_reg;         // PARITY, DATA
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
 
-    assign data_received = rx_shift_reg[8:1];
-    assign parity_error = PARITY ? ~(^rx_shift_reg[9:1]) : (^rx_shift_reg[9:1]);
+    assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
+    assign parity_error = rx_done & parity_error_done;
     
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
@@ -47,33 +47,38 @@ module uart_rx(
 
     always @(posedge baud_clk) 
         begin
-            case (state)
-                INIT: begin
-                    bit_index <= 0;
-                    rx_done <= 0;
-                    rx_shift_reg <= {10{1'b0}};
-                    state <= IDLE;
-                end
-
-                IDLE: begin
-                    if (!rx) begin
+            if(reset) begin
+                state <= INIT;
+            end
+            else
+                case (state)
+                    INIT: begin
+                        bit_index <= 0;
                         rx_done <= 0;
-                        bit_index <= 1;
-                        rx_shift_reg[0] <= 0;
-                        state <= RX;
-                    end
-                end
-
-                RX: begin 
-                    if (bit_index >= 10) begin
+                        rx_shift_reg <= {9{1'b0}};
+                        data_received <= {8{1'b0}};
                         state <= IDLE;
-                        rx_done <= 1;
                     end
-                    else begin
-                        bit_index <= bit_index + 1;
-                        rx_shift_reg[bit_index] <= rx;
+
+                    IDLE: begin
+                        rx_done <= 0;
+                        if (!rx) begin
+                            bit_index <= 0; // Recibimos el start
+                            state <= RX;
+                        end
                     end
-                end
-            endcase
+
+                    RX: begin 
+                        if (bit_index >= 9) begin
+                            state <= IDLE;
+                            data_received <= rx_shift_reg[7:0];
+                            rx_done <= 1;
+                        end
+                        else begin
+                            bit_index <= bit_index + 1;
+                            rx_shift_reg[bit_index] <= rx;
+                        end
+                    end
+                endcase
         end
 endmodule

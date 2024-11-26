@@ -15,7 +15,7 @@ ifeq ($(uname_S), Windows)
 endif
 
 ifeq ($(uname_S), Linux)
-    APIOPKGFOLDER = $${HOME}/.apio	# Direccion a la carpeta .apio (usualmente en la carpeta del usuario)
+    APIOPKGFOLDER = $${HOME}/.apio# Direccion a la carpeta .apio (usualmente en la carpeta del usuario)
 	OSSCAD_LIB_IVL = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/lib/ivl"
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
@@ -57,7 +57,7 @@ hardware.json: $(SOURCES)
 	$(YOSYS) -p "synth_ice40 -dsp -json hardware.json" $(QUIET) $(SOURCES)'
 
 hardware.asc: $(PCF) hardware.json
-	$(ICE40) --up5k --package sg48 --json hardware.json --asc hardware.asc --pcf $(PCF) --freq 72 $(QUIET)'
+	$(ICE40) --up5k --package sg48 --json hardware.json --asc hardware.asc --pcf $(PCF) --freq 48 $(QUIET)'
 
 hardware.bin: hardware.asc
 	$(ICEPACK) hardware.asc hardware.bin'
