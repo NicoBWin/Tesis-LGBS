@@ -59,8 +59,8 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b01101110; //EE
-    localparam turn_off = 8'b01010101; //C5
+    localparam turn_on = 8'b00101010; //2A
+    localparam turn_off = 8'b10010011; //93
     localparam toggle = 8'b11000011;
     localparam ack = 8'b01101011;
     localparam OFF = 1;
