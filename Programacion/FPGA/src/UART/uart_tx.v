@@ -1,110 +1,85 @@
-module uart_tx #(parameter CLKS_PER_BIT = 4)
-(
-    input i_Clock,
-    input i_Tx_DV,
-    input [7:0] i_Tx_Byte,
-    output o_Tx_Active,
-    output reg o_Tx_Serial,
-    output o_Tx_Done
+/*
+    Para usarlo, enviamos la informacion a transmitir a data_to_tx y ponemos start_tx en 1. 
+    Automaticamente el tx_busy = 1 indicando que la transmision esta en progreso. 
+    Un clk despues ya es posible cambiar el valor de data_to_tx. El bit de tx_busy se pone en 1 y 
+    hasta que termine la transmision que se pone en 0.
+*/
+
+`include "./src/UART/baudgen.vh"
+
+module uart_tx(
+    input wire clk,            // Clock signal
+    input wire reset,
+    input wire [7:0] data_to_tx,  // 8-bit data in
+    input wire start_tx,       // Start transmission
+    output wire tx,             // UART transmit line
+    output reg tx_busy         // Indicates transmission is in progress
 );
 
-    parameter s_IDLE = 3'b000;
-    parameter s_TX_START_BIT = 3'b001;
-    parameter s_TX_DATA_BITS = 3'b010;
-    parameter s_TX_STOP_BIT = 3'b011;
-    parameter s_CLEANUP = 3'b100;
+    // Config
+    parameter BAUD_RATE = `BAUD6M_CLK24M;      // Desired baud rate
+    parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
-    reg [2:0] r_SM_Main = 0;
-    reg [13:0] r_Clock_Count = 0;
-    reg [2:0] r_Bit_Index = 0;
-    reg [7:0] r_Tx_Data = 0;
-    reg r_Tx_Done = 0;
-    reg r_Tx_Active = 0;
+    // States
+    localparam INIT = 2'b00;
+    localparam IDLE = 2'b01;
+    localparam TX   = 2'b10;
+    localparam WARM_TX = 2'b11;
 
-    always @(posedge i_Clock)
-    begin
-        case (r_SM_Main)
-            s_IDLE:
-            begin
-                o_Tx_Serial <= 1'b1; // Drive Line High for Idle
-                r_Tx_Done <= 1'b0;
-                r_Clock_Count <= 0;
-                r_Bit_Index <= 0;
-                if (i_Tx_DV == 1'b1)
-                begin
-                    r_Tx_Active <= 1'b1;
-                    r_Tx_Data <= i_Tx_Byte;
-                    r_SM_Main <= s_TX_START_BIT;
-                end
-                else
-                    r_SM_Main <= s_IDLE;
+    reg [11:0] to_transmit;         // STOP(2), PARITY(1), DATA(8), START(0)
+    reg [3:0] bit_index;            // Index for the bits being sent
+    reg [1:0] state = INIT;
+
+    wire parity;                    // Current parity
+    wire baud_clk;
+    
+    assign tx = to_transmit[0];
+    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
+
+    clk_divider #(BAUD_RATE) baudrate_gen(
+        .clk_in(clk),
+        .reset(reset),
+        .clk_out(baud_clk)
+    );
+
+    always @(posedge baud_clk)
+        begin
+            if(reset) begin
+                state <= INIT;
             end
-
-            s_TX_START_BIT:
-            begin
-                o_Tx_Serial <= 1'b0; // Start bit = 0
-                if (r_Clock_Count < CLKS_PER_BIT - 1)
-                begin
-                    if (r_Clock_Count == CLKS_PER_BIT / 2)
-                        r_Tx_Data <= i_Tx_Byte;
-                    r_Clock_Count <= r_Clock_Count + 1;
-                end
-                else
-                begin
-                    r_Clock_Count <= 0;
-                    r_SM_Main <= s_TX_DATA_BITS;
-                end
-            end
-
-            s_TX_DATA_BITS:
-            begin
-                o_Tx_Serial <= r_Tx_Data[r_Bit_Index];
-                if (r_Clock_Count < CLKS_PER_BIT - 1)
-                begin
-                    r_Clock_Count <= r_Clock_Count + 1;
-                end
-                else
-                begin
-                    r_Clock_Count <= 0;
-                    if (r_Bit_Index < 7)
-                    begin
-                        r_Bit_Index <= r_Bit_Index + 1;
+            else
+                case (state)
+                    INIT: begin
+                        tx_busy <= 0;
+                        bit_index <= 0;
+                        to_transmit <= 12'b111111111111;
+                        state <= IDLE;
                     end
-                    else
-                    begin
-                        r_Bit_Index <= 0;
-                        r_SM_Main <= s_TX_STOP_BIT;
+
+                    IDLE: begin
+                        if (start_tx) begin
+                            tx_busy <= 1;
+                            to_transmit <= {2'b11, parity, data_to_tx, 1'b0};
+                            state <= WARM_TX;
+                        end
                     end
-                end
-            end
 
-            s_TX_STOP_BIT:
-            begin
-                o_Tx_Serial <= 1'b1; // Stop bit = 1
-                if (r_Clock_Count < CLKS_PER_BIT - 1)
-                begin
-                    r_Clock_Count <= r_Clock_Count + 1;
-                end
-                else
-                begin
-                    r_Tx_Done <= 1'b1;
-                    r_Clock_Count <= 0;
-                    r_SM_Main <= s_CLEANUP;
-                    r_Tx_Active <= 1'b0;
-                end
-            end
+                    WARM_TX: begin
+                        state <= TX;
+                        bit_index <= 1;
+                        to_transmit <= {1'b1, to_transmit[10:1]};
+                    end
 
-            s_CLEANUP:
-            begin
-                r_Tx_Done <= 1'b0;
-                r_SM_Main <= s_IDLE;
-            end
-
-            default:
-                r_SM_Main <= s_IDLE;
-        endcase
-    end
-
-    assign o_Tx_Active = r_Tx_Active;
-    assign o_Tx_Done = r_Tx_Done;
+                    TX: begin
+                        to_transmit <= {1'b1, to_transmit[10:1]};
+                        if (bit_index >= 11) begin 
+                            state <= IDLE;
+                            tx_busy <= 0;
+                        end
+                        else begin
+                            bit_index <= bit_index + 1;
+                        end
+                    end
+                endcase
+        end
 endmodule
