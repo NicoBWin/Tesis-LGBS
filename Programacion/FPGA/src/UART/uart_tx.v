@@ -25,7 +25,6 @@ module uart_tx(
 
     wire parity;                    // Current parity
     wire baud_clk;
-    wire local_clk;
 
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
@@ -33,7 +32,6 @@ module uart_tx(
         .clk_out(baud_clk)
     );
     
-    //assign local_clk = tx_busy ? baud_clk : clk;
     assign parity = PARITY ? ~(data_to_tx) :  data_to_tx;  // XOR for even parity, inverted XOR for odd parity
 
     always @(posedge baud_clk or posedge reset) 
