@@ -70,7 +70,7 @@ initial begin
         #10
         data_to_tx <= 8'b10110011; //B3
         start_tx <= 1;
-        #10
+        #500
 
         data_to_tx <= 8'b00010010; //12
         #500

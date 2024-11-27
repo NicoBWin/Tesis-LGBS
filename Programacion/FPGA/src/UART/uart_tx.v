@@ -12,7 +12,7 @@ module uart_tx(
     input wire reset,
     input wire [7:0] data_to_tx,  // 8-bit data in
     input wire start_tx,       // Start transmission
-    output wire tx,             // UART transmit line
+    output reg tx,             // UART transmit line
     output reg tx_busy         // Indicates transmission is in progress
 );
 
@@ -20,42 +20,50 @@ module uart_tx(
     parameter BAUD_RATE = `BAUD6M_CLK24M;      // Desired baud rate
     parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
 
-    reg [11:0] to_transmit;         // STOP(2), PARITY(1), DATA(8), START(0)
+    reg [10:0] to_transmit;         // STOP(1), PARITY(1), DATA(8), START(0)
     reg [3:0] bit_index;            // Index for the bits being sent
 
     wire parity;                    // Current parity
     wire baud_clk;
     wire local_clk;
-    
-    assign tx = to_transmit[0];
-    assign local_clk = tx_busy ? baud_clk : clk;
-    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
 
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .reset(reset),
         .clk_out(baud_clk)
     );
+    
+    //assign local_clk = tx_busy ? baud_clk : clk;
+    assign parity = PARITY ? ~(data_to_tx) :  data_to_tx;  // XOR for even parity, inverted XOR for odd parity
 
-    always @(posedge local_clk)
+    always @(posedge baud_clk or posedge reset) 
         begin
-            if(reset) begin
-                tx_busy <= 0;
+            if (reset) 
+            begin
+                tx <= 1'b1;            
+                tx_busy <= 1'b0;
                 bit_index <= 0;
-                to_transmit <= 12'b111111111111;
-            end
-            else if(start_tx & !tx_busy) begin
-                tx_busy <= 1;
-                bit_index <= 0;
-                to_transmit <= {2'b11, parity, data_to_tx, 1'b0};
-            end
-            else if (tx_busy) begin
-                to_transmit <= {1'b1, to_transmit[10:1]};
-                bit_index <= bit_index + 1;
-
-                if (bit_index >= 11) begin 
-                    tx_busy <= 0;
+            end 
+            else if (start_tx && !tx_busy) 
+                begin   
+                    tx_busy <= 1'b1;
+                    to_transmit <= {1'b1, parity, data_to_tx, 1'b0};
+                    tx <= 0;
+                    bit_index <= 1;
                 end
-            end
+            else if (tx_busy) 
+                begin
+                    tx <= to_transmit[bit_index];
+
+                    if (bit_index < 10) 
+                        begin
+                            bit_index <= bit_index + 1;
+                        end
+                    else
+                        begin
+                            tx_busy <= 0;
+                            bit_index <= 0;
+                        end
+                end
         end
 endmodule

@@ -133,45 +133,43 @@ module top(
                 led_g   <= OFF;
                 led_b   <= OFF;
                 counter <= counter + 1;
-                /*  
-                    Los errores de TX se estan produciendo en la transicion
-                    entre el cambio de data mientras start_tx es 1.
-                */
+                
                 if (counter >= 24000000) begin
                     reset <= 0;
                     state <= UART_SEND_ON;
                     data_to_tx <= turn_on;
+                    start_tx <= 1;
                     counter <= 0;
                 end
             end
 
             UART_SEND_ON: begin
-                start_tx <= 1;
-                counter <= counter + 1;
-                led_g <= ON;
-                led_r <= OFF;
-                data_to_tx <= turn_on;
-
                 if (counter >= 48000000) begin
                     state <= UART_SEND_OFF;
-                    start_tx <= 0;
                     data_to_tx <= turn_off;
+                    reset <= 1;
                     counter <= 0;
+                end
+                else begin
+                    reset <= 0;
+                    counter <= counter + 1;
+                    led_g <= ON;
+                    led_r <= OFF;
                 end
             end
 
             UART_SEND_OFF: begin
-                start_tx <= 1;
-                counter <= counter + 1;
-                led_g <= OFF;
-                led_r <= ON;
-                data_to_tx <= turn_off;
-
                 if (counter >= 48000000) begin
                     state <= UART_SEND_ON;
                     data_to_tx <= turn_on;
-                    start_tx <= 0;
+                    reset <= 1;
                     counter <= 0;
+                end
+                else begin
+                    reset <= 0;
+                    counter <= counter + 1;
+                    led_g <= OFF;
+                    led_r <= ON;
                 end
             end
             
