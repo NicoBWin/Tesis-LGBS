@@ -7,6 +7,8 @@
 
 `include "./src/UART/baudgen.vh"
 
+//CAN board fotos, UART señales, inductor nuevo y graficos y de la flyback 
+
 module uart_tx(
     input wire clk,            // Clock signal
     input wire reset,
