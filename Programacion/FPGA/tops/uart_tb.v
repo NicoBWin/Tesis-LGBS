@@ -32,11 +32,12 @@ always #1 clk = ~clk;
 *************************************
 */
     uart_tx transmitter(
-        .clk(clk),
-        .reset(reset),  
-        .data_to_tx(data_to_tx), 
-        .start_tx(start_tx), 
-        .tx(tx)
+        .i_Clock(clk),
+        //.reset(reset),
+        .i_Tx_Byte(data_to_tx), 
+        .i_Tx_DV(start_tx), 
+        .o_Tx_Serial(tx), 
+        .o_Tx_Active(tx_busy)
     );
 
     uart_rx receiver(
@@ -48,11 +49,11 @@ always #1 clk = ~clk;
         .parity_error(parity_error)
     );
 
-    defparam transmitter.PARITY = 0;
-    defparam receiver.PARITY = 0;
+    //defparam transmitter.PARITY = 0;
+    //defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
+    //defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
+    //defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
 
 /*
 ********************************
@@ -70,7 +71,7 @@ initial begin
         #10
         data_to_tx <= 8'b10110011; //B3
         start_tx <= 1;
-        #10
+        #500
 
         data_to_tx <= 8'b00010010; //12
         #500
