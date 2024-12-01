@@ -30,7 +30,7 @@ module uart_tx(
     localparam STOP_SIZE = 6;
     localparam PKG_SIZE = STOP_SIZE+9;
 
-    reg [PKG_SIZE:0] to_transmit;         // STOP(N), PARITY(x), DATA(8), START(0)
+    reg [PKG_SIZE:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
 
