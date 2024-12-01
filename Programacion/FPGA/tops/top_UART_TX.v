@@ -59,10 +59,10 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b01101110; //6E
-    localparam turn_off = 8'b01010101; //55
-    localparam toggle = 8'b11000011; 
-    localparam ack = 8'b01101011;
+    localparam turn_on = 4'b0110; //6
+    localparam turn_off = 4'b1101; //D
+    localparam toggle = 4'b1001; //9
+    localparam ack = 4'b0000; //0
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -71,7 +71,9 @@ module top(
     wire rx_done;
 
     reg start_tx;
-    reg [7:0] data_to_tx;
+    reg [3:0] code;
+    wire [6:0] hamm_code;
+    wire [7:0] data_to_tx = {1'b1, hamm_code};
     reg reset = 0;
     
 /*
@@ -96,6 +98,11 @@ module top(
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error)
+    );
+
+    hamming_7_4_encoder hamm74(
+        .data_in(code),
+        .hamming_out(hamm_code)
     );
 
     defparam transmitter.PARITY = 0;
@@ -140,7 +147,7 @@ module top(
                 if (counter >= 24000000) begin
                     reset <= 0;
                     state <= UART_SEND_ON;
-                    data_to_tx <= turn_on;
+                    code <= turn_on;
                     counter <= 0;
                 end
             end
@@ -150,12 +157,12 @@ module top(
                 counter <= counter + 1;
                 led_g <= ON;
                 led_r <= OFF;
-                data_to_tx <= turn_on;
+                code <= turn_on;
 
                 if (counter >= 48000000) begin
                     state <= UART_SEND_OFF;
                     start_tx <= 0;
-                    data_to_tx <= turn_off;
+                    code <= turn_off;
                     counter <= 0;
                 end
             end
@@ -165,11 +172,11 @@ module top(
                 counter <= counter + 1;
                 led_g <= OFF;
                 led_r <= ON;
-                data_to_tx <= turn_off;
+                code <= turn_off;
 
                 if (counter >= 48000000) begin
                     state <= UART_SEND_ON;
-                    data_to_tx <= turn_on;
+                    code <= turn_on;
                     start_tx <= 0;
                     counter <= 0;
                 end

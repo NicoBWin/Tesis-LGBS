@@ -8,12 +8,12 @@
 `include "./src/UART/baudgen.vh"
 
 module uart_tx(
-    input wire clk,            // Clock signal
+    input wire clk,             // Clock signal
     input wire reset,
-    input wire [7:0] data_to_tx,  // 8-bit data in
-    input wire start_tx,       // Start transmission
+    input wire [7:0] data_to_tx,// 8-bit data in
+    input wire start_tx,        // Start transmission
     output wire tx,             // UART transmit line
-    output reg tx_busy         // Indicates transmission is in progress
+    output reg tx_busy          // Indicates transmission is in progress
 );
 
     // Config

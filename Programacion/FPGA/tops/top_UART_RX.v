@@ -59,14 +59,17 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b01101110; //6E
-    localparam turn_off = 8'b01010101; //55
-    localparam toggle = 8'b11000011;
-    localparam ack = 8'b01101011;
+    localparam turn_on = 4'b0110; //6
+    localparam turn_off = 4'b1101; //D
+    localparam toggle = 4'b1001; //9
+    localparam ack = 4'b0000; //0
     localparam OFF = 1;
     localparam ON = 0;
 
     wire [7:0] data_received;
+    wire [6:0] hamm_code = data_received[6:0];
+    wire [3:0] code;
+    wire hamming_error;
     wire tx_busy;
     wire rx_done;
 
@@ -97,6 +100,14 @@ module top(
         .rx_done(rx_done), 
         .parity_error(parity_error)
     );
+
+    /*
+    hamming_7_4_decoder hamm74(
+        .hamming_in(hamm_code),
+        .data_out(code),                // 4-bit decoded data
+        .error_detected(hamming_error)  // Error detection flag
+    );
+    */
 
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
@@ -145,11 +156,11 @@ module top(
                 counter <= counter + 1;
 
                 if (rx_done) begin
-                    if (data_received == turn_on) begin
+                    if (code == turn_on) begin
                         led_g <= ON;
                         led_r <= OFF;
                     end
-                    else if (data_received == turn_off) begin
+                    else if (code == turn_off) begin
                         led_g <= OFF;
                         led_r <= ON;
                     end
