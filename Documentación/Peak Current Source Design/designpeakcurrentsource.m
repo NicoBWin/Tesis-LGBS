@@ -9,3 +9,4 @@ V_in = 100;
 L = 8E-3;
 
 Vpp_Ramp = (D - 0.18)*R_i*T_s*V_in/L
+
