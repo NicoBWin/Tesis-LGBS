@@ -25,21 +25,15 @@ module uart_rx(
     localparam IDLE = 2'b01;
     localparam RX   = 2'b10;
 
-    wire baud_clk;
+    reg [3:0] clk_counter;
     reg [8:0] rx_shift_reg;         // PARITY, DATA
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
 
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
-    
-    clk_divider #(BAUD_RATE) baudrate_gen(
-        .clk_in(clk),
-        .reset(reset),
-        .clk_out(baud_clk)
-    );
 
-    always @(posedge baud_clk) 
+    always @(posedge clk) 
         begin
             if(reset) begin
                 state <= INIT;
@@ -49,6 +43,7 @@ module uart_rx(
                     INIT: begin
                         bit_index <= 0;
                         rx_done <= 0;
+                        clk_counter <= 0;
                         rx_shift_reg <= {9{1'b0}};
                         data_received <= {8{1'b0}};
                         state <= IDLE;
@@ -62,15 +57,22 @@ module uart_rx(
                         end
                     end
 
-                    RX: begin 
-                        if (bit_index >= 9) begin
-                            state <= IDLE;
-                            data_received <= rx_shift_reg[7:0];
-                            rx_done <= 1;
+                    RX: begin
+                        if (clk_counter >= BAUD_RATE+1) begin
+                            if (bit_index >= 9) begin
+                                state <= IDLE;
+                                data_received <= rx_shift_reg[7:0];
+                                rx_done <= 1;
+                            end
+                            else begin
+                                bit_index <= bit_index + 1;
+                                rx_shift_reg[bit_index] <= rx;
+                            end
+
+                            clk_counter <= 0;
                         end
                         else begin
-                            bit_index <= bit_index + 1;
-                            rx_shift_reg[bit_index] <= rx;
+                            clk_counter <= clk_counter + 1;
                         end
                     end
                 endcase
