@@ -59,8 +59,8 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 4'b0110; //6
-    localparam turn_off = 4'b1101; //D
+    localparam turn_on = 8'b0110011; //6
+    localparam turn_off = 8'b1100110; //D
     localparam toggle = 4'b1001; //9
     localparam ack = 4'b0000; //0
     localparam OFF = 1;
@@ -156,11 +156,11 @@ module top(
                 counter <= counter + 1;
 
                 if (rx_done) begin
-                    if (code == turn_on) begin
+                    if (data_received == turn_on) begin
                         led_g <= ON;
                         led_r <= OFF;
                     end
-                    else if (code == turn_off) begin
+                    else if (data_received == turn_off) begin
                         led_g <= OFF;
                         led_r <= ON;
                     end

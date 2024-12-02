@@ -57,6 +57,8 @@ module uart_rx(
                         end
                     end
 
+                    //0000 1_11 0_00 0_00
+
                     RX: begin
                         if (clk_counter >= BAUD_RATE+1) begin
                             if (bit_index >= 9) begin

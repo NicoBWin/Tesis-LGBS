@@ -11,7 +11,7 @@ module tb_hamming_7_4;
 
     initial begin
         // Test cases
-        data_in = 4'b0000; #10;
+        data_in = 4'b0110; #10;
         $display("Input: %b, Output: %b", data_in, hamming_out);
 
         data_in = 4'b1101; #10;
