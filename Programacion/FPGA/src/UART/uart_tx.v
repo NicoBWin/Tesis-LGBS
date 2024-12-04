@@ -25,7 +25,7 @@ module uart_tx(
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
 
-    localparam STOP_SIZE = 6;
+    localparam STOP_SIZE = 8;
     localparam PKG_SIZE = STOP_SIZE+9;
 
     reg [PKG_SIZE:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)

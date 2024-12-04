@@ -76,7 +76,7 @@ module top(
 
     reg start_tx;
     reg [7:0] data_to_tx = 8'b0;
-    reg reset = 0;
+    reg reset = 1;
     
 /*
 *************************************
@@ -140,11 +140,12 @@ module top(
         if (reset) begin
             led_g <= OFF;
             led_r <= OFF;
-            start_tx <= 1;
             data_to_tx <= 0;
+            reset <= 0;
+            start_tx <= 0;
         end
         else begin
-            if (rx_done)
+            if (rx_done) begin
                 case (data_received)
                     toggle: begin
                         led_g <= OFF;
@@ -156,10 +157,12 @@ module top(
                     end
                     default: begin
                         data_to_tx <= data_to_tx + 1;
+                        start_tx <= 1;
                         led_g <= OFF;
                         led_r <= OFF;
                     end
                 endcase
+            end
         end
     end
 
