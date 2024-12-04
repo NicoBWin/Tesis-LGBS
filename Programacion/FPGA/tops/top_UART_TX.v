@@ -50,7 +50,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 24 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -61,8 +61,8 @@ module top(
 */  
     localparam turn_on = 4'b0110; //6
     localparam turn_off = 4'b1101; //D
-    localparam toggle = 4'b1001; //9
-    localparam ack = 4'b0000; //0
+    localparam toggle = 8'b1001101; //9D
+    localparam ack = 8'b00111100; //3A
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -71,9 +71,9 @@ module top(
     wire rx_done;
 
     reg start_tx;
-    reg [3:0] code;
-    wire [6:0] hamm_code;
-    wire [7:0] data_to_tx = {1'b1, hamm_code};
+    //reg [3:0] code;
+    //wire [6:0] hamm_code;
+    reg [7:0] data_to_tx = toggle; //= {1'b1, hamm_code};
     reg reset = 0;
     
 /*
@@ -100,16 +100,18 @@ module top(
         .parity_error(parity_error)
     );
 
+    /*
     hamming_7_4_encoder hamm74(
         .data_in(code),
         .hamming_out(hamm_code)
     );
+    */
 
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 /*
 ******************
@@ -135,50 +137,54 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                reset   <= 1;
-                led_r   <= OFF;
-                led_g   <= OFF;
-                led_b   <= OFF;
-                counter <= counter + 1;
-                /*  
-                    Los errores de TX se estan produciendo en la transicion
-                    entre el cambio de data mientras start_tx es 1.
-                */
-                if (counter >= 24000000) begin
+                if (counter == 24000000) begin
+                    // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
                     state <= UART_SEND_ON;
-                    code <= turn_on;
-                    counter <= 0;
+                    data_to_tx <= toggle;
+                    counter <= 0; // Reset the counter at the same time
+                end
+                else begin
+                    // Continue incrementing counter and setting LED values
+                    reset <= 1;
+                    led_r <= OFF;
+                    led_g <= OFF;
+                    led_b <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
             UART_SEND_ON: begin
-                start_tx <= 1;
-                counter <= counter + 1;
-                led_g <= ON;
-                led_r <= OFF;
-                code <= turn_on;
-
-                if (counter >= 48000000) begin
+                if (counter == 48000000) begin
+                    // Transition to UART_SEND_OFF state
                     state <= UART_SEND_OFF;
                     start_tx <= 0;
-                    code <= turn_off;
-                    counter <= 0;
+                    data_to_tx <= toggle;
+                    counter <= 0; // Reset counter
+                end
+                else begin
+                    // Continue transmitting and incrementing counter
+                    start_tx <= 1;
+                    led_g <= ON;
+                    led_r <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
             UART_SEND_OFF: begin
-                start_tx <= 1;
-                counter <= counter + 1;
-                led_g <= OFF;
-                led_r <= ON;
-                code <= turn_off;
-
-                if (counter >= 48000000) begin
+                if (counter == 48000000) begin
+                    // Transition back to UART_SEND_ON state
                     state <= UART_SEND_ON;
-                    code <= turn_on;
                     start_tx <= 0;
-                    counter <= 0;
+                    data_to_tx <= ack;
+                    counter <= 0; // Reset counter
+                end
+                else begin
+                    // Continue transmitting and incrementing counter
+                    start_tx <= 1;
+                    led_g <= OFF;
+                    led_r <= ON;
+                    counter <= counter + 1;
                 end
             end
             

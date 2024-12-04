@@ -31,7 +31,7 @@ LIB_SRC = ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/
 SOURCES = ./tops/top_UART_RX.v $(LIB_SRC)
 TBNAME = uart_tb
 MODULE_TO_DRAW = top_UART.v
-SOURCES_TB = ./tops/hamming_7_4_tb.v $(LIB_SRC)
+SOURCES_TB = ./tops/uart_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 

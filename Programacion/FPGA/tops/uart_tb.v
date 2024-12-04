@@ -9,8 +9,8 @@ module top_tb;
 *   Clock setup   *
 *******************
 */
-reg clk = 0;
-always #1 clk = ~clk;
+reg clk_48M = 0;
+always #1 clk_48M = ~clk_48M;
 
 /*
 *****************************
@@ -32,7 +32,7 @@ always #1 clk = ~clk;
 *************************************
 */
     uart_tx transmitter(
-        .clk(clk),
+        .clk(clk_48M),
         .reset(reset),  
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
@@ -40,7 +40,7 @@ always #1 clk = ~clk;
     );
 
     uart_rx receiver(
-        .clk(clk),
+        .clk(clk_48M),
         .reset(reset), 
         .rx(tx),
         .data_received(data_received), 
@@ -51,8 +51,8 @@ always #1 clk = ~clk;
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 /*
 ********************************
@@ -70,7 +70,7 @@ initial begin
         #10
         data_to_tx <= 8'b10110011; //B3
         start_tx <= 1;
-        #10
+        #500
 
         data_to_tx <= 8'b00010010; //12
         #500

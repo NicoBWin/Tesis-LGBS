@@ -50,7 +50,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 24 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -61,8 +61,9 @@ module top(
 */  
     localparam turn_on = 8'b0110011; //6
     localparam turn_off = 8'b1100110; //D
-    localparam toggle = 4'b1001; //9
-    localparam ack = 4'b0000; //0
+
+    localparam toggle = 8'b1001101; //9D
+    localparam ack = 8'b00111100; //3A
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -112,8 +113,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 /*
 ******************
@@ -123,7 +124,7 @@ module top(
 
     parameter INIT  = 3'b001; 
     parameter UART_RECEIVE = 3'b010;
-    parameter WAIT = 3'b011;  
+    parameter CHECK = 3'b011;  
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -136,43 +137,30 @@ module top(
     assign led_blue = led_b;
 
     always @(posedge clk) begin
-        case (state)
-            INIT: begin
-                reset   <= 1;
-                led_r   <= OFF;
-                led_g   <= OFF;
-                led_b   <= OFF;
-                counter <= counter + 1;
-
-                if (counter >= 24000000) begin
-                    reset <= 0;
-                    state <= UART_RECEIVE;
-                    counter <= 0;
-                end
-            end
-
-            UART_RECEIVE: begin
-                start_tx <= 1;
-                counter <= counter + 1;
-
-                if (rx_done) begin
-                    if (data_received == turn_on) begin
-                        led_g <= ON;
-                        led_r <= OFF;
-                    end
-                    else if (data_received == turn_off) begin
+        if (reset) begin
+            led_g <= OFF;
+            led_r <= OFF;
+            start_tx <= 1;
+            data_to_tx <= 0;
+        end
+        else begin
+            if (rx_done)
+                case (data_received)
+                    toggle: begin
                         led_g <= OFF;
                         led_r <= ON;
                     end
-                    else begin
+                    ack: begin
+                        led_g <= ON;
+                        led_r <= OFF;
+                    end
+                    default: begin
                         data_to_tx <= data_to_tx + 1;
                         led_g <= OFF;
                         led_r <= OFF;
                     end
-                end
-            end
-            
-        endcase
+                endcase
+        end
     end
 
 endmodule
