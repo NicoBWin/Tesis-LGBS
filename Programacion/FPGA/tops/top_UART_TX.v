@@ -50,7 +50,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -59,10 +59,10 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam turn_on = 8'b00101010; //2A
-    localparam turn_off = 8'b10010011; //93
-    localparam toggle = 8'b11000011; 
-    localparam ack = 8'b01101011;
+    localparam turn_on = 4'b0110; //6
+    localparam turn_off = 4'b1101; //D
+    localparam toggle = 8'b1001101; //9D
+    localparam ack = 8'b00111100; //3A
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -71,7 +71,9 @@ module top(
     wire rx_done;
 
     reg start_tx;
-    reg [7:0] data_to_tx;
+    //reg [3:0] code;
+    //wire [6:0] hamm_code;
+    reg [7:0] data_to_tx = toggle; //= {1'b1, hamm_code};
     reg reset = 0;
     
 /*
@@ -81,12 +83,12 @@ module top(
 */
     
     uart_tx transmitter(
-        .i_Clock(clk),
-        //.reset(reset),
-        .i_Tx_Byte(data_to_tx), 
-        .i_Tx_DV(start_tx), 
-        .o_Tx_Serial(tx), 
-        .o_Tx_Active(tx_busy)
+        .clk(clk),
+        .reset(reset),
+        .data_to_tx(data_to_tx), 
+        .start_tx(start_tx), 
+        .tx(tx), 
+        .tx_busy(tx_busy)
     );
 
     uart_rx receiver(
@@ -98,11 +100,18 @@ module top(
         .parity_error(parity_error)
     );
 
-    //defparam transmitter.PARITY = 0;
-    //defparam receiver.PARITY = 0;
+    /*
+    hamming_7_4_encoder hamm74(
+        .data_in(code),
+        .hamming_out(hamm_code)
+    );
+    */
 
-    //defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
-    //defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam transmitter.PARITY = 0;
+    defparam receiver.PARITY = 0;
+
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 /*
 ******************
@@ -128,48 +137,54 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                reset   <= 1;
-                led_r   <= OFF;
-                led_g   <= OFF;
-                led_b   <= OFF;
-                counter <= counter + 1;
-                
-                if (counter >= 24000000) begin
+                if (counter == 24000000) begin
+                    // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
                     state <= UART_SEND_ON;
-                    data_to_tx <= turn_on;
-                    start_tx <= 1;
-                    counter <= 0;
+                    data_to_tx <= toggle;
+                    counter <= 0; // Reset the counter at the same time
+                end
+                else begin
+                    // Continue incrementing counter and setting LED values
+                    reset <= 1;
+                    led_r <= OFF;
+                    led_g <= OFF;
+                    led_b <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
             UART_SEND_ON: begin
-                if (counter >= 48000000) begin
+                if (counter == 48000000) begin
+                    // Transition to UART_SEND_OFF state
                     state <= UART_SEND_OFF;
-                    data_to_tx <= turn_off;
-                    reset <= 1;
-                    counter <= 0;
+                    start_tx <= 0;
+                    data_to_tx <= toggle;
+                    counter <= 0; // Reset counter
                 end
                 else begin
-                    reset <= 0;
-                    counter <= counter + 1;
+                    // Continue transmitting and incrementing counter
+                    start_tx <= 1;
                     led_g <= ON;
                     led_r <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
             UART_SEND_OFF: begin
-                if (counter >= 48000000) begin
+                if (counter == 48000000) begin
+                    // Transition back to UART_SEND_ON state
                     state <= UART_SEND_ON;
-                    data_to_tx <= turn_on;
-                    reset <= 1;
-                    counter <= 0;
+                    start_tx <= 0;
+                    data_to_tx <= ack;
+                    counter <= 0; // Reset counter
                 end
                 else begin
-                    reset <= 0;
-                    counter <= counter + 1;
+                    // Continue transmitting and incrementing counter
+                    start_tx <= 1;
                     led_g <= OFF;
                     led_r <= ON;
+                    counter <= counter + 1;
                 end
             end
             

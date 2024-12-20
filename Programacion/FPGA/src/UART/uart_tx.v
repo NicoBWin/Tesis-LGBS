@@ -7,15 +7,13 @@
 
 `include "./src/UART/baudgen.vh"
 
-//CAN board fotos, UART señales, inductor nuevo y graficos y de la flyback 
-
 module uart_tx(
-    input wire clk,            // Clock signal
+    input wire clk,             // Clock signal
     input wire reset,
-    input wire [7:0] data_to_tx,  // 8-bit data in
-    input wire start_tx,       // Start transmission
+    input wire [7:0] data_to_tx,// 8-bit data in
+    input wire start_tx,        // Start transmission
     output wire tx,             // UART transmit line
-    output reg tx_busy         // Indicates transmission is in progress
+    output reg tx_busy          // Indicates transmission is in progress
 );
 
     // Config
@@ -26,9 +24,11 @@ module uart_tx(
     localparam INIT = 2'b00;
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
-    localparam WARM_TX = 2'b11;
 
-    reg [11:0] to_transmit;         // STOP(2), PARITY(1), DATA(8), START(0)
+    localparam STOP_SIZE = 8;
+    localparam PKG_SIZE = STOP_SIZE+9;
+
+    reg [PKG_SIZE:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
     reg [3:0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
 
@@ -54,27 +54,22 @@ module uart_tx(
                     INIT: begin
                         tx_busy <= 0;
                         bit_index <= 0;
-                        to_transmit <= 12'b111111111111;
+                        to_transmit <= {PKG_SIZE{1'b1}};
                         state <= IDLE;
                     end
 
                     IDLE: begin
                         if (start_tx) begin
                             tx_busy <= 1;
-                            to_transmit <= {2'b11, parity, data_to_tx, 1'b0};
-                            state <= WARM_TX;
+                            bit_index <= 1;
+                            to_transmit <= {{STOP_SIZE{1'b1}}, parity, data_to_tx, 1'b0};
+                            state <= TX;
                         end
-                    end
-
-                    WARM_TX: begin
-                        state <= TX;
-                        bit_index <= 1;
-                        to_transmit <= {1'b1, to_transmit[10:1]};
                     end
 
                     TX: begin
                         to_transmit <= {1'b1, to_transmit[10:1]};
-                        if (bit_index >= 11) begin 
+                        if (bit_index >= PKG_SIZE) begin 
                             state <= IDLE;
                             tx_busy <= 0;
                         end
