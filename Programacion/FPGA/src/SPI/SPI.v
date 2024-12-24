@@ -3,25 +3,17 @@
 module SPI(
     input wire clk,            // System clock
     input wire reset,          // System reset
+    input wire start_transfer,
 
-    input wire [15:0] data_to_rx, // Data to be received from external device
-    output reg [15:0] data_to_tx, // Data to be transmitted to external device
+    input wire [15:0] data_to_tx,
+    output reg [15:0] data_to_rx,
 
-    output reg sclk,     // SPI clock
+    output wire sclk,     // SPI clock
     input wire miso,     // Master-In Slave-Out
+    input reg mosi,
     output reg cs        // Chip select
 );
 
-    // Parameters
-    parameter SCLK_FREQ = 4800000; // 4 MHz clock for SPI
-    parameter SYS_FREQ = 48000000; // Assume 50 MHz system clock
-
-    // Internal signals
-    reg [15:0] shift_reg;       // Shift register for SPI communication
-    reg [3:0] bit_counter;      // Counter for tracking bits
-    reg sclk_en;                // Enable SCLK toggle
-
-    // State machine for SPI
     typedef enum reg [1:0] {
         IDLE,
         SELECT,
@@ -29,52 +21,68 @@ module SPI(
         DESELECT
     } spi_state_t;
 
+    // Internal signals
+    reg sclk_en;
+    reg [15:0] shift_reg;       // Shift register for SPI communication
+    reg [3:0] bit_counter;      // Counter for tracking bits
+    wire inner_clk;
+
     spi_state_t state;
 
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
+    parameter COMM_RATE = `RATE4M8_CLK48M;
+    parameter CS_ACTIVE = 1'b1;
+
+    assign mosi = shift_reg[0];
+    assign sclk = inner_clk & sclk_en;
+
+    clk_divider #(COMM_RATE) baudrate_gen(
+        .clk_in(clk),
+        .reset(reset),
+        .clk_out(inner_clk)
+    );
+
+    always @(posedge inner_clk or posedge reset) begin
+        if (reset) 
+        begin
             state <= IDLE;
-            CS <= 2'b11; // Both devices deselected
-            bit_counter <= 0;
-            shift_reg <= 0;
-            data_to_tx <= 16'b0;
-        end else begin
+            data_to_rx <= 15'b0;
+            sclk_en <= 0;
+            cs <= !CS_ACTIVE;
+        end
+        else begin
             case (state)
-                IDLE: begin
-                    if (|data_to_rx) begin // Check if there's data to send
-                        CS <= 2'b10; // Select device 0 (example)
+                IDLE: 
+                begin
+                    if (start_transfer) begin
+                        bit_counter <= 15;
+                        data_to_rx <= 15'b0;
+                        shift_reg <= data_to_tx;
                         state <= SELECT;
                     end
                 end
 
-                SELECT: begin
-                    if (sclk_en) begin
-                        shift_reg <= data_to_rx; // Load data to shift register
-                        bit_counter <= 15;
-                        state <= TRANSFER;
-                    end
+                SELECT: 
+                begin
+                    cs <= CS_ACTIVE;
+                    sclk_en <= 1;
+                    state <= TRANSFER;
                 end
 
-                TRANSFER: begin
-                    if (sclk_en) begin
-                        if (SCLK == 0) begin
-                            // On falling edge, capture MISO and shift data
-                            shift_reg <= {shift_reg[14:0], MISO[0]};
-                        end else begin
-                            // On rising edge, shift out data
-                            data_to_tx <= shift_reg;
-                        end
+                TRANSFER: 
+                begin
+                    data_to_tx <= {1'b0, data_to_tx[15:1]};
+                    data_to_rx <= {miso, data_to_rx[15:1]};
 
-                        if (bit_counter == 0) begin
-                            state <= DESELECT;
-                        end else begin
-                            bit_counter <= bit_counter - 1;
-                        end
+                    if (bit_counter == 0) begin
+                        state <= DESELECT;
+                    end else begin
+                        bit_counter <= bit_counter - 1;
                     end
                 end
 
                 DESELECT: begin
-                    CS <= 2'b11; // Deselect all devices
+                    cs <= !CS_ACTIVE;
+                    sclk_en <= 0;
                     state <= IDLE;
                 end
             endcase

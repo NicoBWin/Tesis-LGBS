@@ -19,8 +19,7 @@ module ADC(
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;
-    parameter COMM_RATE = `SAMPLE2M4_CLK24M;
+    parameter COMM_RATE = `SAMPLE2M4_CLK48M;
     localparam RECEIVE_COUNT = 14;
     localparam CALIBRATE_COUNT = 32;
 
