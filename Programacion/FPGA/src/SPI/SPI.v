@@ -10,24 +10,21 @@ module SPI(
 
     output wire sclk,     // SPI clock
     input wire miso,     // Master-In Slave-Out
-    input reg mosi,
+    output wire mosi,
     output reg cs        // Chip select
 );
 
-    typedef enum reg [1:0] {
-        IDLE,
-        SELECT,
-        TRANSFER,
-        DESELECT
-    } spi_state_t;
+    localparam IDLE     = 2'b00;
+    localparam SELECT   = 2'b01;
+    localparam TRANSFER = 2'b10;
+    localparam DESELECT = 2'b11;
 
     // Internal signals
     reg sclk_en;
+    reg [1:0] state;
     reg [15:0] shift_reg;       // Shift register for SPI communication
     reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
-
-    spi_state_t state;
 
     parameter COMM_RATE = `RATE4M8_CLK48M;
     parameter CS_ACTIVE = 1'b1;
@@ -70,7 +67,7 @@ module SPI(
 
                 TRANSFER: 
                 begin
-                    data_to_tx <= {1'b0, data_to_tx[15:1]};
+                    shift_reg <= {1'b0, shift_reg[15:1]};
                     data_to_rx <= {miso, data_to_rx[15:1]};
 
                     if (bit_counter == 0) begin
