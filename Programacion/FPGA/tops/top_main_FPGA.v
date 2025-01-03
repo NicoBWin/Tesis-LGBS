@@ -3,77 +3,53 @@
 `include "../src/SPI/SPI.vh"
 
 /*
-    Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
-    envia una señal de lectura al ADC y devuelve lo leido al main por UART que lo 
-    refleja en 12 pines del main.
+    Recibe por los 2 SPIs los valores de las 3 señales. Manda por UART que 
+    transistores prender de cada modulo y envia al final un pulso de shoot.
 */
 
 module top(
+
+    //UART
     input wire gpio_23,
-    input wire gpio_25,
+    output wire gpio_10,
+    
 
-    input wire gpio_34,
-    input wire gpio_43,
-    input wire gpio_36,
-    input wire gpio_42,
-    input wire gpio_38,
-    input wire gpio_28,
+    //Signal
+    input wire gpio_12,
+    input wire gpio_21,
 
+    //LEDs
     output wire led_red,
     output wire led_green,
     output wire led_blue,
 
-    output wire gpio_10,
-
-    output wire gpio_12,
-    output wire gpio_21,
-    output wire gpio_13,
-
-    output wire gpio_47,
-    output wire gpio_46,
-    output wire gpio_2
+    //Shoot
+    output wire gpio_25
 );
+
+/*
+*****************************
+*   Variables declaration   *
+*****************************
+*/  
+    localparam OFF = 1;
+    localparam ON = 0;
 
 /*
 *******************
 *   Ports setup   *
 *******************
 */
-
-    wire tx;
-    wire rx;
-    wire shoot;
-    wire phase_a_top;
-    wire phase_b_top;
-    wire phase_c_top;
-    wire phase_a_down;
-    wire phase_b_down;
-    wire phase_c_down;
-
-    wire cs_1;
-    wire sdo_1;
-    wire sclk_1;
-    wire cs_2;
-    wire sdo_2;
-    wire sclk_2;
+    wire tx = gpio_10;
+    wire rx = gpio_23;
+    wire shoot = gpio_25;
+    reg led_r = OFF;
+    reg led_g = OFF;
+    reg led_b = OFF;
     
-    assign tx = gpio_10;
-    assign rx = gpio_23;
-    assign shoot = gpio_25;
-
-    assign phase_a_top = gpio_34;
-    assign phase_b_top = gpio_43;
-    assign phase_c_top = gpio_36;
-    assign phase_a_down = gpio_42;
-    assign phase_b_down = gpio_38;
-    assign phase_c_down = gpio_28;
-
-    assign cs_1 = gpio_12;
-    assign sdo_1 = gpio_21;
-    assign sclk_1 = gpio_13;
-    assign cs_2 = gpio_47;
-    assign sdo_2 = gpio_46;
-    assign sclk_2 = gpio_2;
+    assign led_red = led_r;
+    assign led_green = led_g;
+    assign led_blue = led_b;
 /*
 *********************
 *   HFClock setup   *
@@ -84,20 +60,6 @@ module top(
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
-/*
-*****************************
-*   Variables declaration   *
-*****************************
-*/  
-    // LEDs
-    localparam OFF = 1;
-    localparam ON = 0;
-    reg led_r = OFF;
-    reg led_g = OFF;
-    reg led_b = OFF;
-    assign led_red = led_r;
-    assign led_green = led_g;
-    assign led_blue = led_b;
 
     // General purpose
     reg reset = 0;

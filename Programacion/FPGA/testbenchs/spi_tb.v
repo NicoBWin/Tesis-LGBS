@@ -72,7 +72,7 @@ module SPI_tb;
     *   Monitoring output  *
     ************************
     */
-    always @(posedge sclk) begin
+    always @(negedge sclk) begin
         $display("Time=%0t | MOSI=%b | MISO=%b | Received Data=%h", $time, mosi, mosi, data_rx);
     end
 
