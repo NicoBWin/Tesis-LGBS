@@ -50,13 +50,13 @@ module ADC(
     );
 
     up_counter #(RECEIVE_COUNT) receive_counter (
-        .clk_in(inner_clk),
+        .clk(inner_clk),
         .reset(receive_reset),
         .counter(r_counter)
     );
 
     up_counter #(CALIBRATE_COUNT) calibrate_counter(
-        .clk_in(inner_clk),
+        .clk(inner_clk),
         .reset(calibrate_reset),
         .counter(c_counter)
     );

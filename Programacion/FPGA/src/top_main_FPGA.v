@@ -3,10 +3,10 @@
     transistores prender de cada modulo y envia al final un pulso de shoot.
 */
 
-`include "main.vh"
-`include "../src/UART/UART.vh"
-`include "../src/SPI/SPI.vh"
-`include "../src/timer/timer.vh"
+`include "./src/main.vh"
+`include "./src/UART/UART.vh"
+`include "./src/SPI/SPI.vh"
+`include "./src/timer/timer.vh"
 
 module top(
 
@@ -26,7 +26,7 @@ module top(
 
     // UART 4
     input wire gpio_31,
-    output wire gpio_37,
+    output wire gpio_2,
 
     // UART 5
     input wire gpio_42,
@@ -41,8 +41,8 @@ module top(
     output wire gpio_13,
 
     // UART 8
-    input wire gpio_23_8,
-    output wire gpio_10_8,
+    input wire gpio_9,
+    output wire gpio_6,
 
     // UART 9
     input wire gpio_19,
@@ -77,27 +77,17 @@ module top(
 *******************
 */  
 
-    wire tx_mod_1 = gpio_10;
-    wire rx_mod_1 = gpio_23;
-    wire tx_mod_2 = gpio_27;
-    wire rx_mod_2 = gpio_26;
-    wire tx_mod_3 = gpio_35;
-    wire rx_mod_3 = gpio_32;
-    wire tx_mod_4 = gpio_37;
-    wire rx_mod_4 = gpio_31;
-    wire tx_mod_5 = gpio_38;
-    wire rx_mod_5 = gpio_42;
-    wire tx_mod_6 = gpio_12;
-    wire rx_mod_6 = gpio_28;
-    wire tx_mod_7 = gpio_13;
-    wire rx_mod_7 = gpio_21;
-    wire tx_mod_8 = gpio_10_8;
-    wire rx_mod_8 = gpio_23_8;
-    wire tx_mod_9 = gpio_18;
-    wire rx_mod_9 = gpio_19;
+    `UART_MAP(1, gpio_23, gpio_10)
+    `UART_MAP(2, gpio_26, gpio_27)
+    `UART_MAP(3, gpio_32, gpio_35)
+    `UART_MAP(4, gpio_31, gpio_2)
+    `UART_MAP(5, gpio_42, gpio_38)
+    `UART_MAP(6, gpio_28, gpio_12)
+    `UART_MAP(7, gpio_21, gpio_13)
+    `UART_MAP(8, gpio_9, gpio_6)
+    `UART_MAP(9, gpio_19, gpio_18)
 
     wire shoot = gpio_25;
-
     wire spi_clk = gpio_37;
     wire mosi = gpio_34;
     wire miso = gpio_43;
@@ -200,14 +190,14 @@ module top(
         .cs(cs)
     );
 
-    timer #(SEC_1) timer_1(
+    timer #(`SEC_1) timer_1(
         .clk(clk),
         .reset(reset),
         .start(start_1_sec),
         .done(done_1_sec)
     );
 
-    timer #(SEC_5) timer_2(
+    timer #(`SEC_5) timer_2(
         .clk(clk),
         .reset(reset),
         .start(start_5_sec),
@@ -230,7 +220,7 @@ module top(
 
             IDLE: begin
                 //Si termino la transferencia y se recibio modo pipe
-                if (cs == 1 & received_from_spi == PIPE_MODE) begin
+                if (cs == 1 & received_from_spi == `PIPE_MODE) begin
                     //Entramos al modo debug del inverter
                     state <= DEBUG_MODE;
                     led_b <= ON;
