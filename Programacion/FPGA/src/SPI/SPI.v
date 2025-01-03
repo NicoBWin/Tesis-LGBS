@@ -1,16 +1,20 @@
 `include "./src/SPI/SPI.vh"
 
+/*
+    Nota: El slave tiene que muestrear los bits en el flanco descendente del sclk
+*/
+
 module SPI(
     input wire clk,            // System clock
     input wire reset,          // System reset
     input wire start_transfer,
 
     input wire [15:0] data_to_tx,
-    output reg [15:0] data_to_rx,
+    output reg [15:0] data_rx,
 
     output wire sclk,     // SPI clock
-    input wire miso,     // Master-In Slave-Out
     output wire mosi,
+    input wire miso,     // Master-In Slave-Out
     output reg cs        // Chip select
 );
 
@@ -27,7 +31,7 @@ module SPI(
     wire inner_clk;
 
     parameter COMM_RATE = `RATE4M8_CLK48M;
-    parameter CS_ACTIVE = 1'b1;
+    parameter CS_ACTIVE = 1'b0; // 0 active low
 
     assign mosi = shift_reg[0];
     assign sclk = inner_clk & sclk_en;
@@ -42,7 +46,7 @@ module SPI(
         if (reset) 
         begin
             state <= IDLE;
-            data_to_rx <= 15'b0;
+            data_rx <= 15'b0;
             sclk_en <= 0;
             cs <= !CS_ACTIVE;
         end
@@ -52,7 +56,7 @@ module SPI(
                 begin
                     if (start_transfer) begin
                         bit_counter <= 15;
-                        data_to_rx <= 15'b0;
+                        data_rx <= 15'b0;
                         shift_reg <= data_to_tx;
                         state <= SELECT;
                     end
@@ -68,19 +72,15 @@ module SPI(
                 TRANSFER: 
                 begin
                     shift_reg <= {1'b0, shift_reg[15:1]};
-                    data_to_rx <= {miso, data_to_rx[15:1]};
+                    data_rx <= {miso, data_rx[15:1]};
 
                     if (bit_counter == 0) begin
-                        state <= DESELECT;
+                        cs <= !CS_ACTIVE;
+                        sclk_en <= 0;
+                        state <= IDLE;
                     end else begin
                         bit_counter <= bit_counter - 1;
                     end
-                end
-
-                DESELECT: begin
-                    cs <= !CS_ACTIVE;
-                    sclk_en <= 0;
-                    state <= IDLE;
                 end
             endcase
         end

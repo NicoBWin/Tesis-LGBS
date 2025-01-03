@@ -18,8 +18,7 @@ module SPI_tb;
     reg reset;
     reg start_transfer;
     reg [15:0] data_to_tx;
-    reg miso;
-    wire [15:0] data_to_rx;
+    wire [15:0] data_rx;
     wire sclk;
     wire cs;
     wire mosi;
@@ -34,9 +33,9 @@ module SPI_tb;
         .reset(reset),
         .start_transfer(start_transfer),
         .data_to_tx(data_to_tx),
-        .data_to_rx(data_to_rx),
+        .data_rx(data_rx),
         .sclk(sclk),
-        .miso(miso),
+        .miso(mosi),
         .mosi(mosi),
         .cs(cs)
     );
@@ -53,24 +52,18 @@ module SPI_tb;
         // Initialize signals
         reset <= 1;
         start_transfer <= 0;
-        data_to_tx <= 16'h0;
-        miso <= 0;
+        data_to_tx <= 16'h0000;
 
         #10 reset <= 0;  // Release reset
 
         // Test case 1: Send and receive data
-        #5
-        data_to_tx <= 16'hA5A5;  // Transmit pattern
+        data_to_tx <= 16'hA5A5;  // Transmit pattern 10100101 
         start_transfer <= 1;
 
-        #5 start_transfer <= 0; // Deassert start_transfer
+        #20
+        start_transfer <= 0;
 
-        // Simulate incoming MISO data
-        repeat (16) begin
-            #2 miso <= ~miso; // Toggle MISO value
-        end
-
-        #100
+        #800
         $finish;
     end
 
@@ -80,7 +73,7 @@ module SPI_tb;
     ************************
     */
     always @(posedge sclk) begin
-        $display("Time=%0t | MOSI=%b | MISO=%b | Received Data=%h", $time, mosi, miso, data_to_rx);
+        $display("Time=%0t | MOSI=%b | MISO=%b | Received Data=%h", $time, mosi, mosi, data_rx);
     end
 
 endmodule
