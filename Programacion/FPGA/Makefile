@@ -28,9 +28,9 @@ ifeq ($(uname_S), Darwin)
 endif
 
 LIB_SRC = ./src/SPI/SPI.v ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
-SOURCES = ./tops/top_SPI.v $(LIB_SRC)
+SOURCES = ./src/top_main_FPGA.v $(LIB_SRC)
 TBNAME = spi_tb
-MODULE_TO_DRAW = top_SPI.v
+MODULE_TO_DRAW = top_main_FPGA.v
 SOURCES_TB = ./testbenchs/spi_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q

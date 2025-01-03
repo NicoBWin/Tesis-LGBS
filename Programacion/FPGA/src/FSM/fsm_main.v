@@ -1,8 +1,8 @@
-module debugging_fsm (
+module fsm_main (
     input wire clk,
     input wire reset,
     input wire start,
-    output wire done
+    output wire [1:0] state
 );
 
     localparam IDLE    = 2'b00;
@@ -12,9 +12,12 @@ module debugging_fsm (
 
     reg [1:0] current_state, next_state;
 
+    assign state = current_state;
+
     always @(posedge clk or posedge reset) begin
         if (reset)
             current_state <= IDLE;
+            next_state <= IDLE;
         else begin
             case (current_state)
                 IDLE:    next_state = start ? READ : IDLE;
@@ -23,11 +26,9 @@ module debugging_fsm (
                 WRITE:   next_state = IDLE;
                 default: next_state = IDLE;
             endcase
-
-            current_state <= next_state;
         end
-    end
 
-    assign done = (current_state == WRITE);
+        current_state <= next_state;
+    end
 
 endmodule
