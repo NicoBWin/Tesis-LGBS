@@ -1,5 +1,6 @@
 
-`include "../src/UART/baudgen.vh"
+`include "../src/UART/UART.vh"
+`include "../src/SPI/SPI.vh"
 
 /*
     Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
