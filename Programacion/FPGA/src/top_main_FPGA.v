@@ -117,9 +117,12 @@ module top(
 *************************************
 */
 
+    parameter [4:0] SET1[9:0] = {8'hAA, 8'hBB, 8'hCC, 8'hDD, 8'hEE, 8'hFF, 8'h11, 8'h22, 8'h33, 8'h44};
+
     // General purpose
     genvar i;
     reg reset = 0;
+    reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
 
     // Timers
     reg start_1_sec = 0;
@@ -131,6 +134,7 @@ module top(
     localparam IDLE         = 3'b001;
     localparam DEBUG_MODE   = 3'b010;
     localparam NORMAL_MODE  = 3'b100;
+    localparam PIPE_MODE    = 3'b110;
     reg [2:0] state = INIT;
 
     // UART
@@ -155,7 +159,8 @@ module top(
 */
     
     generate
-        for (i = 0; i < 9; i = i + 1) begin : uart_modules
+        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin : uart_modules
+
             // UART TX module
             uart_tx to_modules_tx(
                 .clk(clk),
@@ -221,8 +226,8 @@ module top(
             IDLE: begin
                 //Si termino la transferencia y se recibio modo pipe
                 if (cs == 1 & received_from_spi == `PIPE_MODE) begin
-                    //Entramos al modo debug del inverter
-                    state <= DEBUG_MODE;
+                    //Entramos al modo pipe del inverter
+                    state <= PIPE_MODE;
                     led_b <= ON;
                 end
                 else if(done_5_sec == 1) begin
@@ -230,6 +235,10 @@ module top(
                     state <= NORMAL_MODE;
                     led_g <= ON;
                 end
+            end
+
+            PIPE_MODE: begin
+                
             end
         endcase
     end
