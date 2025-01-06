@@ -11,6 +11,7 @@ module SPI(
 
     input wire [15:0] data_to_tx,
     output reg [15:0] data_rx,
+    output reg transfer_done,
 
     output wire sclk,     // SPI clock
     output wire mosi,
@@ -48,12 +49,14 @@ module SPI(
             state <= IDLE;
             data_rx <= 15'b0;
             sclk_en <= 0;
+            transfer_done <= 0;
             cs <= !CS_ACTIVE;
         end
         else begin
             case (state)
                 IDLE: 
                 begin
+                    transfer_done <= 0;
                     if (start_transfer) begin
                         bit_counter <= 15;
                         data_rx <= 15'b0;
@@ -77,6 +80,7 @@ module SPI(
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
                         sclk_en <= 0;
+                        transfer_done <= 1;
                         state <= IDLE;
                     end else begin
                         bit_counter <= bit_counter - 1;
