@@ -4,8 +4,8 @@ modules_number = 9;
 
 %% SPWM_Mod_Block
 
-cfg.clk_freq = 40e6;
-cfg.tri_freq = 160e3;
+cfg.clk_freq = 48e6;
+cfg.tri_freq = 250e3;
 cfg.mod_number = 3;
 
 %This counter value shouldn't exceed 255 (tri_freq >= 160E3)
