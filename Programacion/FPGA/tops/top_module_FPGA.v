@@ -1,10 +1,11 @@
 
-`include "../src/UART/baudgen.vh"
+`include "../src/UART/UART.vh"
+`include "../src/SPI/SPI.vh"
 
 /*
-    Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
-    envia una señal de lectura al ADC y devuelve lo leido al main por UART que lo 
-    refleja en 12 pines del main.
+    Recibe un codigo (cual disparar, 6 cod posibles) y recibe un pulso de shoot. 
+    Cada 1 segundo, envia una señal de lectura al ADC y devuelve lo leido al main 
+    por UART que lo refleja en 12 pines del main.
 */
 
 module top(
@@ -42,19 +43,9 @@ module top(
     wire tx;
     wire rx;
     wire shoot;
-    wire phase_a_top;
-    wire phase_b_top;
-    wire phase_c_top;
-    wire phase_a_down;
-    wire phase_b_down;
-    wire phase_c_down;
-
-    wire cs_1;
-    wire sdo_1;
-    wire sclk_1;
-    wire cs_2;
-    wire sdo_2;
-    wire sclk_2;
+    wire cs;
+    wire sdo;
+    wire sclk;
     
     assign tx = gpio_10;
     assign rx = gpio_23;

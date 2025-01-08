@@ -1,3 +1,6 @@
 
 // 24Mhz
 `define SAMPLE2M4_CLK24M 10
+
+// 48Mhz
+`define SAMPLE2M4_CLK48M 20

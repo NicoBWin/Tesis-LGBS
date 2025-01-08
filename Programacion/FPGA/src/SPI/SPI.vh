@@ -1,3 +1,3 @@
 
-// 24Mhz
-`define SAMPLE2M4_CLK24M 10
+// 48Mhz
+`define RATE4M8_CLK48M 10
