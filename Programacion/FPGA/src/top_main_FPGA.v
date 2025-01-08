@@ -251,7 +251,7 @@ endtask
 
             IDLE: begin
                 logic is_code_received;
-                check_condition(`PIPE_MODE_SPI, is_code_received);
+                is_code_received = check_condition(`PIPE_MODE_SPI, is_code_received);
 
                 //Si termino la transferencia y se recibio modo pipe
                 if (is_code_received) begin
@@ -268,7 +268,6 @@ endtask
             end
 
             PIPE_MODE: begin
-                // In Pipe Mode, transfer data to each UART module
                 case (pipe_state)
                     IDLE_PIPE: begin
                         if (transfer_done_spi) begin
