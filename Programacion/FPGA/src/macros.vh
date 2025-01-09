@@ -16,7 +16,6 @@
 `define GET_ADC 5'11111
 
 // SPI codes
-`define 
 `define PIPE_MODE_SPI 16'hB0CA
 `define IDLE_SPI 16'h0000
 

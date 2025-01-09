@@ -13,9 +13,6 @@ module ADC(
 
     output wire [11:0] value,
     output reg read_done,
-
-    output wire state_0,
-    output wire state_1
 );
 
     // Config
@@ -34,9 +31,6 @@ module ADC(
     reg [11:0] signal_val = 0; 
     reg calibrate_reset;
     reg receive_reset;
-
-    assign state_0 = state[0];
-    assign state_1 = state[1];
 
     wire inner_clk;
     wire[$clog2(RECEIVE_COUNT)-1:0] r_counter;
