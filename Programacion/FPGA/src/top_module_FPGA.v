@@ -12,6 +12,7 @@
 `include "./src/macros.vh"
 `include "./src/UART/UART.vh"
 `include "./src/timer/timer.vh"
+`include "./src/ADC/ADC.vh"
 
 module top(
 
@@ -102,10 +103,6 @@ module top(
     wire code_received;
     wire uart_code;
 
-    // Timers
-    reg start_1_sec = 0;
-    wire done_1_sec;
-
 /*
 *********************
 *   HFClock setup   *
@@ -133,27 +130,122 @@ module top(
     wire parity_error; 
     wire tx; 
     wire rx; 
-
     assign uart_code = data_received[6:3];
+
+    // Timers
+    reg start_1_sec = 0;
+    wire done_1_sec;
+
+    // Signals for ADC 1
+    wire adc_1_read;
+    wire adc_1_recalibrate;
+    wire [11:0] adc_1_value;
+    wire adc_1_done;
+
+    // Signals for ADC 2
+    wire adc_2_read;
+    wire adc_2_recalibrate;
+    wire [11:0] adc_2_value;
+    wire adc_2_done;
 /*
 *************************************
 *        Functions declarations     *
 *************************************
 */
 
-task uart_code_received;
-    input logic [3:0] code;
-
+task uart_code_received(input logic [3:0] code);
     begin
         code_received = (rx_done && uart_code == code) ? 1 : 0;
     end
 endtask
 
-task transistors_state;
+task read_and_send_adc_value(input [3:0] uart_code);
+
+    reg [11:0] adc_value;
+    reg [1:0] state = 2'b00;
+
+    case (uart_code)
+        `ADC_TOP: begin
+            adc_1_read = 1;
+            adc_1_recalibrate = 0;
+            wait(adc_1_done);
+            adc_value = adc_1_value;
+        end
+        `ADC_BOTTOM: begin
+            adc_2_read = 1;
+            adc_2_recalibrate = 0;
+            wait(adc_2_done);
+            adc_value = adc_2_value;
+        end
+    endcase
+    
+    for (integer i = 0; i < 3; i = i + 1) begin
+        //TODO: Agregar ECC en lugar de los 0's
+        data_to_tx = {adc_value[4*i +:4], 4'b0};  // Get next 4 bits from the ADC value
+        start_tx = 1;
+        wait(!tx_busy);  // Wait until UART is ready
+    end
+
+endtask
+
+
+task change_transistors_state(input reg [3:0] code);
     begin
+        //Importante, checker si necesitamos delay aca para la transicion (shoot thought)
         case (uart_code)
-            
+            `ON1A2B: begin
+                g1_a = TR_ON;
+                g2_b = TR_ON;
+            end
+
+            `ON1A2C: begin
+                g1_a = TR_ON;
+                g2_c = TR_ON;
+            end
+
+            `ON1B2A: begin
+                g1_b = TR_ON;
+                g2_a = TR_ON;
+            end
+
+            `ON1B2C: begin
+                g1_b = TR_ON;
+                g2_c = TR_ON;
+            end
+
+            `ON1C2A: begin
+                g1_c = TR_ON;
+                g2_a = TR_ON;
+            end
+
+            `ON1C2B: begin
+                g1_c = TR_ON;
+                g2_b = TR_ON;
+            end
+
+            `ZERO_A: begin
+                g1_a = TR_ON;
+                g2_a = TR_ON;
+            end
+
+            `ZERO_B: begin
+                g1_b = TR_ON;
+                g2_b = TR_ON;
+            end
+
+            `ZERO_C: begin
+                g1_c = TR_ON;
+                g2_c = TR_ON;
+            end
         endcase
+
+        if (uart_code != `ON1A2B && uart_code != `ON1A2C && uart_code != `ZERO_A) g1_a = TR_OFF;
+        if (uart_code != `ON1B2A && uart_code != `ON1B2C && uart_code != `ZERO_B) g1_b = TR_OFF;
+        if (uart_code != `ON1C2A && uart_code != `ON1C2B && uart_code != `ZERO_C) g1_c = TR_OFF;
+        
+        if (uart_code != `ON1B2A && uart_code != `ON1C2A && uart_code != `ZERO_A) g2_a = TR_OFF;
+        if (uart_code != `ON1A2B && uart_code != `ON1C2B && uart_code != `ZERO_B) g2_b = TR_OFF;
+        if (uart_code != `ON1A2C && uart_code != `ON1B2C && uart_code != `ZERO_C) g2_c = TR_OFF;
     end
 endtask
 
@@ -183,6 +275,31 @@ endtask
         .parity_error(parity_error)
     );
 
+    ADC #(.COMM_RATE(`SAMPLE2M4_CLK48M)) adc_1 (
+        .clk(clk),
+        .reset(reset),
+        .read(adc_1_read),
+        .recalibrate(adc_1_recalibrate),
+        .sdo(sdo_1),
+        .cs(cs_1),
+        .sclk(sclk_1),
+        .value(adc_1_value),
+        .read_done(adc_1_done)
+    );
+
+    ADC #(.COMM_RATE(`SAMPLE2M4_CLK48M)) adc_2 (
+        .clk(clk),
+        .reset(reset),
+        .read(adc_2_read),
+        .recalibrate(adc_2_recalibrate),
+        .sdo(sdo_2),
+        .cs(cs_2),
+        .sclk(sclk_2),
+        .value(adc_2_value),
+        .read_done(adc_2_done)
+    );
+
+
 /*
 ******************
 *   Statements   *
@@ -204,11 +321,15 @@ endtask
             end
 
             DECODE: begin
-
                 if (rx_done) begin
                     if (!parity_error) begin
                         case (uart_code)
-
+                            `ON1A2B, `ON1A2C, `ON1B2A,
+                            `ON1B2C, `ON1C2A, `ON1C2B,
+                            `ZERO_A, `ZERO_B, `ZERO_C: 
+                                change_transistors_state(uart_code);
+                            `ADC_TOP, `ADC_BOTTOM:
+                                read_and_send_adc_value(uart_code);
                         endcase
                     end
                     else begin

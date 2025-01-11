@@ -17,6 +17,7 @@ module ADC(
 
     // Config
     parameter COMM_RATE = `SAMPLE2M4_CLK48M;
+    
     localparam RECEIVE_COUNT = 14;
     localparam CALIBRATE_COUNT = 32;
 
