@@ -63,14 +63,11 @@ module SPI_tb;
         data_to_tx <= 16'hA5A5;  // Transmit pattern
         start_transfer <= 1;
 
-        #5 start_transfer <= 0; // Deassert start_transfer
+        #100 start_transfer <= 0; // Deassert start_transfer
 
-        // Simulate incoming MISO data
-        repeat (16) begin
-            #2 miso <= ~miso; // Toggle MISO value
-        end
+        miso <= mosi;
 
-        #100
+        #1000
         $finish;
     end
 
