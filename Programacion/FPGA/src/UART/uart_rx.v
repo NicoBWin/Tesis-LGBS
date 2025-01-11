@@ -5,7 +5,7 @@
     necesitamos (4bits de data).
 */
 
-`include "./src/UART/baudgen.vh"
+`include "./src/UART/UART.vh"
 
 module uart_rx(
     input wire clk,            // Clock signal
