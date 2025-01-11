@@ -253,6 +253,8 @@ endtask
                 logic is_code_received;
                 is_code_received = check_condition(`PIPE_MODE_SPI, is_code_received);
 
+                reset <= 0;
+
                 //Si termino la transferencia y se recibio modo pipe
                 if (is_code_received) begin
                     //Entramos al modo pipe del inverter

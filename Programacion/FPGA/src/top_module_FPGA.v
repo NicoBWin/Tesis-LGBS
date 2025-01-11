@@ -57,6 +57,9 @@ module top(
     localparam TR_ON = 1;
     localparam TR_OFF = 0;
 
+    localparam INIT = 2'b00;
+    localparam DECODE = 2'b01;
+    localparam RX_ERROR = 2'b10;
 /*
 *******************
 *   Ports setup   *
@@ -96,6 +99,13 @@ module top(
     assign gpio_46 = g3_a;
     assign gpio_2 = g3_b;
 
+    wire code_received;
+    wire uart_code;
+
+    // Timers
+    reg start_1_sec = 0;
+    wire done_1_sec;
+
 /*
 *********************
 *   HFClock setup   *
@@ -114,29 +124,38 @@ module top(
     // General purpose
     reg reset = 0;
 
-    // Timers
-    reg start_1_sec = 0;
-    reg start_5_sec = 0;
-    wire done_1_sec;
-    wire done_5_sec;
-
     // UART
-    reg start_tx; // One start_tx signal for each UART
-    reg [7:0] data_to_tx; // Data to transmit for each UART
-    wire [7:0] data_received; // Data received from each UART
-    wire tx_busy; // TX busy signal for each UART
-    wire rx_done; // RX done signal for each UART
-    wire parity_error; // Parity error signal for each UART
-    wire tx; // TX wire for each UART
-    wire rx; // RX wire for each UART
+    reg start_tx;
+    reg [7:0] data_to_tx;
+    wire [7:0] data_received; 
+    wire tx_busy; 
+    wire rx_done; 
+    wire parity_error; 
+    wire tx; 
+    wire rx; 
 
+    assign uart_code = data_received[6:3];
 /*
 *************************************
 *        Functions declarations     *
 *************************************
 */
 
+task uart_code_received;
+    input logic [3:0] code;
 
+    begin
+        code_received = (rx_done && uart_code == code) ? 1 : 0;
+    end
+endtask
+
+task transistors_state;
+    begin
+        case (uart_code)
+            
+        endcase
+    end
+endtask
 
 /*
 *************************************
@@ -164,21 +183,6 @@ module top(
         .parity_error(parity_error)
     );
 
-
-    timer #(`SEC_1) timer_1(
-        .clk(clk),
-        .reset(reset),
-        .start(start_1_sec),
-        .done(done_1_sec)
-    );
-
-    timer #(`SEC_5) timer_2(
-        .clk(clk),
-        .reset(reset),
-        .start(start_5_sec),
-        .done(done_5_sec)
-    );
-
 /*
 ******************
 *   Statements   *
@@ -188,60 +192,35 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                reset <= 1;
-                start_5_sec <= 1;
-                tx_rx_spi <= 1;
-                state <= IDLE;
-            end
-
-            IDLE: begin
-                logic is_code_received;
-                is_code_received = check_condition(`PIPE_MODE_SPI, is_code_received);
-
-                //Si termino la transferencia y se recibio modo pipe
-                if (is_code_received) begin
-                    //Entramos al modo pipe del inverter
-                    state <= PIPE_MODE;
-                    pipe_state <= IDLE_PIPE;
-                    led_b <= ON;
+                if (done_1_sec) begin
+                    reset <= 0;
+                    start_1_sec <= 0;
+                    state <= IDLE;
                 end
-                else if(done_5_sec == 1) begin
-                    //Entramos al modo normal de funcionamiento del inverter
-                    state <= NORMAL_MODE;
-                    led_g <= ON;
+                else begin
+                    reset <= 1;
+                    start_1_sec <= 1;
                 end
             end
 
-            PIPE_MODE: begin
-                case (pipe_state)
-                    IDLE_PIPE: begin
-                        if (transfer_done_spi) begin
-                            spi_to_uart_id = received_from_spi[15:8];
-                            spi_to_uart_code = received_from_spi[7:0];
-                            data_to_tx[spi_to_uart_id] = spi_to_uart_code;
-                            pipe_state <= SEND_PIPE;
-                        end
-                    end
-                    
-                    SEND_PIPE: begin
-                        if (!tx_busy[spi_to_uart_id]) begin
-                            start_tx[spi_to_uart_id] = 1;
-                            pipe_state <= RECEIVE_PIPE;
-                        end
-                    end
+            DECODE: begin
 
-                    RECEIVE_PIPE: begin
-                        if (!rx_busy[spi_to_uart_id]) begin
-                            start_tx[spi_to_uart_id] = 1;
-                            pipe_state <= RECEIVE_PIPE;
-                        end
+                if (rx_done) begin
+                    if (!parity_error) begin
+                        case (uart_code)
+
+                        endcase
                     end
-                endcase
+                    else begin
+                        state <= RX_ERROR;
+                    end 
+                end
             end
 
-            NORMAL_MODE: begin
-                // Handle normal mode operations (non-pipe mode)
+            RX_ERROR: begin
+                
             end
+
         endcase
     end
 

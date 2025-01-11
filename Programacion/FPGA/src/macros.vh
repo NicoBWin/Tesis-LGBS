@@ -2,18 +2,18 @@
 `define NUM_OF_MODULES 9
 
 // UART codes
-`define TR_00 5'00000
-`define TR_01 5'00001
-`define TR_10 5'00010
-`define TR_11 5'00011
-`define TR_20 5'00100
-`define TR_21 5'00101
-
-`define IDLE 5'00101
-`define ACK 5'11101
-`define PIPE 5'11110    //Permite forwardear todo lo que venga por UART hacia 1 solo modulo
-
-`define GET_ADC 5'11111
+`define IDLE 4'd0
+`define TR1_A 4'd1
+`define TR2_A 4'd2
+`define TR1_B 4'd3
+`define TR2_B 4'd4
+`define TR1_C 4'd5
+`define TR2_C 4'd6
+`define ACK 4'd7
+`define NACK 4'd8
+`define START 4'd9
+`define STOP 4'd10
+`define ADC 4'd11   // Read adc
 
 // SPI codes
 `define PIPE_MODE_SPI 16'hB0CA
