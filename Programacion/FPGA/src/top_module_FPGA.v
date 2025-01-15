@@ -204,7 +204,6 @@ endtask
             end
 
             DECODE: begin
-
                 if (rx_done) begin
                     if (!parity_error) begin
                         case (uart_code)
