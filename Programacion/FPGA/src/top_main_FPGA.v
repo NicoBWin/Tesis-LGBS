@@ -70,8 +70,6 @@ module top(
 */  
     localparam OFF = 1;
     localparam ON = 0;
-    localparam MODULE_OFFSET = (1 << 17) / `NUM_OF_MODULES;
-    localparam PHASE_OFFSET = (1 << 17) / `NUM_OF_PHASES;
 
 /*
 *******************
@@ -181,12 +179,15 @@ task check_condition;
 endtask
 
 task sin_value_send;
+    wire [15:0] offset = i * `MODULE_OFFSET + j * `PHASE_OFFSET; 
+
     begin
         for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-            for (j = 0; j < 2; j = j + 1) begin
-                if (MODULE_OFFSET + ) begin
-                    data_to_tx <= MODULE_OFFSET;
-                end
+            for (j = 0; j < `NUM_OF_PHASES; j = j + 1) begin
+                sin_index = offset;
+                data_to_tx[i] = sin_value;
+                start_tx = 1;
+                wait(tx_busy == 0);
             end
         end
     end
