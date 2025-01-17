@@ -59,7 +59,7 @@ module top(
     localparam TR_OFF = 0;
 
     localparam INIT = 2'b00;
-    localparam DECODE = 2'b01;
+    localparam IDLE = 2'b01;
     localparam RX_ERROR = 2'b10;
 /*
 *******************
@@ -159,96 +159,6 @@ task uart_code_received(input logic [3:0] code);
     end
 endtask
 
-task read_and_send_adc_value(input [3:0] uart_code);
-
-    reg [11:0] adc_value;
-    reg [1:0] state = 2'b00;
-
-    case (uart_code)
-        `ADC_TOP: begin
-            adc_1_read = 1;
-            adc_1_recalibrate = 0;
-            wait(adc_1_done);
-            adc_value = adc_1_value;
-        end
-        `ADC_BOTTOM: begin
-            adc_2_read = 1;
-            adc_2_recalibrate = 0;
-            wait(adc_2_done);
-            adc_value = adc_2_value;
-        end
-    endcase
-    
-    for (integer i = 0; i < 3; i = i + 1) begin
-        //TODO: Agregar ECC en lugar de los 0's
-        data_to_tx = {adc_value[4*i +:4], 4'b0};  // Get next 4 bits from the ADC value
-        start_tx = 1;
-        wait(!tx_busy);  // Wait until UART is ready
-    end
-
-endtask
-
-
-task change_transistors_state(input reg [3:0] code);
-    begin
-        //Importante, checker si necesitamos delay aca para la transicion (shoot thought)
-        case (uart_code)
-            `ON1A2B: begin
-                g1_a = TR_ON;
-                g2_b = TR_ON;
-            end
-
-            `ON1A2C: begin
-                g1_a = TR_ON;
-                g2_c = TR_ON;
-            end
-
-            `ON1B2A: begin
-                g1_b = TR_ON;
-                g2_a = TR_ON;
-            end
-
-            `ON1B2C: begin
-                g1_b = TR_ON;
-                g2_c = TR_ON;
-            end
-
-            `ON1C2A: begin
-                g1_c = TR_ON;
-                g2_a = TR_ON;
-            end
-
-            `ON1C2B: begin
-                g1_c = TR_ON;
-                g2_b = TR_ON;
-            end
-
-            `ZERO_A: begin
-                g1_a = TR_ON;
-                g2_a = TR_ON;
-            end
-
-            `ZERO_B: begin
-                g1_b = TR_ON;
-                g2_b = TR_ON;
-            end
-
-            `ZERO_C: begin
-                g1_c = TR_ON;
-                g2_c = TR_ON;
-            end
-        endcase
-
-        if (uart_code != `ON1A2B && uart_code != `ON1A2C && uart_code != `ZERO_A) g1_a = TR_OFF;
-        if (uart_code != `ON1B2A && uart_code != `ON1B2C && uart_code != `ZERO_B) g1_b = TR_OFF;
-        if (uart_code != `ON1C2A && uart_code != `ON1C2B && uart_code != `ZERO_C) g1_c = TR_OFF;
-        
-        if (uart_code != `ON1B2A && uart_code != `ON1C2A && uart_code != `ZERO_A) g2_a = TR_OFF;
-        if (uart_code != `ON1A2B && uart_code != `ON1C2B && uart_code != `ZERO_B) g2_b = TR_OFF;
-        if (uart_code != `ON1A2C && uart_code != `ON1B2C && uart_code != `ZERO_C) g2_c = TR_OFF;
-    end
-endtask
-
 /*
 *************************************
 *   External Modules declarations   *
@@ -320,17 +230,10 @@ endtask
                 end
             end
 
-            DECODE: begin
+            IDLE: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        case (uart_code)
-                            `ON1A2B, `ON1A2C, `ON1B2A,
-                            `ON1B2C, `ON1C2A, `ON1C2B,
-                            `ZERO_A, `ZERO_B, `ZERO_C: 
-                                change_transistors_state(uart_code);
-                            `ADC_TOP, `ADC_BOTTOM:
-                                read_and_send_adc_value(uart_code);
-                        endcase
+                        
                     end
                     else begin
                         state <= RX_ERROR;

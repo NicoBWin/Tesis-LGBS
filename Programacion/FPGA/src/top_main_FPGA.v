@@ -70,6 +70,8 @@ module top(
 */  
     localparam OFF = 1;
     localparam ON = 0;
+    localparam MODULE_OFFSET = (1 << 17) / `NUM_OF_MODULES;
+    localparam PHASE_OFFSET = (1 << 17) / `NUM_OF_PHASES;
 
 /*
 *******************
@@ -107,9 +109,11 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
-    )
-    hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
+    SB_HFOSC  #(.CLKHF_DIV("0b00")) hf_osc (
+        .CLKHFPU(1'b1), 
+        .CLKHFEN(1'b1), 
+        .CLKHF(clk)
+    ); // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
 
 /*
 *************************************
@@ -117,13 +121,14 @@ module top(
 *************************************
 */
 
-    parameter [4:0] SET1[9:0] = {8'hAA, 8'hBB, 8'hCC, 8'hDD, 8'hEE, 8'hFF, 8'h11, 8'h22, 8'h33, 8'h44};
-
     // General purpose
-    genvar i;
+    genvar i, j;
     reg reset = 0;
+    reg is_code_received = 0;
     reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
     reg [7:0] spi_to_uart_id, spi_to_uart_code;
+    reg [15:0] sin_index;
+    reg [7:0] sin_value;
 
     // Timers
     reg start_1_sec = 0;
@@ -168,11 +173,22 @@ module top(
 */
 
 task check_condition;
-    input logic [7:0] code;
-    output logic is_code_received;
+    input logic [15:0] code;
 
     begin
         is_code_received = (transfer_done_spi == 1 && received_from_spi == code) ? 1 : 0;
+    end
+endtask
+
+task sin_value_send;
+    begin
+        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+            for (j = 0; j < 2; j = j + 1) begin
+                if (MODULE_OFFSET + ) begin
+                    data_to_tx <= MODULE_OFFSET;
+                end
+            end
+        end
     end
 endtask
 
@@ -234,6 +250,11 @@ endtask
         .done(done_5_sec)
     );
 
+    RAM ram (
+        .address(sin_index),
+        .data(sin_value)
+    );
+
 /*
 ******************
 *   Statements   *
@@ -250,9 +271,7 @@ endtask
             end
 
             IDLE: begin
-                logic is_code_received;
-                is_code_received = check_condition(`PIPE_MODE_SPI, is_code_received);
-
+                is_code_received = check_condition(`PIPE_MODE_SPI);
                 reset <= 0;
 
                 //Si termino la transferencia y se recibio modo pipe
@@ -297,7 +316,7 @@ endtask
             end
 
             NORMAL_MODE: begin
-                // Handle normal mode operations (non-pipe mode)
+                sin_value_pick();
             end
         endcase
     end
