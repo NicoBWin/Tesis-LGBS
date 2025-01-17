@@ -188,6 +188,7 @@ task sin_value_send;
                 data_to_tx[i] = sin_value;
                 start_tx = 1;
                 wait(tx_busy == 0);
+                start_tx = 0;
             end
         end
     end
