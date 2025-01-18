@@ -125,8 +125,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 /*
 ******************

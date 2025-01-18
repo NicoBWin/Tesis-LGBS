@@ -31,7 +31,7 @@ module uart_rx(
 
     wire parity_error_done;
 
-    reg [5:0] clk_counter;
+    reg [$clog2(BAUD_RATE+BAUD_RATE)-1:0] clk_counter;
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
@@ -59,38 +59,39 @@ module uart_rx(
                     end
 
                     IDLE: begin
-                        if (clk_counter == 0) begin
-                            if (!rx) begin
-                                rx_done <= 0;
-                                bit_index <= 0;     // Se detecto el start
-                                clk_counter <= 1;
-                            end
+                        if (!rx) begin
+                            rx_done <= 0;
+                            bit_index <= 0;     // Se detecto el start
+                            clk_counter <= 1;
+                            state <= START;
                         end
-                        else begin
-                            clk_counter <= clk_counter + 1;
-                        end
+                    end
 
-                        if (clk_counter >= BAUD_RATE) begin
+                    START: begin
+                        if (clk_counter >= BAUD_RATE-1) begin
                             state <= RX;
                             clk_counter <= 0;
                         end 
+                        else begin
+                            clk_counter <= clk_counter + 1;
+                        end
                     end
 
                     RX: begin
                         if (clk_counter >= BAUD_RATE+BAUD_RATE-1) begin
                             clk_counter <= 0;
                             bit_index <= bit_index + 1;
+
+                            if (bit_index >= 9) begin
+                                state <= IDLE;
+                                rx_done <= 1;
+                            end
+                            else begin
+                                rx_shift_reg <= {rx, rx_shift_reg[8:1]};
+                            end
                         end 
                         else begin
                             clk_counter <= clk_counter + 1;
-                        end
-
-                        if (bit_index >= 9) begin
-                            state <= IDLE;
-                            rx_done <= 1;
-                        end
-                        else begin
-                            rx_shift_reg <= {rx, rx_shift_reg[8:1]};
                         end
                     end
                 endcase
