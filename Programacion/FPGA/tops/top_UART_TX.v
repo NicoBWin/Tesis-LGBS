@@ -73,7 +73,7 @@ module top(
     reg start_tx;
     //reg [3:0] code;
     //wire [6:0] hamm_code;
-    reg [7:0] data_to_tx = toggle; //= {1'b1, hamm_code};
+    reg [7:0] data_to_tx = 0; //toggle; //= {1'b1, hamm_code};
     reg reset = 0;
     
 /*
@@ -110,9 +110,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
-
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
 /*
 ******************
 *   Statements   *
@@ -140,8 +139,9 @@ module top(
                 if (counter == 24000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    state <= UART_SEND_ON;
-                    data_to_tx <= toggle;
+                    state <= WAIT;
+                    data_to_tx <= 0;
+                    start_tx <= 1;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin
@@ -155,36 +155,13 @@ module top(
             end
 
             UART_SEND_ON: begin
-                if (counter == 48000000) begin
-                    // Transition to UART_SEND_OFF state
-                    state <= UART_SEND_OFF;
-                    start_tx <= 0;
-                    data_to_tx <= toggle;
-                    counter <= 0; // Reset counter
-                end
-                else begin
-                    // Continue transmitting and incrementing counter
-                    start_tx <= 1;
-                    led_g <= ON;
-                    led_r <= OFF;
-                    counter <= counter + 1;
-                end
+                data_to_tx <= data_to_tx + 1;
+                state <= WAIT;
             end
 
-            UART_SEND_OFF: begin
-                if (counter == 48000000) begin
-                    // Transition back to UART_SEND_ON state
+            WAIT: begin
+                if (!tx_busy) begin
                     state <= UART_SEND_ON;
-                    start_tx <= 0;
-                    data_to_tx <= ack;
-                    counter <= 0; // Reset counter
-                end
-                else begin
-                    // Continue transmitting and incrementing counter
-                    start_tx <= 1;
-                    led_g <= OFF;
-                    led_r <= ON;
-                    counter <= counter + 1;
                 end
             end
         endcase

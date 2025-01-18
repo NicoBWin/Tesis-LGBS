@@ -113,8 +113,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
 
 /*
 ******************
@@ -122,7 +122,8 @@ module top(
 ******************
 */
 
-    parameter INIT  = 3'b001; 
+    parameter INIT  = 3'b001;
+    parameter RESET  = 3'b101; 
     parameter UART_RECEIVE = 3'b010;
     parameter CHECK = 3'b011;  
 
@@ -136,34 +137,43 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
 
+    reg [7:0] expected_data = 0;
+
     always @(posedge clk) begin
-        if (reset) begin
-            led_g <= OFF;
-            led_r <= OFF;
-            data_to_tx <= 0;
-            reset <= 0;
-            start_tx <= 0;
-        end
-        else begin
-            if (rx_done) begin
-                case (data_received)
-                    toggle: begin
-                        led_g <= OFF;
-                        led_r <= ON;
-                    end
-                    ack: begin
-                        led_g <= ON;
-                        led_r <= OFF;
-                    end
-                    default: begin
-                        data_to_tx <= data_to_tx + 1;
-                        start_tx <= 1;
-                        led_g <= OFF;
-                        led_r <= OFF;
-                    end
-                endcase
+        case (state)
+            INIT: begin
+                led_g <= ON;
+                data_to_tx <= 0;
+                reset <= 1;
+                start_tx <= 0;
+                expected_data <= 0;
+                state <= RESET;
             end
-        end
+
+            RESET: begin
+                reset <= 0;
+                state <= UART_RECEIVE;
+            end
+
+            UART_RECEIVE: begin
+                if (rx_done) begin
+                    state <= CHECK;
+                end
+            end
+
+            CHECK: begin
+                if (parity_error || (data_received != expected_data)) begin
+                    data_to_tx <= data_to_tx + 1;
+                    start_tx <= 1;
+                end
+                else begin
+                    start_tx <= 0;
+                end
+                state <= UART_RECEIVE;
+                expected_data <= expected_data + 1;
+            end
+
+        endcase
     end
 
 endmodule
