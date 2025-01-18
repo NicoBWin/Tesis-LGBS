@@ -3,7 +3,7 @@
     transistores prender de cada modulo y envia al final un pulso de shoot.
 */
 
-`include "./src/main.vh"
+`include "./src/macros.vh"
 `include "./src/UART/UART.vh"
 `include "./src/SPI/SPI.vh"
 `include "./src/timer/timer.vh"
@@ -107,9 +107,11 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
-    )
-    hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
+    SB_HFOSC  #(.CLKHF_DIV("0b00")) hf_osc (
+        .CLKHFPU(1'b1), 
+        .CLKHFEN(1'b1), 
+        .CLKHF(clk)
+    ); // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
 
 /*
 *************************************
@@ -117,13 +119,14 @@ module top(
 *************************************
 */
 
-    parameter [4:0] SET1[9:0] = {8'hAA, 8'hBB, 8'hCC, 8'hDD, 8'hEE, 8'hFF, 8'h11, 8'h22, 8'h33, 8'h44};
-
     // General purpose
-    genvar i;
+    genvar i, j;
     reg reset = 0;
+    reg is_code_received = 0;
     reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
     reg [7:0] spi_to_uart_id, spi_to_uart_code;
+    wire [15:0] sin_index;
+    reg [7:0] sin_value;
 
     // Timers
     reg start_1_sec = 0;
@@ -168,11 +171,25 @@ module top(
 */
 
 task check_condition;
-    input logic [7:0] code;
-    output logic is_code_received;
+    input logic [15:0] code;
 
     begin
         is_code_received = (transfer_done_spi == 1 && received_from_spi == code) ? 1 : 0;
+    end
+endtask
+
+task sin_value_send;
+    wire [15:0] sin_index = i * `MODULE_OFFSET + j * `PHASE_OFFSET; 
+
+    begin
+        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+            for (j = 0; j < `NUM_OF_PHASES; j = j + 1) begin
+                data_to_tx[i] = sin_value;
+                start_tx = 1;
+                wait(tx_busy == 0);
+                start_tx = 0;
+            end
+        end
     end
 endtask
 
@@ -234,6 +251,11 @@ endtask
         .done(done_5_sec)
     );
 
+    RAM ram (
+        .address(sin_index),
+        .data(sin_value)
+    );
+
 /*
 ******************
 *   Statements   *
@@ -250,8 +272,8 @@ endtask
             end
 
             IDLE: begin
-                logic is_code_received;
-                check_condition(`PIPE_MODE_SPI, is_code_received);
+                is_code_received = check_condition(`PIPE_MODE_SPI);
+                reset <= 0;
 
                 //Si termino la transferencia y se recibio modo pipe
                 if (is_code_received) begin
@@ -268,7 +290,6 @@ endtask
             end
 
             PIPE_MODE: begin
-                // In Pipe Mode, transfer data to each UART module
                 case (pipe_state)
                     IDLE_PIPE: begin
                         if (transfer_done_spi) begin
@@ -296,7 +317,7 @@ endtask
             end
 
             NORMAL_MODE: begin
-                // Handle normal mode operations (non-pipe mode)
+                sin_value_pick();
             end
         endcase
     end

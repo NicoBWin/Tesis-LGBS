@@ -27,7 +27,7 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ./src/timer/timer.v ./src/SPI/SPI.v ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
+LIB_SRC = ./src/RAM/RAM.v ./src/timer/timer.v ./src/SPI/SPI.v ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
 SOURCES = ./src/top_main_FPGA.v $(LIB_SRC)
 TBNAME = spi_tb
 MODULE_TO_DRAW = top_main_FPGA.v
