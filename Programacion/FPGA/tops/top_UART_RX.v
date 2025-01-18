@@ -162,15 +162,14 @@ module top(
             end
 
             CHECK: begin
-                if (parity_error || (data_received != expected_data)) begin
-                    data_to_tx <= data_to_tx + 1;
-                    start_tx <= 1;
-                end
-                else begin
-                    start_tx <= 0;
-                end
+                
+                //if (parity_error || (data_received != expected_data)) begin
+                //    data_to_tx <= data_to_tx + 1;
+                //end
+
+                start_tx <= 1;
+                data_to_tx <= data_received;
                 state <= UART_RECEIVE;
-                expected_data <= expected_data + 1;
             end
 
         endcase
