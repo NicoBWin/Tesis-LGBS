@@ -77,6 +77,8 @@ module top(
     reg start_tx;
     reg [7:0] data_to_tx = 8'b0;
     reg reset = 1;
+    wire parity_error;
+
     
 /*
 *************************************
@@ -125,7 +127,7 @@ module top(
     parameter INIT  = 3'b001;
     parameter RESET  = 3'b101; 
     parameter UART_RECEIVE = 3'b010;
-    parameter CHECK = 3'b011;  
+    parameter UART_SEND_ERROR = 3'b011;  
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -142,36 +144,29 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                led_g <= ON;
-                data_to_tx <= 0;
-                reset <= 1;
-                start_tx <= 0;
-                expected_data <= 0;
-                state <= RESET;
-            end
-
-            RESET: begin
-                reset <= 0;
-                state <= UART_RECEIVE;
-            end
-
-            UART_RECEIVE: begin
-                if (rx_done) begin
-                    state <= CHECK;
+                if (counter == 24000000) begin
+                    // Reset all values and transition to UART_SEND_ON state
+                    reset <= 0;
+                    state <= UART_SEND_ERROR;
+                    data_to_tx <= 0;
+                    start_tx <= 1;
+                    counter <= 0; // Reset the counter at the same time
+                end
+                else begin
+                    // Continue incrementing counter and setting LED values
+                    reset <= 1;
+                    led_r <= OFF;
+                    led_g <= OFF;
+                    led_b <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
-            CHECK: begin
-                
-                //if (parity_error || (data_received != expected_data)) begin
-                //    data_to_tx <= data_to_tx + 1;
-                //end
-
-                start_tx <= 1;
-                data_to_tx <= data_received;
-                state <= UART_RECEIVE;
+            UART_SEND_ERROR: begin
+                if (rx_done) begin
+                    data_to_tx <= data_received;
+                end
             end
-
         endcase
     end
 

@@ -75,6 +75,7 @@ module top(
     //wire [6:0] hamm_code;
     reg [7:0] data_to_tx = 0; //toggle; //= {1'b1, hamm_code};
     reg reset = 0;
+    wire parity_error;
     
 /*
 *************************************

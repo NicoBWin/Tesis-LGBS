@@ -27,7 +27,7 @@ module uart_rx(
     localparam WAIT  = 3'b011;
     localparam RX    = 3'b100;
 
-    reg [3:0] clk_counter;
+    reg [$clog2(BAUD_RATE+BAUD_RATE)-1:0] clk_counter;
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
     reg [2:0] state = INIT;
