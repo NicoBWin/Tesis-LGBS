@@ -4,11 +4,11 @@
     sincronizarlos.  
 */
 
-`include "./src/UART/baudgen.vh"
+`include "./src/UART/UART.vh"
 
 module top(
     input wire gpio_23,
-    input wire gpio_25,
+    output wire gpio_25,
     output wire gpio_10,
 
     output wire gpio_12,
@@ -61,8 +61,8 @@ module top(
 */  
     localparam turn_on = 4'b0110; //6
     localparam turn_off = 4'b1101; //D
-    localparam toggle = 8'b1001101; //9D
-    localparam ack = 8'b00111100; //3A
+    localparam toggle = 8'b10011101; //9D
+    localparam ack = 8'b00111100; //3C
     localparam OFF = 1;
     localparam ON = 0;
 
@@ -187,7 +187,6 @@ module top(
                     counter <= counter + 1;
                 end
             end
-            
         endcase
     end
 

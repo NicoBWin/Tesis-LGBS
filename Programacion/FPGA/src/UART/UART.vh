@@ -1,5 +1,6 @@
 // 48M clk
 `define BAUD6M_CLK48M 4'd4
+`define BAUD1M_CLK48M 5'd24
 
 // 24M clk
 `define BAUD1M_CLK24M 4'd12

@@ -28,8 +28,8 @@ module uart_tx(
     localparam STOP_SIZE = 8;
     localparam PKG_SIZE = STOP_SIZE+9;
 
-    reg [PKG_SIZE:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
-    reg [3:0] bit_index;            // Index for the bits being sent
+    reg [PKG_SIZE-1:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
+    reg [$clog2(PKG_SIZE):0] bit_index;            // Index for the bits being sent
     reg [1:0] state = INIT;
 
     wire parity;                    // Current parity
@@ -68,7 +68,7 @@ module uart_tx(
                     end
 
                     TX: begin
-                        to_transmit <= {1'b1, to_transmit[10:1]};
+                        to_transmit <= {1'b1, to_transmit[PKG_SIZE-1:1]};
                         if (bit_index >= PKG_SIZE) begin 
                             state <= IDLE;
                             tx_busy <= 0;

@@ -12,7 +12,7 @@ module ADC(
     output wire sclk,
 
     output wire [11:0] value,
-    output reg read_done,
+    output reg read_done
 );
 
     // Config
