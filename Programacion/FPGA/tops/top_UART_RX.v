@@ -25,7 +25,11 @@ module top(
 
     //output wire gpio_46, //Borrar
     //output wire gpio_47, //Borrar
-    output wire gpio_45 //Borrar
+    output wire gpio_45, //Borrar
+
+    output wire gpio_37, //Borrar
+    output wire gpio_31, //Borrar
+    output wire gpio_35 //Borrar
 );
 
 /*
@@ -106,7 +110,8 @@ module top(
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error),
-        .curr_state({gpio_47, gpio_45})
+        .curr_state({gpio_47, gpio_45}),
+        .clkc({gpio_37, gpio_31, gpio_35})
     );
 
     /*
@@ -143,7 +148,6 @@ module top(
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
-    assign gpio_42 = rx_done;
 
     reg [7:0] expected_data = 0;
 
