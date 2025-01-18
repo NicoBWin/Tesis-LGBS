@@ -84,7 +84,7 @@ module top(
 
     reg start_tx;
     reg [7:0] data_to_tx = 8'b0;
-    reg reset = 1;
+    reg reset;
     wire parity_error;
 
     
@@ -149,12 +149,10 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
 
-    reg [7:0] expected_data = 0;
-
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                if (counter == 24000000) begin
+                if (counter == 48000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
                     state <= UART_SEND_ERROR;

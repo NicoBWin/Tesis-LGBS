@@ -24,12 +24,14 @@ module uart_rx(
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
-    localparam INIT  = 2'b01;
-    localparam IDLE  = 2'b00;
+    localparam INIT  = 2'b00;
+    localparam IDLE  = 2'b01;
     localparam START = 2'b10;
     localparam RX    = 2'b11;
 
-    reg [$clog2(BAUD_RATE+BAUD_RATE)-1:0] clk_counter;
+    wire parity_error_done;
+
+    reg [5:0] clk_counter;
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
@@ -57,26 +59,25 @@ module uart_rx(
                     end
 
                     IDLE: begin
-                        if (!rx) begin
-                            rx_done <= 0;
-                            bit_index <= 0;     // Se detecto el start
-                            clk_counter <= 1;
-                            state <= START;
+                        if (clk_counter == 0) begin
+                            if (!rx) begin
+                                rx_done <= 0;
+                                bit_index <= 0;     // Se detecto el start
+                                clk_counter <= 1;
+                            end
                         end
-                    end
-
-                    START: begin
-                        if (clk_counter >= BAUD_RATE-1) begin
-                            state <= RX;
-                            clk_counter <= 0;
-                        end 
                         else begin
                             clk_counter <= clk_counter + 1;
                         end
+
+                        if (clk_counter >= BAUD_RATE) begin
+                            state <= RX;
+                            clk_counter <= 0;
+                        end 
                     end
 
                     RX: begin
-                        if (clk_counter == BAUD_RATE+BAUD_RATE-1) begin
+                        if (clk_counter >= BAUD_RATE+BAUD_RATE-1) begin
                             clk_counter <= 0;
                             bit_index <= bit_index + 1;
                         end 
