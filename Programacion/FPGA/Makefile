@@ -31,7 +31,7 @@ LIB_SRC = ./src/RAM/RAM.v ./src/timer/timer.v ./src/SPI/SPI.v ./src/utils/hammin
 SOURCES = ./tops/top_UART_RX.v $(LIB_SRC)
 TBNAME = uart_tb
 MODULE_TO_DRAW = top_UART_RX.v
-SOURCES_TB = ./testbench/uart_tb.v $(LIB_SRC)
+SOURCES_TB = ./testbenchs/uart_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q
 

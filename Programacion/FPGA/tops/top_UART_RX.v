@@ -21,7 +21,11 @@ module top(
 
     output wire gpio_47,
     output wire gpio_46,
-    output wire gpio_2
+    output wire gpio_2,
+
+    //output wire gpio_46, //Borrar
+    //output wire gpio_47, //Borrar
+    output wire gpio_45 //Borrar
 );
 
 /*
@@ -101,7 +105,8 @@ module top(
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
-        .parity_error(parity_error)
+        .parity_error(parity_error),
+        .curr_state({gpio_47, gpio_45})
     );
 
     /*
@@ -138,6 +143,7 @@ module top(
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
+    assign gpio_42 = rx_done;
 
     reg [7:0] expected_data = 0;
 
@@ -150,6 +156,7 @@ module top(
                     state <= UART_SEND_ERROR;
                     data_to_tx <= 0;
                     start_tx <= 1;
+                    led_g <= ON;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin
@@ -164,6 +171,7 @@ module top(
 
             UART_SEND_ERROR: begin
                 if (rx_done) begin
+                    led_r <= ON;
                     data_to_tx <= data_received;
                 end
             end
