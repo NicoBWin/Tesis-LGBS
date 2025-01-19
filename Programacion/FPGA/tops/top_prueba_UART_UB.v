@@ -115,6 +115,7 @@ module top(
 
     reg[2:0] state = INIT;
     reg[7:0] countercito = 0;
+    reg handled = 0;
 
     always @(posedge clk) begin
         case (state)
@@ -133,8 +134,14 @@ module top(
             end
 
             SEND_BACK: begin
-                countercito <= countercito + 1;
-                data_to_tx <= countercito;
+                if (!tx_busy && !handled) begin
+                    countercito <= countercito + 1;
+                    data_to_tx <= countercito;
+                    handled <= 1;
+                end
+                else if (tx_busy) begin
+                    handled <= 0;
+                end
             end
         endcase
     end

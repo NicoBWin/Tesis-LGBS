@@ -103,17 +103,11 @@ module top(
 
     parameter INIT  = 3'b000; 
     parameter IDLE = 3'b001;
-    parameter TX = 3'b010;
-    parameter SEND_ACK = 3'b011;
-    parameter CHECK = 3'b100;
-    parameter SEND_BACK = 3'b101;
-    parameter WAITING = 3'b110;
 
-    reg [5:0] current_code = 0;
-
+    reg[5:0] current_code = 0;
     reg[2:0] state = INIT;
 
-    assign gpio_34 = rx;
+    assign gpio_34 = data_received[0];
     assign gpio_43 = data_received[1];
     assign gpio_36 = data_received[2];
     assign gpio_42 = data_received[3];
@@ -141,6 +135,10 @@ module top(
                 if(!tx_busy) begin
                     current_code <= current_code + 1;
                     data_to_tx <= {2'b0, current_code};
+                    start_tx <= 1;
+                end
+                else begin
+                    start_tx <= 0;
                 end
             end
         endcase

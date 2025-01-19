@@ -64,8 +64,8 @@ module uart_rx(
                     end
 
                     IDLE: begin
+                        rx_done <= 0;
                         if (!rx) begin
-                            rx_done <= 0;
                             bit_index <= 0;     // Se detecto el start
                             clk_counter <= 1;
                             state <= START;
