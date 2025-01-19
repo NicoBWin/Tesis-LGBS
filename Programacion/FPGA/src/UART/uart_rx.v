@@ -7,6 +7,11 @@
 
 `include "./src/UART/UART.vh"
 
+/*
+FPGA TX manda numeros 0 al 63, los numeros que recibe la otra, los reenvia a la TX (loopback) y manda lo que
+recibio por los pines disponibles para los disparos.
+*/
+
 module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,
