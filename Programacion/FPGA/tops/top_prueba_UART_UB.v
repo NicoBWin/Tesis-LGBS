@@ -114,6 +114,7 @@ module top(
     parameter WAITING = 3'b110;
 
     reg[2:0] state = INIT;
+    reg[7:0] countercito = 0;
 
     always @(posedge clk) begin
         case (state)
@@ -132,8 +133,8 @@ module top(
             end
 
             SEND_BACK: begin
-                if(rx_done)
-                    data_to_tx <= data_received;
+                countercito <= countercito + 1;
+                data_to_tx <= countercito;
             end
         endcase
     end

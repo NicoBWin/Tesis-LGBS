@@ -113,7 +113,7 @@ module top(
 
     reg[2:0] state = INIT;
 
-    assign gpio_34 = data_received[0];
+    assign gpio_34 = rx;
     assign gpio_43 = data_received[1];
     assign gpio_36 = data_received[2];
     assign gpio_42 = data_received[3];
@@ -130,17 +130,17 @@ module top(
                 if (counter >= 24000000) begin
                     reset <= 0;
                     counter <= 0;
-                    data_to_tx <= current_code;
+                    data_to_tx <= {2'b0, current_code};
                     start_tx <= 1;
                     state <= IDLE;
-                    led_g <= ON;
+                    led_b <= ON;
                 end
             end
 
             IDLE: begin
                 if(!tx_busy) begin
-                    current_code = current_code + 1;
-                    data_to_tx = current_code;
+                    current_code <= current_code + 1;
+                    data_to_tx <= {2'b0, current_code};
                 end
             end
         endcase
