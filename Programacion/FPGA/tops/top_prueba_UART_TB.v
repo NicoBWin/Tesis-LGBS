@@ -87,7 +87,8 @@ module top(
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
-        .parity_error(parity_error)
+        .parity_error(parity_error),
+        .curr_state({gpio_36, gpio_42})
     );
 
     defparam transmitter.PARITY = 0;
@@ -107,12 +108,12 @@ module top(
     reg[5:0] current_code = 0;
     reg[2:0] state = INIT;
 
-    assign gpio_34 = data_received[0];
-    assign gpio_43 = data_received[1];
-    assign gpio_36 = data_received[2];
-    assign gpio_42 = data_received[3];
-    assign gpio_38 = data_received[4];
-    assign gpio_28 = data_received[5];
+    assign gpio_34 = rx_done;
+    assign gpio_43 = rx;
+    //assign gpio_36 = data_received[0];
+    //assign gpio_42 = data_received[1];
+    assign gpio_38 = data_received[2];
+    assign gpio_28 = data_received[3];
 
     always @(posedge clk) begin
         case (state)

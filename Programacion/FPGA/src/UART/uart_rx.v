@@ -18,10 +18,9 @@ module uart_rx(
     input wire rx,             // UART receive line
     output wire [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
-    output wire parity_error     // Flag that indicates that there was a parity error
+    output wire parity_error,     // Flag that indicates that there was a parity error
 
-    //output wire [1:0] curr_state,
-    //output wire [2:0] clkc
+    output wire [1:0] curr_state
 );
 
     // Config
@@ -29,10 +28,10 @@ module uart_rx(
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
-    localparam INIT  = 2'b00;
-    localparam IDLE  = 2'b01;
-    localparam START = 2'b10;
-    localparam RX    = 2'b11;
+    localparam INIT  = 2'b01;
+    localparam IDLE  = 2'b00;
+    localparam START = 2'b11;
+    localparam RX    = 2'b10;
 
     wire parity_error_done;
 
@@ -41,8 +40,7 @@ module uart_rx(
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
     
-    //assign curr_state   = state;    //Borrar
-    //assign clkc         = clk_counter[2:0];
+    assign curr_state   = state;    //Borrar
 
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
