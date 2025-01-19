@@ -18,9 +18,9 @@ module uart_rx(
     input wire rx,             // UART receive line
     output wire [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
-    output wire parity_error,     // Flag that indicates that there was a parity error
+    output wire parity_error     // Flag that indicates that there was a parity error
 
-    output wire [1:0] curr_state
+    //output wire [1:0] curr_state
 );
 
     // Config
@@ -35,12 +35,12 @@ module uart_rx(
 
     wire parity_error_done;
 
-    reg [$clog2(BAUD_RATE+BAUD_RATE)-1:0] clk_counter;
+    reg [5:0] clk_counter;          //TODO: Si ponemos celing log 2 se rompe
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
     reg [1:0] state = INIT;
     
-    assign curr_state   = state;    //Borrar
+    //assign curr_state   = state;    //Borrar
 
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
