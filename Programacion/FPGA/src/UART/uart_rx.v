@@ -16,11 +16,9 @@ module uart_rx(
     input wire clk,            // Clock signal
     input wire reset,
     input wire rx,             // UART receive line
-    output wire [7:0] data_received,   // 8-bit data out
+    output reg [7:0] data_received,   // 8-bit data out
     output reg rx_done,         // Indicates reception is complete
     output wire parity_error     // Flag that indicates that there was a parity error
-
-    //output wire [1:0] curr_state
 );
 
     // Config
@@ -44,7 +42,6 @@ module uart_rx(
 
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
-    assign data_received = rx_shift_reg[7:0];
 
     always @(posedge clk) 
         begin
@@ -87,6 +84,7 @@ module uart_rx(
 
                             if (bit_index >= 9) begin
                                 state <= IDLE;
+                                data_received <= rx_shift_reg[7:0];
                                 rx_done <= 1;
                             end
                             else begin

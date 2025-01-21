@@ -8,7 +8,7 @@ module RAM (
 
     // Initialize the RAM with data
     initial begin
-        $readmemh("sine_wave.hex", memory); // Load data from a hex file
+        //$readmemh("sine_wave.hex", memory); // Load data from a hex file
     end
 
     // Read operation

@@ -13,7 +13,7 @@ module uart_tx(
     input wire [7:0] data_to_tx,// 8-bit data in
     input wire start_tx,        // Start transmission
     output wire tx,             // UART transmit line
-    output reg tx_busy          // Indicates transmission is in progress
+    output reg tx_busy
 );
 
     // Config
@@ -25,7 +25,7 @@ module uart_tx(
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
 
-    localparam STOP_SIZE = 1;
+    localparam STOP_SIZE = 1;   //Creo que si cambiamos esto se rompe el transmisor
     localparam PKG_SIZE = STOP_SIZE + 9;
 
     reg [PKG_SIZE-1:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
@@ -37,30 +37,23 @@ module uart_tx(
     
     assign tx = to_transmit[0];
     assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
-
+    
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .reset(reset),
         .clk_out(baud_clk)
     );
 
-    always @(posedge baud_clk)
+    always @(posedge clk)
         begin
             if(reset) begin
-                state <= INIT;
+                state <= IDLE;
                 tx_busy <= 0;
                 bit_index <= 0;
                 to_transmit <= {PKG_SIZE{1'b1}};
             end
             else
                 case (state)
-                    INIT: begin
-                        tx_busy <= 0;
-                        bit_index <= 0;
-                        to_transmit <= {PKG_SIZE{1'b1}};
-                        state <= IDLE;
-                    end
-
                     IDLE: begin
                         if (start_tx) begin
                             tx_busy <= 1;

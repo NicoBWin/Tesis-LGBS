@@ -88,7 +88,7 @@ module top(
         .reset(reset),
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
-        .tx(tx), 
+        .tx(tx),
         .tx_busy(tx_busy)
     );
 
@@ -111,8 +111,11 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+
+
+
 /*
 ******************
 *   Statements   *
@@ -130,14 +133,42 @@ module top(
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
 
+    reg tx_done = 0;
+
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
 
+/*
+*************************************
+*        Functions declarations     *
+*************************************
+*/
+
+    function is_tx_done;
+        input uart_tx_busy;
+        input temp_tx_done;
+        begin
+            if (!uart_tx_busy && !temp_tx_done) begin
+                is_tx_done = 1;
+            end
+
+            if (uart_tx_busy) begin
+                is_tx_done = 0;
+            end
+        end
+    endfunction
+
+/*
+******************
+*      Main      *
+******************
+*/
+
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                if (counter == 24000000) begin
+                if (counter == 48000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
                     state <= WAIT;
@@ -161,7 +192,10 @@ module top(
             end
 
             WAIT: begin
-                if (!tx_busy) begin
+
+                tx_done = is_tx_done(tx_busy, tx_done);
+
+                if (tx_done) begin
                     state <= UART_SEND_ON;
                 end
             end

@@ -109,9 +109,7 @@ module top(
         .rx(rx),
         .data_received(data_received), 
         .rx_done(rx_done), 
-        .parity_error(parity_error),
-        .curr_state({gpio_47, gpio_45}),
-        .clkc({gpio_37, gpio_31, gpio_35})
+        .parity_error(parity_error)
     );
 
     /*
@@ -125,8 +123,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
 
 /*
 ******************
@@ -149,15 +147,28 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
 
+/*
+*************************************
+*        Functions declarations     *
+*************************************
+*/
+
+
+
+/*
+******************
+*      Main      *
+******************
+*/
+
     always @(posedge clk) begin
         case (state)
             INIT: begin
                 if (counter == 48000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    state <= UART_SEND_ERROR;
+                    state <= UART_RECEIVE;
                     data_to_tx <= 0;
-                    start_tx <= 1;
                     led_g <= ON;
                     counter <= 0; // Reset the counter at the same time
                 end
@@ -171,12 +182,20 @@ module top(
                 end
             end
 
-            UART_SEND_ERROR: begin
+            UART_RECEIVE: begin
                 if (rx_done) begin
                     led_r <= ON;
                     data_to_tx <= data_received;
+                    state <= UART_SEND_ERROR;
                 end
+                start_tx <= 1;
             end
+
+            UART_SEND_ERROR: begin
+                start_tx <= 0; // Reset start_tx
+                state <= UART_RECEIVE; // Go back to UART_RECEIVE state
+            end
+            
         endcase
     end
 
