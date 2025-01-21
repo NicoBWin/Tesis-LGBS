@@ -141,23 +141,22 @@ module top(
 
 /*
 *************************************
-*        Functions declarations     *
+*        Tasks declarations         *
 *************************************
 */
 
-    function is_tx_done;
+    task is_tx_done;
         input uart_tx_busy;
-        input temp_tx_done;
+        output temp_tx_done;
         begin
-            if (!uart_tx_busy && !temp_tx_done) begin
-                is_tx_done = 1;
+            if (!uart_tx_busy && !tx_done) begin
+                temp_tx_done = 1;
             end
-
-            if (uart_tx_busy) begin
-                is_tx_done = 0;
+            else begin
+                temp_tx_done = 0;
             end
         end
-    endfunction
+    endtask
 
 /*
 ******************
@@ -192,8 +191,8 @@ module top(
             end
 
             WAIT: begin
-
-                tx_done = is_tx_done(tx_busy, tx_done);
+                
+                is_tx_done(tx_busy, tx_done);
 
                 if (tx_done) begin
                     state <= UART_SEND_ON;
