@@ -44,7 +44,7 @@ module uart_tx(
         .clk_out(baud_clk)
     );
 
-    always @(posedge clk)
+    always @(posedge baud_clk)
         begin
             if(reset) begin
                 state <= IDLE;

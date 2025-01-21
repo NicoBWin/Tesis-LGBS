@@ -37,9 +37,9 @@ module top(
     wire sdo_1;
     wire sclk_1;
 
-    assign tx = gpio_10;
+    assign tx = gpio_25;
     assign rx = gpio_23;
-    assign shoot = gpio_25;
+    //assign shoot = gpio_25;
 
     assign cs_1 = gpio_12;
     assign sdo_1 = gpio_21;
