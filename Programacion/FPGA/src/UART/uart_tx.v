@@ -47,13 +47,20 @@ module uart_tx(
     always @(posedge baud_clk)
         begin
             if(reset) begin
-                state <= IDLE;
+                state <= INIT;
                 tx_busy <= 0;
                 bit_index <= 0;
                 to_transmit <= {PKG_SIZE{1'b1}};
             end
             else
                 case (state)
+                    INIT: begin
+                        tx_busy <= 0;
+                        bit_index <= 0;
+                        to_transmit <= {PKG_SIZE{1'b1}};
+                        state <= IDLE;
+                    end
+
                     IDLE: begin
                         if (start_tx) begin
                             tx_busy <= 1;
