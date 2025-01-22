@@ -143,7 +143,6 @@ module top(
                     state <= UART_TRANSCEIVE;
                     data_to_tx <= 0;
                     start_tx <= 1;
-                    led_g <= ON;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin
@@ -155,17 +154,28 @@ module top(
                 end
             end
 
-            UART_RECEIVE: begin
+            WAIT: begin
+                data_to_tx <= data_to_tx + 1;
+                start_tx <= 1;
+                state <= UART_TRANSCEIVE;
+            end
+
+            UART_TRANSCEIVE: begin
                 if (rx_done) begin
-                    if (!parity_error) begin
+                    if (data_to_tx == data_received) begin
                         led_g <= ON;
-                        data_to_tx <= data_to_tx + 1;
+                        led_r <= OFF;
+                        start_tx <= 0;
+                        state <= WAIT;
                     end
                     else begin
                         led_g <= OFF;
                         led_r <= ON;
-                        data_to_tx <= data_to_tx;
                     end
+                end
+                else begin
+                    led_g <= OFF;
+                    led_r <= OFF;
                 end
             end            
         endcase

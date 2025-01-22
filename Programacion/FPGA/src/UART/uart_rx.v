@@ -26,20 +26,19 @@ module uart_rx(
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
-    localparam INIT  = 2'b01;
-    localparam IDLE  = 2'b00;
-    localparam START = 2'b11;
-    localparam RX    = 2'b10;
+    localparam INIT     = 3'b001;
+    localparam IDLE     = 3'b000;
+    localparam START    = 3'b011;
+    localparam RX       = 3'b010;
+    localparam RX_DONE  = 3'b100;
 
     wire parity_error_done;
 
     reg [5:0] clk_counter;          //TODO: Si ponemos celing log 2 se rompe
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
-    reg [1:0] state = INIT;
+    reg [2:0] state = INIT;
     
-    //assign curr_state   = state;    //Borrar
-
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
 
@@ -59,7 +58,6 @@ module uart_rx(
                     end
 
                     IDLE: begin
-                        rx_done <= 0;
                         if (!rx) begin
                             bit_index <= 0;     // Se detecto el start
                             clk_counter <= 1;
@@ -83,7 +81,7 @@ module uart_rx(
                             bit_index <= bit_index + 1;
 
                             if (bit_index >= 9) begin
-                                state <= IDLE;
+                                state <= RX_DONE;
                                 data_received <= rx_shift_reg[7:0];
                                 rx_done <= 1;
                             end
@@ -94,6 +92,11 @@ module uart_rx(
                         else begin
                             clk_counter <= clk_counter + 1;
                         end
+                    end
+
+                    RX_DONE: begin
+                        rx_done <= 0;
+                        state <= IDLE;
                     end
                 endcase
         end
