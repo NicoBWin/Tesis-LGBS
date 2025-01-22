@@ -111,8 +111,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
 
 
 
@@ -145,18 +145,6 @@ module top(
 *************************************
 */
 
-    task is_tx_done;
-        input uart_tx_busy;
-        output temp_tx_done;
-        begin
-            if (!uart_tx_busy && !tx_done) begin
-                temp_tx_done = 1;
-            end
-            else begin
-                temp_tx_done = 0;
-            end
-        end
-    endtask
 
 /*
 ******************
@@ -187,15 +175,20 @@ module top(
 
             UART_SEND_ON: begin
                 data_to_tx <= data_to_tx + 1;
+                start_tx <= 1;
                 state <= WAIT;
             end
 
             WAIT: begin
                 
-                is_tx_done(tx_busy, tx_done);
-
-                if (tx_done) begin
+                // Verificamos si ya handleamos el evento de que termino la transmision
+                if (!tx_busy && !tx_done) begin
+                    tx_done <= 1;
                     state <= UART_SEND_ON;
+                end
+                else if(tx_busy) begin
+                    tx_done <= 0;
+                    start_tx <= 0;
                 end
             end
         endcase
