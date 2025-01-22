@@ -111,10 +111,17 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD6M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD6M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
 
+    /*
+        Comentarios:
 
+            Sin las placas del circuito
+             - A 1MHz o menos anda bien.
+             - A 3MHz anda pero con errores de partidad segun la digilent.
+             - A 6MHz anda con aun mas errores.
+    */
 
 /*
 ******************

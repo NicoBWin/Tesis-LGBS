@@ -1,8 +1,14 @@
+/*
+    Este module se encarga de generar las señales de SPWM que se enviaran 
+    a cada uno de los submodulos FPGA_modulo. Tambien enviara la señal de disparo para
+    sincronizarlos.  
+*/
 
 `include "./src/UART/UART.vh"
 
 module top(
     input wire gpio_23,
+    output wire gpio_25,
     output wire gpio_10,
 
     output wire led_red,
@@ -25,10 +31,11 @@ module top(
 
     wire tx;
     wire rx;
+    wire shoot;
 
     assign tx = gpio_10;
     assign rx = gpio_23;
-
+    assign shoot = gpio_25;
 /*
 *********************
 *   HFClock setup   *
@@ -44,26 +51,22 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    // LEDs
+    localparam turn_on = 4'b0110; //6
+    localparam turn_off = 4'b1101; //D
+    localparam toggle = 8'b10011101; //9D
+    localparam ack = 8'b00111100; //3C
     localparam OFF = 1;
     localparam ON = 0;
-    reg led_r = OFF;
-    reg led_g = OFF;
-    reg led_b = OFF;
-    assign led_red = led_r;
-    assign led_green = led_g;
-    assign led_blue = led_b;
 
-    // General purpose
-    reg reset = 0;
-    reg[31:0] counter = 0;
-
-    // UART
-    reg start_tx;
-    reg [7:0] data_to_tx;
     wire [7:0] data_received;
     wire tx_busy;
     wire rx_done;
+
+    reg start_tx;
+    //reg [3:0] code;
+    //wire [6:0] hamm_code;
+    reg [7:0] data_to_tx = 0; //toggle; //= {1'b1, hamm_code};
+    reg reset = 0;
     wire parity_error;
     
 /*
@@ -77,7 +80,7 @@ module top(
         .reset(reset),
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
-        .tx(tx), 
+        .tx(tx),
         .tx_busy(tx_busy)
     );
 
@@ -88,13 +91,29 @@ module top(
         .data_received(data_received), 
         .rx_done(rx_done), 
         .parity_error(parity_error)
-        //.curr_state({gpio_36, gpio_42})
     );
+
+    /*
+    hamming_7_4_encoder hamm74(
+        .data_in(code),
+        .hamming_out(hamm_code)
+    );
+    */
 
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
+
     defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
     defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+
+    /*
+        Comentarios:
+
+            Sin las placas del circuito
+             - A 1MHz o menos anda bien.
+             - A 3MHz anda pero con errores de partidad segun la digilent.
+             - A 6MHz anda con aun mas errores.
+    */
 
 /*
 ******************
@@ -102,12 +121,21 @@ module top(
 ******************
 */
 
-    parameter INIT  = 3'b000; 
-    parameter IDLE = 3'b001;
+    parameter INIT  = 3'b001; 
+    parameter UART_SEND_ON = 3'b010;
+    parameter WAIT = 3'b011;  
 
-    reg[5:0] current_code = 0;
+    reg led_r = OFF;
+    reg led_g = OFF;
+    reg led_b = OFF;
     reg[2:0] state = INIT;
+    reg[31:0] counter = 0;
 
+    reg tx_done = 0;
+
+    assign led_red = led_r;
+    assign led_green = led_g;
+    assign led_blue = led_b;
     assign gpio_34 = tx;
     assign gpio_43 = data_received[1];
     assign gpio_36 = data_received[2];
@@ -115,27 +143,12 @@ module top(
     assign gpio_38 = data_received[4];
     assign gpio_28 = data_received[5];
 
-    reg tx_done = 0;
-
 /*
 *************************************
-*        Functions declarations     *
+*        Tasks declarations         *
 *************************************
 */
 
-    function is_tx_done;
-        input uart_tx_busy;
-        input temp_tx_done;
-        begin
-            if (!uart_tx_busy && !temp_tx_done) begin
-                is_tx_done = 1;
-            end
-
-            if (uart_tx_busy) begin
-                is_tx_done = 0;
-            end
-        end
-    endfunction
 
 /*
 ******************
@@ -146,31 +159,41 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                reset   <= 1;
-                counter <= counter + 1;
-
-                // 1 sec
-                if (counter >= 24000000) begin
+                if (counter == 48000000) begin
+                    // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    counter <= 0;
-                    data_to_tx <= {2'b0, current_code};
+                    state <= WAIT;
+                    data_to_tx <= 0;
                     start_tx <= 1;
-                    state <= IDLE;
-                    led_b <= ON;
+                    counter <= 0; // Reset the counter at the same time
+                end
+                else begin
+                    // Continue incrementing counter and setting LED values
+                    reset <= 1;
+                    led_r <= OFF;
+                    led_g <= OFF;
+                    led_b <= OFF;
+                    counter <= counter + 1;
                 end
             end
 
-            IDLE: begin
+            UART_SEND_ON: begin
+                data_to_tx <= data_to_tx + 1;
+                start_tx <= 1;
+                state <= WAIT;
+            end
 
-                tx_done = is_tx_done(tx_busy, tx_done);
-
-                if (tx_done) begin
-                    current_code <= current_code + 1;
-                    data_to_tx <= {2'b0, current_code};
-                    start_tx <= 1;
+            WAIT: begin
+                
+                // Verificamos si ya handleamos el evento de que termino la transmision
+                if (!tx_busy && !tx_done) begin
+                    tx_done <= 1;
+                    state <= UART_SEND_ON;
                 end
-                else
+                else if(tx_busy) begin
+                    tx_done <= 0;
                     start_tx <= 0;
+                end
             end
         endcase
     end

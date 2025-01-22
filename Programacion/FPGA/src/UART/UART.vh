@@ -2,7 +2,7 @@
 `define BAUD6M_CLK48M 4'd4
 `define BAUD3M_CLK48M 4'd8
 `define BAUD1M_CLK48M 5'd24
-`define BAUD115200_CLK48M 10'd417
+`define BAUD115200_CLK48M 8'd208
 
 // 24M clk
 `define BAUD1M_CLK24M 4'd12
