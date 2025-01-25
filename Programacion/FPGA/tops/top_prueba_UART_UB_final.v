@@ -134,6 +134,7 @@ module top(
 
             WAITING: begin
                 data_to_tx <= data_to_tx + 1;
+                start_tx <= 1;
                 state <= TX;
             end
 

@@ -186,7 +186,6 @@ module top(
             end
 
             WAIT: begin
-                
                 // Verificamos si ya handleamos el evento de que termino la transmision
                 if (!tx_busy && !tx_done) begin
                     tx_done <= 1;

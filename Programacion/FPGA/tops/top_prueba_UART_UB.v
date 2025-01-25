@@ -122,7 +122,7 @@ module top(
                 counter <= counter + 1;
 
                 // 1 sec
-                if (counter >= 24000000) begin
+                if (counter >= 48000000) begin
                     reset <= 0;
                     counter <= 0;
                     start_tx <= 1;
@@ -132,7 +132,7 @@ module top(
             end
 
             SEND_BACK: begin
-                if (!tx_busy) begin
+                if (rx_done) begin
                     data_to_tx <= data_received;
                 end
             end
