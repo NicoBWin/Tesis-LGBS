@@ -179,23 +179,8 @@ module top(
                 end
             end
 
-            UART_SEND_ON: begin
-                data_to_tx <= data_to_tx + 1;
-                start_tx <= 1;
-                state <= WAIT;
-            end
-
             WAIT: begin
                 
-                // Verificamos si ya handleamos el evento de que termino la transmision
-                if (!tx_busy && !tx_done) begin
-                    tx_done <= 1;
-                    state <= UART_SEND_ON;
-                end
-                else if(tx_busy) begin
-                    tx_done <= 0;
-                    start_tx <= 0;
-                end
             end
         endcase
     end
