@@ -64,6 +64,7 @@ module top(
 
     // UART
     reg start_tx;
+    reg tx_done = 0;
     reg [7:0] data_to_tx;
     wire [7:0] data_received;
     wire tx_busy;
@@ -108,7 +109,7 @@ module top(
     parameter INIT  = 3'b000; 
     parameter IDLE = 3'b001;
     parameter TX = 3'b010;
-    parameter SEND_ACK = 3'b011;
+    parameter START_TX = 3'b011;
     parameter CHECK = 3'b100;
     parameter SEND_BACK = 3'b101;
     parameter WAITING = 3'b110;
@@ -126,29 +127,40 @@ module top(
                     reset <= 0;
                     counter <= 0;
                     start_tx <= 0;
+                    tx_done <= 0;
                     state <= SEND_BACK;
                     led_g <= ON;
                 end
             end
 
-            CHECK: begin
-                if (tx_busy) begin
-                    state <= SEND_BACK;
+            SEND_BACK: begin
+                if (rx_done) begin
+                    data_to_tx <= data_received; //ACAAA
+                    state <= START_TX;
                 end
-                else begin
-                    start_tx <= 1;
-                    data_to_tx <= data_received;
+                //else begin
+                //    start_tx <= 0;
+                //end
+            end
+
+            START_TX: begin
+                start_tx <= 1;
+                if (tx_busy) begin
+                    state <= CHECK;
                 end
             end
 
-            SEND_BACK: begin
-                if (rx_done) begin
-                    state <= CHECK;
+            CHECK: begin
+                if (!tx_busy && !tx_done) begin
+                    tx_done <= 1;
+                    state <= SEND_BACK;
                 end
-                else begin
+                else if(tx_busy) begin
+                    tx_done <= 0;
                     start_tx <= 0;
                 end
             end
+ 
         endcase
     end
 

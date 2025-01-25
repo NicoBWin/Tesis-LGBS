@@ -26,11 +26,12 @@ module uart_rx(
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
-    localparam INIT     = 3'b001;
-    localparam IDLE     = 3'b000;
-    localparam START    = 3'b011;
-    localparam RX       = 3'b010;
-    localparam RX_DONE  = 3'b100;
+    localparam INIT         = 3'b000;
+    localparam IDLE         = 3'b001;
+    localparam START        = 3'b010;
+    localparam CHECK_START  = 3'b011;
+    localparam RX           = 3'b100;
+    localparam RX_DONE      = 3'b101;
 
     wire parity_error_done;
 
@@ -61,12 +62,21 @@ module uart_rx(
                         if (!rx) begin
                             bit_index <= 0;     // Se detecto el start
                             clk_counter <= 1;
+                            state <= CHECK_START;
+                        end
+                    end
+
+                    CHECK_START: begin
+                        if (!rx) begin  // Se checkeo que sea start
                             state <= START;
+                        end
+                        else begin
+                            state <= IDLE;
                         end
                     end
 
                     START: begin
-                        if (clk_counter >= BAUD_RATE-1) begin
+                        if (clk_counter >= BAUD_RATE-2) begin
                             state <= RX;
                             clk_counter <= 0;
                         end 

@@ -123,6 +123,7 @@ module top(
 
     parameter INIT  = 3'b001; 
     parameter UART_SEND_ON = 3'b010;
+    parameter START_TX = 3'b110;
     parameter WAIT = 3'b011;  
 
     reg led_r = OFF;
@@ -137,9 +138,9 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
     
-    assign gpio_34 = rx; //DIO 5
-    assign gpio_43 = data_received[1];
-    assign gpio_36 = data_received[2];
+    assign tx = gpio_34; //DIO 5
+    assign gpio_43 = rx;
+    assign gpio_36 = rx_done;
     assign gpio_42 = data_received[3];
     assign gpio_38 = data_received[4];
     assign gpio_28 = data_received[5];
@@ -163,10 +164,10 @@ module top(
                 if (counter == 48000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    state <= WAIT;
+                    state <= START_TX;
                     led_b <= ON;
+                    tx_done <= 0;
                     data_to_tx <= 0;
-                    start_tx <= 1;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin
@@ -179,10 +180,18 @@ module top(
                 end
             end
 
-            UART_SEND_ON: begin
-                data_to_tx <= data_to_tx + 1;
+            START_TX: begin
                 start_tx <= 1;
-                state <= WAIT;
+                if (tx_busy) begin
+                    state <= WAIT;
+                end
+            end
+
+            UART_SEND_ON: begin
+                if (rx_done) begin
+                    data_to_tx <= data_to_tx + 1;
+                    state <= START_TX;
+                end
             end
 
             WAIT: begin
