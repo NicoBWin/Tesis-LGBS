@@ -131,8 +131,6 @@ module top(
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
 
-    reg tx_done = 0;
-
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
@@ -165,8 +163,6 @@ module top(
                     reset <= 0;
                     state <= WAIT;
                     led_b <= ON;
-                    data_to_tx <= 0;
-                    start_tx <= 1;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin

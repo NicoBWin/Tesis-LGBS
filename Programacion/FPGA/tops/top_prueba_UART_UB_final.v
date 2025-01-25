@@ -121,8 +121,7 @@ module top(
                 reset   <= 1;
                 counter <= counter + 1;
 
-                // 1 sec
-                if (counter >= 24000000) begin
+                if (counter >= 48000000) begin
                     reset <= 0;
                     counter <= 0;
                     start_tx <= 1;
