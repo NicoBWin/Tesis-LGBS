@@ -64,6 +64,7 @@ module top(
 
     // UART
     reg start_tx;
+    reg tx_done;
     reg [7:0] data_to_tx = 0;
     wire [7:0] data_received;
     wire tx_busy;
@@ -125,6 +126,7 @@ module top(
                     reset <= 0;
                     counter <= 0;
                     start_tx <= 1;
+                    tx_done <= 0;
                     state <= TX;
                     led_g <= ON;
                 end
@@ -132,6 +134,7 @@ module top(
 
             WAITING: begin
                 data_to_tx <= data_to_tx + 1;
+                state <= TX;
             end
 
             TX: begin
