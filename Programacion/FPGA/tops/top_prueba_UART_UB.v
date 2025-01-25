@@ -132,15 +132,17 @@ module top(
             end
 
             CHECK: begin
-                start_tx <= 1;
                 if (tx_busy) begin
                     state <= SEND_BACK;
+                end
+                else begin
+                    start_tx <= 1;
+                    data_to_tx <= data_received;
                 end
             end
 
             SEND_BACK: begin
                 if (rx_done) begin
-                    data_to_tx <= data_received;
                     state <= CHECK;
                 end
                 else begin
