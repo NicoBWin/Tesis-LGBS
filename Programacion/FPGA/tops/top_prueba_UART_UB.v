@@ -133,7 +133,9 @@ module top(
 
             CHECK: begin
                 start_tx <= 1;
-                state <= SEND_BACK;
+                if (tx_busy) begin
+                    state <= SEND_BACK;
+                end
             end
 
             SEND_BACK: begin

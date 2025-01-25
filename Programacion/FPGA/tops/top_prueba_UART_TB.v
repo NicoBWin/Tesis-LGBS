@@ -137,7 +137,7 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
     
-    assign gpio_34 = data_received[0]; //DIO 5
+    assign gpio_34 = rx; //DIO 5
     assign gpio_43 = data_received[1];
     assign gpio_36 = data_received[2];
     assign gpio_42 = data_received[3];
