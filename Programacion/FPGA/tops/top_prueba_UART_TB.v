@@ -42,7 +42,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -103,8 +103,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD1M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD1M_CLK24M;
 
     /*
         Comentarios:
