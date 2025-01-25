@@ -125,15 +125,24 @@ module top(
                 if (counter >= 48000000) begin
                     reset <= 0;
                     counter <= 0;
-                    start_tx <= 1;
+                    start_tx <= 0;
                     state <= SEND_BACK;
                     led_g <= ON;
                 end
             end
 
+            CHECK: begin
+                start_tx <= 1;
+                state <= SEND_BACK;
+            end
+
             SEND_BACK: begin
                 if (rx_done) begin
                     data_to_tx <= data_received;
+                    state <= CHECK;
+                end
+                else begin
+                    start_tx <= 0;
                 end
             end
         endcase
