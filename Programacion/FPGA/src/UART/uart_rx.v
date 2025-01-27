@@ -39,6 +39,10 @@ module uart_rx(
     reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
     reg [3:0] bit_index;            // Index for the bits being received
     reg [2:0] state = INIT;
+
+    reg [5:0] zero_counter = 0;
+    reg [5:0] one_counter = 0;
+    reg rx_desition = 0;
     
     assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
     assign parity_error = rx_done & parity_error_done;
@@ -76,7 +80,7 @@ module uart_rx(
                     end
 
                     START: begin
-                        if (clk_counter >= BAUD_RATE-2) begin
+                        if (clk_counter >= BAUD_RATE+BAUD_RATE-2) begin
                             state <= RX;
                             clk_counter <= 0;
                         end 
@@ -86,6 +90,19 @@ module uart_rx(
                     end
 
                     RX: begin
+                        if (rx) begin
+                            one_counter <= one_counter + 1;
+                        end
+                        else begin
+                            zero_counter <= zero_counter + 1;
+                        end
+                        if (zero_counter > one_counter) begin
+                            rx_desition = 0;
+                        end
+                        else begin
+                            rx_desition = 1;
+                        end
+
                         if (clk_counter >= BAUD_RATE+BAUD_RATE-1) begin
                             clk_counter <= 0;
                             bit_index <= bit_index + 1;
@@ -94,9 +111,13 @@ module uart_rx(
                                 state <= RX_DONE;
                                 data_received <= rx_shift_reg[7:0];
                                 rx_done <= 1;
+                                zero_counter <= 0;
+                                one_counter <= 0;
                             end
                             else begin
-                                rx_shift_reg <= {rx, rx_shift_reg[8:1]};
+                                zero_counter <= 0;
+                                one_counter <= 0;
+                                rx_shift_reg <= {rx_desition, rx_shift_reg[8:1]};
                             end
                         end 
                         else begin
