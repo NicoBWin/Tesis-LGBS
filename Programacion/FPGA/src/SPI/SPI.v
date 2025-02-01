@@ -22,7 +22,7 @@ module SPI(
     localparam IDLE     = 2'b00;
     localparam SELECT   = 2'b01;
     localparam TRANSFER = 2'b10;
-    localparam DESELECT = 2'b11;
+    localparam DONE = 2'b11;
 
     // Internal signals
     reg sclk_en;
@@ -81,13 +81,13 @@ module SPI(
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
                         sclk_en <= 0;
-                        state <= DESELECT;
+                        state <= DONE;
                     end else begin
                         bit_counter <= bit_counter - 1;
                     end
                 end
 
-                DESELECT: 
+                DONE: 
                 begin
                     transfer_done <= 1;
                     state <= IDLE;
