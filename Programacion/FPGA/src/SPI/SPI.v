@@ -36,7 +36,7 @@ module SPI(
     parameter CS_ACTIVE = 1'b0; // 0 active low
 
     assign mosi = shift_reg[0];
-    assign sclk = inner_clk & sclk_en;
+    assign sclk = inner_clk | ~sclk_en;
 
     clk_divider #(COMM_RATE) baudrate_gen(
         .clk_in(clk),
