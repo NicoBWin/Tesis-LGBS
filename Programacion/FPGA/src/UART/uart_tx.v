@@ -62,11 +62,11 @@ module uart_tx(
                     end
 
                     IDLE: begin
+                        bit_index <= 1;
                         if (start_tx) begin
-                            tx_busy <= 1;
-                            bit_index <= 1;
-                            to_transmit <= {{STOP_SIZE{1'b1}}, parity, data_to_tx, 1'b0};
                             state <= TX;
+                            tx_busy <= 1;
+                            to_transmit <= {{STOP_SIZE{1'b1}}, parity, data_to_tx, 1'b0};
                         end
                     end
 

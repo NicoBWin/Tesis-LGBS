@@ -63,16 +63,14 @@ module uart_rx(
                     end
 
                     IDLE: begin
-                        if (!rx) begin
-                            bit_index <= 0;     // Se detecto el start
-                            clk_counter <= 1;
+                        if (!rx) begin  // Se detecto el start
                             state <= CHECK_START;
                         end
                     end
 
                     CHECK_START: begin
-                        if (!rx) begin  // Se checkeo que sea start
-                            state <= START;
+                        if (!rx) begin  // Se checkeo que sea start nuevamente (2 samples)
+                            state <= START; //TODO: CAMBIAR
                         end
                         else begin
                             state <= IDLE;
@@ -111,8 +109,6 @@ module uart_rx(
                                 state <= RX_DONE;
                                 data_received <= rx_shift_reg[7:0];
                                 rx_done <= 1;
-                                zero_counter <= 0;
-                                one_counter <= 0;
                             end
                             else begin
                                 zero_counter <= 0;
@@ -126,7 +122,11 @@ module uart_rx(
                     end
 
                     RX_DONE: begin
+                        bit_index <= 0;     
+                        clk_counter <= 0;
                         rx_done <= 0;
+                        zero_counter <= 0;
+                        one_counter <= 0;
                         state <= IDLE;
                     end
                 endcase

@@ -103,8 +103,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD1M_CLK24M;
-    defparam receiver.BAUD_RATE = `BAUD1M_CLK24M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
 
     /*
         Comentarios:
@@ -128,7 +128,7 @@ module top(
     parameter CHECK_ERROR = 3'b000;
     parameter UPDATE_TX_DATA = 3'b111;
 
-    parameter WAITING_DELAY = 364; //@24MHz, 1Mb/s, 364 es el tope minimo del delay
+    parameter WAITING_DELAY = 61; //@24MHz, 1Mb/s, 364 es el tope minimo del delay
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -145,14 +145,15 @@ module top(
     assign led_blue = led_b;
 
     //assign gpio_34 = data_received[5];
-    //assign rx = gpio_34;
     wire error_pin = gpio_34;
     // assign gpio_43 = data_received[4];
     assign rx = gpio_43;
     // assign gpio_36 = data_received[3];
     assign gpio_36 = parity_error;
-    assign gpio_42 = data_received[2];
-    assign gpio_38 = data_received[1];
+    // assign gpio_42 = data_received[2];
+    assign gpio_42 = tx;
+    // assign gpio_38 = data_received[1];
+    assign gpio_38 = rx_done;
     assign gpio_28 = data_received[0];
 
 
