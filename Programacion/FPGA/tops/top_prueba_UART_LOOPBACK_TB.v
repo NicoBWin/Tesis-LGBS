@@ -1,7 +1,15 @@
+
 /*
-    Este module se encarga de generar las señales de SPWM que se enviaran 
-    a cada uno de los submodulos FPGA_modulo. Tambien enviara la señal de disparo para
-    sincronizarlos.  
+    Prueba LOOPBACK:
+    UB: UartBoard
+    TB: TestBoard
+
+    La TB enviara a la UB una secuencia de datos ascendentes de 8 bits, de a uno. La UB reenviará cualquier
+    cosa que reciba por UART. La TB esperará entonces recibir el mismo mensaje que envió y de lo contrario
+    levantará por un ciclo de clock al pin error_pin, que puede ser visto por una de las salidas de la placa.
+
+    Esta prueba es útil para probar que la comunicación funciona en ambos sentidos. Si se quiere poner a prueba
+    la velocidad de la comunicación es mejor utilizar la prueba UNI.
 */
 
 `include "./src/UART/UART.vh"
@@ -42,7 +50,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
+    SB_HFOSC  #(.CLKHF_DIV("0b01") // 48 MHz / div (0b00=1, 0b01=2, 0b10=4, 0b11=8)
     )
     hf_osc (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(clk));
 
@@ -103,8 +111,8 @@ module top(
     defparam transmitter.PARITY = 0;
     defparam receiver.PARITY = 0;
 
-    defparam transmitter.BAUD_RATE = `BAUD1M_CLK48M;
-    defparam receiver.BAUD_RATE = `BAUD1M_CLK48M;
+    defparam transmitter.BAUD_RATE = `BAUD6M_CLK24M;
+    defparam receiver.BAUD_RATE = `BAUD6M_CLK24M;
 
     /*
         Comentarios:
@@ -123,7 +131,12 @@ module top(
 
     parameter INIT  = 3'b001; 
     parameter UART_SEND_ON = 3'b010;
-    parameter WAIT = 3'b011;  
+    parameter START_TX = 3'b110;
+    parameter WAIT = 3'b011;
+    parameter CHECK_ERROR = 3'b000;
+    parameter UPDATE_TX_DATA = 3'b111;
+
+    parameter WAITING_DELAY = 61; //@24MHz, 1Mb/s, 364 es el tope minimo del delay
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -131,16 +144,26 @@ module top(
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
 
+    reg[9:0] cycle_done = 0;
+    reg error_pin;
+
+
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
-    
-    assign gpio_34 = data_received[5]; //DIO 5
-    assign gpio_43 = data_received[4];
-    assign gpio_36 = data_received[3];
-    assign gpio_42 = data_received[2];
-    assign gpio_38 = data_received[1];
+
+    //assign gpio_34 = data_received[5];
+    wire error_pin = gpio_34;
+    // assign gpio_43 = data_received[4];
+    assign rx = gpio_43;
+    // assign gpio_36 = data_received[3];
+    assign gpio_36 = parity_error;
+    // assign gpio_42 = data_received[2];
+    assign gpio_42 = tx;
+    // assign gpio_38 = data_received[1];
+    assign gpio_38 = rx_done;
     assign gpio_28 = data_received[0];
+
 
 /*
 *************************************
@@ -158,11 +181,13 @@ module top(
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                if (counter == 48000000) begin
+                if (counter >= 48000000) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    state <= WAIT;
+                    state <= START_TX;
                     led_b <= ON;
+                    tx_done <= 0;
+                    data_to_tx <= 0;
                     counter <= 0; // Reset the counter at the same time
                 end
                 else begin
@@ -175,9 +200,41 @@ module top(
                 end
             end
 
-            WAIT: begin
-                
+            START_TX: begin
+                start_tx <= 1;
+                cycle_done <= 0;    //reset message delay counter
+                if (tx_busy) begin  //wait til it starts sending to change state
+                    state <= WAIT;
+                end
             end
+            
+            WAIT: begin
+                start_tx <= 0;
+                error_pin <= 0;
+                if (!tx_busy) begin
+                    state <= UART_SEND_ON;
+                end
+            end
+
+            UART_SEND_ON: begin
+                cycle_done <= cycle_done + 1;   //I give the receiver a delay to check the message
+                if (cycle_done >= WAITING_DELAY) begin
+                    state <= CHECK_ERROR;
+                end
+            end
+
+            CHECK_ERROR: begin
+                if (data_received != data_to_tx) begin
+                    error_pin <= 1;
+                end
+                state <= UPDATE_TX_DATA;
+            end
+
+            UPDATE_TX_DATA: begin
+                data_to_tx <= data_to_tx + 1;
+                state <= START_TX;
+            end
+
         endcase
     end
 

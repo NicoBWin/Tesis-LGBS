@@ -1,16 +1,9 @@
 /*
-    A cada modulo va a ir un cable ethernet que contiene el tx y rx de cada modulo. Como necesitamos
-    que cada modulo trabaje a minimo 250k y son 11 bits, entonces 250k*11=2.75Mbits/seg minimo. Tener
-    en cuenta que las palabras de 11 bits contienen en sus datos los bits para el ECC. Al menos 16 codigos.
-    necesitamos (4bits de data).
+    Receptor de UART. Fue probado hasta 6Mb/s utilizando un clock de 24MHz.
+    A cada modulo va a ir un cable ethernet que contiene el tx y rx de cada modulo.
 */
 
 `include "./src/UART/UART.vh"
-
-/*
-FPGA TX manda numeros 0 al 63, los numeros que recibe la otra, los reenvia a la TX (loopback) y manda lo que
-recibio por los pines disponibles para los disparos.
-*/
 
 module uart_rx(
     input wire clk,            // Clock signal

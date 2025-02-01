@@ -2,9 +2,15 @@
 `include "./src/UART/UART.vh"
 
 /*
-    Recibe un codigo (cual disparar, 6 cod) y recibe un pulso de disparo. Cada 1 segundo,
-    envia una señal de lectura al ADC y devuelve lo leido al main por UART que lo 
-    refleja en 12 pines del main.
+    Prueba UNI:
+    UB: UartBoard
+    TB: TestBoard
+
+    Esta prueba es mas fiel de lo que sucederá en el sistema final mientras se utilice la modulación SPWM. 
+    Ya que la comunicación es unidireccional y de muy alta velocidad.
+
+    UB Envía, sin parar, una secuencia de números ascendentes del 0 al 255, naturalmente reiniciando
+    al terminar, la TB espera esa secuencia y si recibe algo distinto dispara el error_pin.
 */
 
 module top(
@@ -64,7 +70,8 @@ module top(
 
     // UART
     reg start_tx;
-    reg [7:0] data_to_tx;
+    reg tx_done;
+    reg [7:0] data_to_tx = 0;
     wire [7:0] data_received;
     wire tx_busy;
     wire rx_done;
@@ -108,15 +115,12 @@ module top(
     parameter INIT  = 3'b000; 
     parameter IDLE = 3'b001;
     parameter TX = 3'b010;
-    parameter START_TX = 3'b011;
+    parameter SEND_ACK = 3'b011;
     parameter CHECK = 3'b100;
     parameter SEND_BACK = 3'b101;
-    parameter WAIT = 3'b110;
-
-    parameter WAITING_DELAY_2 = 30; //an attempt to avoid rebounds
+    parameter WAITING = 3'b110;
 
     reg[2:0] state = INIT;
-    reg[9:0] cycle_done = 0;
 
     always @(posedge clk) begin
         case (state)
@@ -124,45 +128,29 @@ module top(
                 reset   <= 1;
                 counter <= counter + 1;
 
-                // 1 sec
                 if (counter >= 48000000) begin
                     reset <= 0;
                     counter <= 0;
                     start_tx <= 0;
-                    state <= SEND_BACK;
+                    state <= WAITING;
                     led_g <= ON;
                 end
             end
 
-            SEND_BACK: begin
-                cycle_done <= 0;
-                if (rx_done) begin
-                    data_to_tx <= data_received;
-                    state <= START_TX;
-                end
-            end
-
-            START_TX: begin
+            WAITING: begin
                 start_tx <= 1;
                 if (tx_busy) begin
-                    state <= CHECK;
+                    data_to_tx <= data_to_tx + 1;
+                    state <= TX;
                 end
             end
 
-            CHECK: begin
+            TX: begin
                 start_tx <= 0;
                 if (!tx_busy) begin
-                    state <= WAIT;
+                    state <= WAITING;
                 end
             end
-
-            WAIT: begin
-                cycle_done <= cycle_done + 1;   //I give the receiver a delay to check the message
-                if (cycle_done >= WAITING_DELAY_2) begin
-                    state <= SEND_BACK;
-                end
-            end
- 
         endcase
     end
 

@@ -19,7 +19,7 @@ module uart_tx(
     // Config
     parameter BAUD_RATE = `BAUD6M_CLK24M;      // Desired baud rate
     parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
-    parameter STOP_SIZE = 1;   //Creo que si cambiamos esto se rompe el transmisor
+    parameter STOP_SIZE = 2;   //Creo que si cambiamos esto se rompe el transmisor
 
     // States
     localparam INIT = 2'b00;
