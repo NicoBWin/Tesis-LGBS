@@ -26,12 +26,13 @@ module SPI(
 
     // Internal signals
     reg sclk_en;
+    reg sclk_reset;
     reg [1:0] state;
     reg [15:0] shift_reg;       // Shift register for SPI communication
     reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
 
-    parameter COMM_RATE = `RATE4M8_CLK48M;
+    parameter COMM_RATE = `RATE2M4_CLK48M;
     parameter CS_ACTIVE = 1'b0; // 0 active low
 
     assign mosi = shift_reg[0];
@@ -80,11 +81,16 @@ module SPI(
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
                         sclk_en <= 0;
-                        transfer_done <= 1;
-                        state <= IDLE;
+                        state <= DESELECT;
                     end else begin
                         bit_counter <= bit_counter - 1;
                     end
+                end
+
+                DESELECT: 
+                begin
+                    transfer_done <= 1;
+                    state <= IDLE;
                 end
             endcase
         end

@@ -1,3 +1,4 @@
 
 // 48Mhz
-`define RATE4M8_CLK48M 10
+`define RATE2M4_CLK48M 10
+`define RATE4M8_CLK48M 5
