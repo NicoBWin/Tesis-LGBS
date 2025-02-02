@@ -1,4 +1,4 @@
-module RAM (
+module PRAM (
     input wire [15:0] address, // 16-bit address line
     output reg [7:0] data     // 8-bit data output
 );
@@ -8,7 +8,7 @@ module RAM (
 
     // Initialize the RAM with data
     initial begin
-        //$readmemh("sine_wave.hex", memory); // Load data from a hex file
+        $readmemh("sine_wave.hex", memory); // Load data from a hex file
     end
 
     // Read operation

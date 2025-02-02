@@ -88,10 +88,11 @@ module top(
     `UART_MAP(9, gpio_19, gpio_18)
 
     wire shoot = gpio_25;
-    wire spi_clk = gpio_37;
-    wire mosi = gpio_34;
-    wire miso = gpio_43;
-    wire cs = gpio_36;
+
+    wire spi_clk_1 = gpio_37;
+    wire mosi_1 = gpio_34;
+    wire miso_1 = gpio_43;
+    wire cs_1 = gpio_36;
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -124,7 +125,7 @@ module top(
     reg reset = 0;
     reg is_code_received = 0;
     reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
-    reg [7:0] spi_to_uart_id, spi_to_uart_code;
+    reg [7:0] spi_to_uart_id;
     wire [15:0] sin_index;
     reg [7:0] sin_value;
 
@@ -148,6 +149,12 @@ module top(
     localparam RETRANSMIT_PIPE  = 2'b11;
     reg [1:0] pipe_state = IDLE_PIPE;
 
+    //Normal mode
+    localparam IDLE_NORMAL        = 2'b00;
+    localparam RECEIVE_NORMAL     = 2'b01;
+    localparam RETRANSMIT_NORMAL  = 2'b10;
+    reg [1:0] normal_state = IDLE_NORMAL;
+
     // UART
     reg [`NUM_OF_MODULES-1:0] start_tx; // One start_tx signal for each UART
     reg [7:0] data_to_tx[`NUM_OF_MODULES-1:0]; // Data to transmit for each UART
@@ -158,11 +165,18 @@ module top(
     wire [`NUM_OF_MODULES-1:0] tx; // TX wire for each UART
     wire [`NUM_OF_MODULES-1:0] rx; // RX wire for each UART
 
-    //SPI
-    reg tx_rx_spi;
-    reg [15:0] to_tx_spi;
-    wire [15:0] received_from_spi;
-    wire transfer_done_spi;
+    //SPI 1
+    reg tx_rx_spi_1;
+    reg [15:0] to_tx_spi_1;
+    wire [15:0] received_from_spi_1;
+    wire transfer_done_spi_1;
+
+    //SPI 2
+    reg tx_rx_spi_2;
+    reg [15:0] to_tx_spi_2;
+    wire [15:0] received_from_spi_2;
+    wire transfer_done_spi_2;
+
 
 /*
 *************************************
@@ -171,10 +185,12 @@ module top(
 */
 
 task check_condition;
-    input logic [15:0] code;
+    input wire [15:0] code;
+    input wire [15:0] received_spi;
+    input wire transfer_done_spi;
 
     begin
-        is_code_received = (transfer_done_spi == 1 && received_from_spi == code) ? 1 : 0;
+        is_code_received = (transfer_done_spi == 1 && received_spi == code) ? 1 : 0;
     end
 endtask
 
@@ -224,17 +240,30 @@ endtask
         end
     endgenerate
 
-    SPI from_uC_spi(
+    SPI from_uC_spi_1(
         .clk(clk),
         .reset(reset),
-        .start_transfer(tx_rx_spi),
-        .transfer_done(transfer_done_spi),
-        .data_to_tx(to_tx_spi),
-        .data_rx(received_from_spi),
-        .sclk(spi_clk),
-        .mosi(mosi),
-        .miso(miso),
-        .cs(cs)
+        .start_transfer(tx_rx_spi_1),
+        .transfer_done(transfer_done_spi_1),
+        .data_to_tx(to_tx_spi_1),
+        .data_rx(received_from_spi_1),
+        .sclk(spi_clk_1),
+        .mosi(mosi_1),
+        .miso(miso_1),
+        .cs(cs_1)
+    );
+
+    SPI from_uC_spi_2(
+        .clk(clk),
+        .reset(reset),
+        .start_transfer(tx_rx_spi_2),
+        .transfer_done(transfer_done_spi_2),
+        .data_to_tx(to_tx_spi_2),
+        .data_rx(received_from_spi_2),
+        .sclk(spi_clk_2),
+        .mosi(mosi_2),
+        .miso(miso_2),
+        .cs(cs_2)
     );
 
     timer #(`SEC_1) timer_1(
@@ -251,7 +280,7 @@ endtask
         .done(done_5_sec)
     );
 
-    RAM ram (
+    PRAM pram (
         .address(sin_index),
         .data(sin_value)
     );
@@ -266,14 +295,18 @@ endtask
         case (state)
             INIT: begin
                 reset <= 1;
+                start_1_sec <= 1;
                 start_5_sec <= 1;
-                tx_rx_spi <= 1;
-                state <= IDLE;
+                
+                if (done_1_sec == 1) begin
+                    state <= IDLE;
+                end
+                
             end
 
             IDLE: begin
-                is_code_received = check_condition(`PIPE_MODE_SPI);
                 reset <= 0;
+                is_code_received = check_condition(`PIPE_MODE_SPI);
 
                 //Si termino la transferencia y se recibio modo pipe
                 if (is_code_received) begin
@@ -292,15 +325,15 @@ endtask
             PIPE_MODE: begin
                 case (pipe_state)
                     IDLE_PIPE: begin
-                        if (transfer_done_spi) begin
-                            spi_to_uart_id = received_from_spi[15:8];
-                            spi_to_uart_code = received_from_spi[7:0];
-                            data_to_tx[spi_to_uart_id] = spi_to_uart_code;
+                        if (transfer_done_spi_1) begin
+                            spi_to_uart_id <= received_from_spi_1[15:8];
+                            data_to_tx[spi_to_uart_id] <= received_from_spi_1[7:0];
                             pipe_state <= SEND_PIPE;
                         end
                     end
                     
                     SEND_PIPE: begin
+                        // Continuar de aca ...
                         if (!tx_busy[spi_to_uart_id]) begin
                             start_tx[spi_to_uart_id] = 1;
                             pipe_state <= RECEIVE_PIPE;
@@ -317,7 +350,23 @@ endtask
             end
 
             NORMAL_MODE: begin
-                sin_value_pick();
+                case (normal_state)
+                    IDLE_NORMAL: begin
+                        if (transfer_done_spi_1) begin
+                            spi_to_uart_id <= received_from_spi_1[15:8];
+                            data_to_tx[spi_to_uart_id] <= received_from_spi_1[7:0];
+                            pipe_state <= SEND_PIPE;
+                        end
+                    end
+                    
+                    RECEIVE_NORMAL: begin
+
+                    end
+
+                    RETRANSMIT_NORMAL: begin
+                        
+                    end
+                endcase
             end
         endcase
     end

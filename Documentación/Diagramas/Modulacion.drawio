@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36" version="24.8.4">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36" version="26.0.6">
   <diagram name="Página-1" id="Yvos32dWdBQQlg7Hisrq">
-    <mxGraphModel dx="1725" dy="464" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1628" dy="413" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,14 +10,14 @@
         <mxCell id="izhmh5ZhqzcekRWEDMXZ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="izhmh5ZhqzcekRWEDMXZ-2" target="izhmh5ZhqzcekRWEDMXZ-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="izhmh5ZhqzcekRWEDMXZ-2" value="FPGA main&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Tiene que recibir ma, mf y el 1er indice de la tabla de señal y reenviarla a los N modulos.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Se envia 120 grados desfasados entre fase (2 señales) y 360/N grados entre modulos&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="izhmh5ZhqzcekRWEDMXZ-2" value="FPGA main&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Tiene que recibir ma y el 1er indice de la tabla de señal y reenviarla a los N modulos.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Se envia 120 grados desfasados entre fase (2 señales) y 360/N grados entre modulos&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="20" y="50" width="160" height="170" as="geometry" />
         </mxCell>
         <mxCell id="izhmh5ZhqzcekRWEDMXZ-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="izhmh5ZhqzcekRWEDMXZ-3" target="izhmh5ZhqzcekRWEDMXZ-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="izhmh5ZhqzcekRWEDMXZ-3" value="uC&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Tiene el control, el cual ajusta el ma, mf y el indice de la tabla&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="230" y="95" width="160" height="80" as="geometry" />
+        <mxCell id="izhmh5ZhqzcekRWEDMXZ-3" value="uC&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Tiene el control, el cual ajusta el ma, mf y el indice de la tabla. El mf es un factor de escala del indice.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="240" y="82.5" width="160" height="105" as="geometry" />
         </mxCell>
         <mxCell id="izhmh5ZhqzcekRWEDMXZ-7" value="FPGA modulo&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Debe actualizar los estados de los transistores tan pronto como cambien los estados.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="590" y="220" width="160" height="170" as="geometry" />
@@ -55,10 +55,10 @@
         <mxCell id="izhmh5ZhqzcekRWEDMXZ-17" value="&lt;div&gt;Cuello de botella&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="765" y="180" width="95" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="izhmh5ZhqzcekRWEDMXZ-19" value="Por SPI (4,8MHz)&lt;div&gt;&lt;br&gt;&lt;div&gt;indice -&amp;gt; aprox 10 bits&lt;/div&gt;&lt;div&gt;mf -&amp;gt; aprox 16 bits&lt;/div&gt;&lt;div&gt;ma -&amp;gt; aprox 6 bits (FP)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Transmision 300kHz efectivos de datos&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="230" y="175" width="160" height="130" as="geometry" />
+        <mxCell id="izhmh5ZhqzcekRWEDMXZ-19" value="Por 2 SPIs (12MHz)&lt;div&gt;&lt;br&gt;&lt;div&gt;indice -&amp;gt; aprox 16 bits&lt;/div&gt;&lt;div&gt;ma -&amp;gt; aprox 16 bits (FP)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Transmision 750kHz efectivos de datos&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="240" y="187.5" width="160" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="kIaeQH4PRV0hIJ0TNbZ1-1" value="Por UART (6MHz)&lt;div&gt;&lt;br&gt;&lt;div&gt;Debe enviarse 8 bits de amplitud de senoidal. Si usamos ECC tenemos 5 bits de datos.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Transmision 375kHz efectivos de datos&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="kIaeQH4PRV0hIJ0TNbZ1-1" value="Por UART (6MHz)&lt;div&gt;&lt;br&gt;&lt;div&gt;Debe enviarse 3 x 8 bits de amplitud de senoidal. Si usamos ECC tenemos 5 bits de datos.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Transmision 160kHz efectivos de datos&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="-140" y="50" width="160" height="170" as="geometry" />
         </mxCell>
       </root>
