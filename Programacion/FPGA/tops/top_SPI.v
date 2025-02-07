@@ -36,22 +36,38 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    
-    reg reset;
+    parameter ON = 0;
+    parameter OFF = 1;
+
+    wire inner_clk;
+
+    reg reset = 0;
     reg start_transfer;
-    reg [15:0] data_to_tx;
-    wire [15:0] data_rx;
+    reg [7:0] data_to_tx = 0;
+    wire [7:0] data_rx;
     wire sclk;
     wire mosi;
     wire miso;
     wire cs;
     
+    clk_divider #(5) baudrate_gen(
+        .clk_in(clk),
+        .reset(reset),
+        .clk_out(inner_clk)
+    );
+
+    reg i_tx_dv;
+    reg o_tx_ready;
+    reg o_rx_dv;
+
+
 /*
 *************************************
 *   External Modules declarations   *
 *************************************
 */
 
+/*
     SPI spi_instance (
         .clk(clk),
         .reset(reset),
@@ -63,8 +79,23 @@ module top(
         .mosi(mosi),
         .cs(cs)
     );
+*/
 
-    spi_instance.COMM_RATE = ``RATE2M4_CLK24M;
+    SPIController spi_instance (
+        .i_clk(inner_clk),
+        .i_reset_n(reset),
+        .i_tx_byte(data_to_tx),
+        .i_tx_dv(i_tx_dv),
+        .o_tx_ready(o_tx_ready),
+        .o_rx_dv(o_rx_dv),
+        .o_rx_byte(data_rx),
+        .o_spi_clk(sclk),
+        .i_spi_cipo(miso),
+        .o_spi_copi(mosi)
+    );
+
+
+    // spi_instance.COMM_RATE = `RATE2M4_CLK24M;
 
 /*
 ******************
@@ -73,8 +104,10 @@ module top(
 */
 
     parameter INIT  = 3'b001; 
-    parameter UART_CHECK = 3'b010;
-    parameter WAIT = 3'b011;  
+    parameter TRANSF_PREP = 3'b010;
+    parameter TRANSF = 3'b011;  
+    parameter TRANSF_CHECK = 3'b000;
+    parameter TRANSF_CHECK_2 = 3'b111;
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -82,31 +115,19 @@ module top(
     reg[2:0] state = INIT;
     reg[31:0] counter = 0;
 
+    reg[10:0] delay_time = 0;
+    reg error_pin = 0;
+
     assign led_red = led_r;
     assign led_green = led_g;
     assign led_blue = led_b;
     
-    //assign gpio_34 = data_received[5];
-    wire error_pin = gpio_34;
-    // assign gpio_43 = data_received[4];
-    assign rx = gpio_43;
-    // assign gpio_36 = data_received[3];
-    assign gpio_36 = parity_error;
-    assign gpio_42 = data_received[2];
-    // assign gpio_42 = tx;
-    assign gpio_38 = data_received[1];
-    // assign gpio_38 = rx_done;
-    assign gpio_28 = data_received[0];
-
-    reg error_pin;
-    reg [7:0] comp_data;
-
-/*
-*************************************
-*        Tasks declarations         *
-*************************************
-*/
-
+    assign gpio_34 = start_transfer;  //DER
+    assign gpio_43 = error_pin;
+    assign gpio_36 = miso;
+    assign gpio_42 = mosi;
+    assign gpio_38 = sclk;
+    assign gpio_28 = cs;  //IZQ
 
 /*
 ******************
@@ -114,13 +135,13 @@ module top(
 ******************
 */
 
-    always @(posedge clk) begin
+    always @(posedge i_clk) begin
         case (state)
-            INIT: begin
-                if (counter == 48000000) begin
+            INIT: begin //48000000
+                if (counter == 480) begin
                     // Reset all values and transition to UART_SEND_ON state
                     reset <= 0;
-                    state <= WAIT;
+                    state <= TRANSF_PREP;
                     led_b <= ON;
                     counter <= 0; // Reset the counter at the same time
                 end
@@ -134,19 +155,33 @@ module top(
                 end
             end
 
-            WAIT: begin
-                error_pin = 0;
-                if (rx_done) begin
-                    state <= UART_CHECK;
+            TRANSF_PREP: begin
+                data_to_tx <= data_to_tx + 1;
+                delay_time <= 0;
+                error_pin <= 0;
+                state <= TRANSF;
+            end
+
+            TRANSF: begin
+                i_tx_dv <= 1;
+                start_transfer <= 1;
+                state <= TRANSF_CHECK;
+            end
+
+            TRANSF_CHECK: begin
+                start_transfer <= 0;
+                i_tx_dv <= 1;
+                delay_time <= delay_time + 1;
+                if (delay_time > 1000) begin
+                    state <= TRANSF_CHECK_2; 
                 end
             end
 
-            UART_CHECK: begin
-                if (comp_data != data_received)begin
+            TRANSF_CHECK_2: begin
+                if (data_rx != 5) begin
                     error_pin <= 1;
                 end
-                comp_data <= data_received + 1;
-                state <= WAIT;
+                state <= TRANSF_PREP;
             end
 
         endcase
