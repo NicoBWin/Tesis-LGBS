@@ -87,7 +87,7 @@ module top(
         .cs(cs)
     );
 
-    defparam spi_i.COMM_RATE = `RATE250k_CLK24M;
+    defparam spi_i.COMM_RATE = `RATE6M_CLK24M;
 
 /*
 ******************

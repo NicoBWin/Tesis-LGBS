@@ -35,9 +35,10 @@ module SPI(
 
     parameter COMM_RATE = `RATE2M4_CLK24M;
     parameter CS_ACTIVE = 1'b0; // 0 active low
+    parameter CPOL = 1'b0; // idle state
 
     assign mosi = shift_reg[0];
-    assign sclk = inner_clk | ~sclk_en;
+    assign sclk = CPOL ? (inner_clk | ~sclk_en) : (inner_clk & sclk_en);
 
     clk_divider #(COMM_RATE) baudrate_gen(
         .clk_in(clk),
