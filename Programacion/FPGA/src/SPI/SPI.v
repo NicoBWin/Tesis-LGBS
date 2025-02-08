@@ -33,7 +33,7 @@ module SPI(
     reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
 
-    parameter COMM_RATE = `RATE250k_CLK24M;
+    parameter COMM_RATE = `RATE2M4_CLK24M;
     parameter CS_ACTIVE = 1'b0; // 0 active low
 
     assign mosi = shift_reg[0];
