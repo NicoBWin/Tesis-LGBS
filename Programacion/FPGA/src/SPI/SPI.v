@@ -12,6 +12,7 @@ module SPI(
     input wire [15:0] data_to_tx,
     output reg [15:0] data_rx,
     output reg transfer_done,
+    output reg transfer_busy,
 
     output wire sclk,     // SPI clock
     output wire mosi,
@@ -32,7 +33,7 @@ module SPI(
     reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
 
-    parameter COMM_RATE = 5;
+    parameter COMM_RATE = `RATE2M4_CLK24M;
     parameter CS_ACTIVE = 1'b0; // 0 active low
 
     assign mosi = shift_reg[0];
@@ -51,6 +52,7 @@ module SPI(
             data_rx <= 15'b0;
             sclk_en <= 0;
             transfer_done <= 0;
+            transfer_busy <= 0;
             cs <= !CS_ACTIVE;
         end
         else begin
@@ -61,6 +63,7 @@ module SPI(
                     if (start_transfer) begin
                         bit_counter <= 15;
                         data_rx <= 15'b0;
+                        transfer_busy <= 1;
                         shift_reg <= data_to_tx;
                         state <= SELECT;
                     end
@@ -90,6 +93,7 @@ module SPI(
                 DONE: 
                 begin
                     transfer_done <= 1;
+                    transfer_busy <= 0;
                     state <= IDLE;
                 end
             endcase
