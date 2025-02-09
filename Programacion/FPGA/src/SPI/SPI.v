@@ -91,7 +91,8 @@ module SPI(
                         cs <= !CS_ACTIVE;
                         state <= DONE;
                     end else begin
-                        bit_counter <= bit_counter - 1;
+                        bit_counter <= 6;
+                        //bit_counter <= bit_counter - 1;
                     end
                 end
 
