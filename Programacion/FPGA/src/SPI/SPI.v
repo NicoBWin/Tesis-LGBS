@@ -48,6 +48,8 @@ module SPI(
     always @(negedge inner_clk) begin
         if (bit_counter == 0 && state == TRANSFER) begin
             sclk_en <= 0;
+            cs <= !CS_ACTIVE;
+            state <= DONE;
         end
     end
 
@@ -87,13 +89,7 @@ module SPI(
                     shift_reg <= {1'b0, shift_reg[15:1]};
                     data_rx <= {miso, data_rx[15:1]};
 
-                    if (bit_counter == 0) begin
-                        cs <= !CS_ACTIVE;
-                        state <= DONE;
-                    end else begin
-                        bit_counter <= 6;
-                        //bit_counter <= bit_counter - 1;
-                    end
+                    bit_counter <= bit_counter - 1;
                 end
 
                 DONE: 
