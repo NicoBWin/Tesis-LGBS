@@ -29,7 +29,7 @@ module SPI(
     reg sclk_en;
     reg [1:0] state;
     reg [15:0] shift_reg;       // Shift register for SPI communication
-    reg [4:0] bit_counter;      // Counter for tracking bits
+    reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
 
     parameter COMM_RATE = `RATE2M4_CLK24M;
@@ -45,7 +45,7 @@ module SPI(
         .clk_out(inner_clk)
     );
 
-    always @(inner_clk or posedge reset) begin
+    always @(posedge inner_clk or posedge reset) begin
         if (reset) 
         begin
             state <= IDLE;
@@ -61,7 +61,7 @@ module SPI(
                 begin
                     transfer_done <= 0;
                     if (start_transfer) begin
-                        bit_counter <= 16;
+                        bit_counter <= 15;
                         data_rx <= 15'b0;
                         transfer_busy <= 1;
                         shift_reg <= data_to_tx;
@@ -71,28 +71,21 @@ module SPI(
 
                 SELECT: 
                 begin
-                    sclk_en <= 1;
                     cs <= CS_ACTIVE;
+                    sclk_en <= 1;
                     state <= TRANSFER;
                 end
 
                 TRANSFER: 
                 begin
-                    if (inner_clk == 1) begin
+                    if (bit_counter == 0) begin
+                        cs <= !CS_ACTIVE;
+                        sclk_en <= 0;
+                        state <= DONE;
+                    end else begin
                         shift_reg <= {1'b0, shift_reg[15:1]};
-
-                        if (bit_counter == 0) begin
-                            cs <= !CS_ACTIVE;
-                            state <= DONE;
-                        end else begin
-                            bit_counter <= bit_counter - 1;
-                        end
-                    end
-                    else begin
-                        if (bit_counter == 0) begin
-                            sclk_en <= 0;
-                        end
                         data_rx <= {miso, data_rx[15:1]};
+                        bit_counter <= bit_counter - 1;
                     end
                 end
 
