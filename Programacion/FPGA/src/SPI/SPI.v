@@ -36,7 +36,7 @@ module SPI(
     parameter CS_ACTIVE = 1'b0; // 0 active low
     parameter CPOL = 1'b0; // idle state
 
-    assign mosi = shift_reg[15];
+    assign mosi = shift_reg[0];
     assign sclk = CPOL ? (inner_clk | ~sclk_en) : (inner_clk & sclk_en);
 
     clk_divider #(COMM_RATE) baudrate_gen(
@@ -78,8 +78,8 @@ module SPI(
 
                 TRANSFER: 
                 begin
-                    shift_reg <= {shift_reg[14:0], 1'b0};
-                    data_rx <= {data_rx[14:0], miso};
+                    shift_reg <= {1'b0, shift_reg[15:1]};
+                    data_rx <= {miso, data_rx[15:1]};
 
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
