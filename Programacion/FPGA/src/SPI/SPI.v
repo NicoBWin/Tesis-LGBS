@@ -45,7 +45,7 @@ module SPI(
         .clk_out(inner_clk)
     );
 
-    always @(negedge inner_clk or posedge reset) begin
+    always @(posedge inner_clk or posedge reset) begin
         if (reset) 
         begin
             state <= IDLE;
@@ -74,11 +74,12 @@ module SPI(
                 begin
                     cs <= CS_ACTIVE;
                     sclk_en <= 1;
-                    state <= TX;
+                    state <= RX;
                 end
 
                 TX: 
                 begin
+                    sclk <= ~sclk;
                     shift_reg <= {1'b0, shift_reg[15:1]};
                     state <= RX;
                 end
@@ -86,11 +87,12 @@ module SPI(
                 RX: 
                 begin
                     sclk <= ~sclk;
+                    data_rx <= {miso, data_rx[15:1]};
+
                     if (bit_counter == 0) begin
                         sclk_en <= 0;
                         state <= DONE;
                     end else begin
-                        data_rx <= {miso, data_rx[15:1]};
                         bit_counter <= bit_counter - 1;
                         state <= TX;
                     end
@@ -100,6 +102,7 @@ module SPI(
                 begin
                     transfer_done <= 1;
                     transfer_busy <= 0;
+                    sclk <= CPOL;
                     cs <= !CS_ACTIVE;
                     state <= IDLE;
                 end
