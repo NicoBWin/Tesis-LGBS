@@ -46,7 +46,7 @@ module SPI(
     );
 
     always @(negedge inner_clk) begin
-        if (bit_counter == 0 & state == TRANSFER) begin
+        if (bit_counter == 0 && state == TRANSFER) begin
             sclk_en <= 0;
         end
     end
