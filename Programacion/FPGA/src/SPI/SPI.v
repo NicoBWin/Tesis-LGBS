@@ -70,6 +70,7 @@ module SPI(
                         bit_counter <= 15;
                         data_rx <= 15'b0;
                         transfer_busy <= 1;
+                        cs <= CS_ACTIVE;
                         shift_reg <= data_to_tx;
                         state <= SELECT;
                     end
@@ -77,19 +78,19 @@ module SPI(
 
                 SELECT: 
                 begin
-                    cs <= CS_ACTIVE;
                     sclk_en <= 1;
                     state <= TRANSFER;
                 end
 
                 TRANSFER: 
                 begin
+                    shift_reg <= {1'b0, shift_reg[15:1]};
+                    data_rx <= {miso, data_rx[15:1]};
+
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
                         state <= DONE;
                     end else begin
-                        shift_reg <= {1'b0, shift_reg[15:1]};
-                        data_rx <= {miso, data_rx[15:1]};
                         bit_counter <= bit_counter - 1;
                     end
                 end
