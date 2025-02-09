@@ -14,7 +14,7 @@ module SPI(
     output reg transfer_done,
     output reg transfer_busy,
 
-    output wire sclk,     // SPI clock
+    output reg sclk,     // SPI clock
     output wire mosi,
     input wire miso,     // Master-In Slave-Out
     output reg cs        // Chip select
@@ -38,7 +38,6 @@ module SPI(
     parameter CPOL = 1'b0; // idle state
 
     assign mosi = shift_reg[0];
-    assign sclk = CPOL ? (inner_clk | ~sclk_en) : (inner_clk & sclk_en);
 
     clk_divider #(COMM_RATE) baudrate_gen(
         .clk_in(clk),
@@ -52,6 +51,7 @@ module SPI(
             state <= IDLE;
             data_rx <= 15'b0;
             sclk_en <= 0;
+            sclk <= CPOL;
             transfer_done <= 0;
             transfer_busy <= 0;
             cs <= !CS_ACTIVE;
@@ -85,6 +85,7 @@ module SPI(
 
                 RX: 
                 begin
+                    sclk <= ~sclk;
                     if (bit_counter == 0) begin
                         sclk_en <= 0;
                         state <= DONE;
