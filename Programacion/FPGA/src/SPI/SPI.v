@@ -45,6 +45,12 @@ module SPI(
         .clk_out(inner_clk)
     );
 
+    always @(negedge inner_clk) begin
+        if (bit_counter == 0 & state == TRANSFER) begin
+            sclk_en <= 0;
+        end
+    end
+
     always @(posedge inner_clk or posedge reset) begin
         if (reset) 
         begin
@@ -80,7 +86,6 @@ module SPI(
                 begin
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
-                        sclk_en <= 0;
                         state <= DONE;
                     end else begin
                         shift_reg <= {1'b0, shift_reg[15:1]};
