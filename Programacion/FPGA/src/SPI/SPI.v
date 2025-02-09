@@ -27,7 +27,6 @@ module SPI(
 
     // Internal signals
     reg sclk_en;
-    reg sclk_reset;
     reg [1:0] state;
     reg [15:0] shift_reg;       // Shift register for SPI communication
     reg [3:0] bit_counter;      // Counter for tracking bits
@@ -42,7 +41,7 @@ module SPI(
 
     clk_divider #(COMM_RATE) baudrate_gen(
         .clk_in(clk),
-        .reset(reset),
+        .reset(~sclk_en),
         .clk_out(inner_clk)
     );
 
