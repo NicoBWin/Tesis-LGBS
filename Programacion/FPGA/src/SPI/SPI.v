@@ -78,14 +78,13 @@ module SPI(
 
                 TRANSFER: 
                 begin
-                    shift_reg <= {1'b0, shift_reg[15:1]};
-                    data_rx <= {miso, data_rx[15:1]};
-
                     if (bit_counter == 0) begin
                         cs <= !CS_ACTIVE;
                         sclk_en <= 0;
                         state <= DONE;
                     end else begin
+                        shift_reg <= {1'b0, shift_reg[15:1]};
+                        data_rx <= {miso, data_rx[15:1]};
                         bit_counter <= bit_counter - 1;
                     end
                 end
