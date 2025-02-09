@@ -20,19 +20,20 @@ module SPI(
     output reg cs        // Chip select
 );
 
-    localparam IDLE     = 2'b00;
-    localparam SELECT   = 2'b01;
-    localparam TRANSFER = 2'b10;
-    localparam DONE = 2'b11;
+    localparam IDLE     = 3'b000;
+    localparam SELECT   = 3'b001;
+    localparam TX = 3'b010;
+    localparam RX = 3'b011;
+    localparam DONE = 3'b100;
 
     // Internal signals
     reg sclk_en;
-    reg [1:0] state;
+    reg [2:0] state;
     reg [15:0] shift_reg;       // Shift register for SPI communication
     reg [3:0] bit_counter;      // Counter for tracking bits
     wire inner_clk;
 
-    parameter COMM_RATE = `RATE2M4_CLK24M;
+    parameter COMM_RATE = `RATE6M_CLK24M;
     parameter CS_ACTIVE = 1'b0; // 0 active low
     parameter CPOL = 1'b0; // idle state
 
@@ -45,7 +46,7 @@ module SPI(
         .clk_out(inner_clk)
     );
 
-    always @(posedge inner_clk or posedge reset) begin
+    always @(negedge inner_clk or posedge reset) begin
         if (reset) 
         begin
             state <= IDLE;
@@ -73,19 +74,24 @@ module SPI(
                 begin
                     cs <= CS_ACTIVE;
                     sclk_en <= 1;
-                    state <= TRANSFER;
+                    state <= TX;
                 end
 
-                TRANSFER: 
+                TX: 
+                begin
+                    shift_reg <= {1'b0, shift_reg[15:1]};
+                    state <= RX;
+                end
+
+                RX: 
                 begin
                     if (bit_counter == 0) begin
-                        cs <= !CS_ACTIVE;
                         sclk_en <= 0;
                         state <= DONE;
                     end else begin
-                        shift_reg <= {1'b0, shift_reg[15:1]};
                         data_rx <= {miso, data_rx[15:1]};
                         bit_counter <= bit_counter - 1;
+                        state <= TX;
                     end
                 end
 
@@ -93,6 +99,7 @@ module SPI(
                 begin
                     transfer_done <= 1;
                     transfer_busy <= 0;
+                    cs <= !CS_ACTIVE;
                     state <= IDLE;
                 end
             endcase
