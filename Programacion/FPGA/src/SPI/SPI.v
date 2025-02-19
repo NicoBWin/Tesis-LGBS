@@ -61,6 +61,8 @@ module SPI(
                 IDLE: 
                 begin
                     transfer_done <= 0;
+                    cs <= !CS_ACTIVE;
+                    
                     if (start_transfer) begin
                         bit_counter <= 15;
                         data_rx <= 15'b0;
@@ -103,7 +105,6 @@ module SPI(
                     transfer_done <= 1;
                     transfer_busy <= 0;
                     sclk <= CPOL;
-                    cs <= !CS_ACTIVE;
                     state <= IDLE;
                 end
             endcase

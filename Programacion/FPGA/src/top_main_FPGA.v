@@ -48,7 +48,13 @@ module top(
     input wire gpio_19,
     output wire gpio_18,
 
-    //Signal from SPI
+    //Signal from SPI 1
+    output wire gpio_37,
+    output wire gpio_34,
+    input wire gpio_43,
+    output wire gpio_36,
+
+    //TODO: Poner bien -> Signal from SPI 2
     output wire gpio_37,
     output wire gpio_34,
     input wire gpio_43,
@@ -94,6 +100,12 @@ module top(
     wire miso_1 = gpio_43;
     wire cs_1 = gpio_36;
 
+    //TODO: Poner bien esto
+    wire spi_clk_2 = gpio_37;
+    wire mosi_2 = gpio_34;
+    wire miso_2 = gpio_43;
+    wire cs_2 = gpio_36;
+
     reg led_r = OFF;
     reg led_g = OFF;
     reg led_b = OFF;
@@ -127,6 +139,11 @@ module top(
     reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
     reg [7:0] spi_to_uart_id;
     wire [15:0] sin_index;
+    wire [15:0] ma_mult;
+    wire [31:0] scaled_sin_value;
+    wire ma_mult_received;
+    wire sin_index_received;
+
     reg [7:0] sin_value;
 
     // Timers
@@ -150,10 +167,10 @@ module top(
     reg [1:0] pipe_state = IDLE_PIPE;
 
     //Normal mode
-    localparam IDLE_NORMAL        = 2'b00;
-    localparam RECEIVE_NORMAL     = 2'b01;
-    localparam RETRANSMIT_NORMAL  = 2'b10;
-    reg [1:0] normal_state = IDLE_NORMAL;
+    localparam REQUEST_NORMAL  = 2'b00;
+    localparam PROCESS_NORMAL  = 2'b01;
+    localparam SEND_NORMAL     = 2'b10;
+    reg [1:0] normal_state = REQUEST_NORMAL;
 
     // UART
     reg [`NUM_OF_MODULES-1:0] start_tx; // One start_tx signal for each UART
@@ -228,6 +245,8 @@ endtask
                 .tx_busy(tx_busy[i])
             );
 
+            assign tx[i] = scaled_sin_value[31:16];
+
             // UART RX module
             uart_rx from_modules_rx(
                 .clk(clk),
@@ -297,6 +316,8 @@ endtask
                 reset <= 1;
                 start_1_sec <= 1;
                 start_5_sec <= 1;
+                tx_rx_spi_1 <= 0;
+                tx_rx_spi_2 <= 0;
                 
                 if (done_1_sec == 1) begin
                     state <= IDLE;
@@ -333,7 +354,7 @@ endtask
                     end
                     
                     SEND_PIPE: begin
-                        // Continuar de aca ...
+                        //TODO: Continuar de aca ...
                         if (!tx_busy[spi_to_uart_id]) begin
                             start_tx[spi_to_uart_id] = 1;
                             pipe_state <= RECEIVE_PIPE;
@@ -351,15 +372,29 @@ endtask
 
             NORMAL_MODE: begin
                 case (normal_state)
-                    IDLE_NORMAL: begin
+                    REQUEST_NORMAL: begin
+                        tx_rx_spi_1 <= 1;
+                        tx_rx_spi_2 <= 1;
+
+                        // Obtenemos el indice
                         if (transfer_done_spi_1) begin
-                            spi_to_uart_id <= received_from_spi_1[15:8];
-                            data_to_tx[spi_to_uart_id] <= received_from_spi_1[7:0];
-                            pipe_state <= SEND_PIPE;
+                            sin_index <= received_from_spi_1;
+                            sin_index_received <= 1;
+                        end
+
+                        // Obtenemos el ma como potencia negativa de 2
+                        if (transfer_done_spi_2) begin
+                            ma_mult <= received_from_spi_2;
+                            ma_mult_received <= 1;
+                        end
+
+                        if (sin_index_received & ma_mult_received) begin
+                            scaled_sin_value <= sin_index * ma_mult;
+                            normal_state <= PROCESS_NORMAL;
                         end
                     end
                     
-                    RECEIVE_NORMAL: begin
+                    PROCESS_NORMAL: begin
 
                     end
 
