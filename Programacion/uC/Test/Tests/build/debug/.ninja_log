@@ -1,0 +1,4 @@
+# ninja log v6
+3	62	1734222428182902222	CMakeFiles/Tests.dir/Startup/startup_stm32f103c8tx.s.obj	e8f4b1845e92d026
+3	86	1734222428182902222	CMakeFiles/Tests.dir/Src/sysmem.c.obj	4f1277eeeb1417d3
+3	96	1734222428182902222	CMakeFiles/Tests.dir/Src/syscall.c.obj	4b1fede14b902062

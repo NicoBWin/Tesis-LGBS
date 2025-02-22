@@ -1,0 +1,5 @@
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Spi_cube_test/CMakeFiles/Spi_cube_test.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Spi_cube_test/CMakeFiles/edit_cache.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Spi_cube_test/CMakeFiles/rebuild_cache.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Spi_cube_test/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Spi_cube_test/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,22 @@
+# ninja log v5
+1	145	1737843873386481595	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c.obj	3e88220a4c925473
+39	58	1737843926474397851	Spi_cube_test.elf	2f2a444630d2ae83
+2	31	1737843873273145594	CMakeFiles/Spi_cube_test.dir/Core/Src/syscalls.c.obj	bdf5ce3d262c77ad
+1	74	1737843873313146536	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj	7ef476246e50eecb
+0	63	1737843873303146300	CMakeFiles/Spi_cube_test.dir/Core/Src/stm32f1xx_it.c.obj	73ca191d75ab227e
+1	63	1737843873303146300	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c.obj	8e2c0af0692d80ca
+0	21	1738370214054655487	build.ninja	2af8dc8d489e64b3
+1	143	1737843873383148182	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj	7f1178ab47f830b
+1	103	1737843873343147242	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_spi.c.obj	918ed3d5096c0867
+2	22	1737843873263145360	CMakeFiles/Spi_cube_test.dir/Core/Src/sysmem.c.obj	56c4b6706bab5f5a
+1	69	1737843873309813125	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c.obj	a82644e672d2b254
+1	39	1737843926454397381	CMakeFiles/Spi_cube_test.dir/Core/Src/main.c.obj	9362dea3f2e235b9
+1	71	1737843873313146536	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c.obj	4b52bd9f5b561457
+2	10	1737843873249811713	CMakeFiles/Spi_cube_test.dir/startup_stm32f103xb.s.obj	dc23dd93183a8fcc
+1	78	1737843873319813358	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj	f3977d827ff9e6f2
+1	138	1737843873379814771	CMakeFiles/Spi_cube_test.dir/Core/Src/stm32f1xx_hal_msp.c.obj	9b5a7a0f9178494f
+1	76	1737843873316479948	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c.obj	ea77f145a56cf93a
+2	63	1737843873303146300	CMakeFiles/Spi_cube_test.dir/Core/Src/system_stm32f1xx.c.obj	81841649bdcb7886
+1	143	1737843873383148182	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj	58fe081371797955
+2	140	1737843873376481360	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c.obj	70948233d2f7a741
+1	141	1737843873383148182	CMakeFiles/Spi_cube_test.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c.obj	1b4e1535fd0f7612

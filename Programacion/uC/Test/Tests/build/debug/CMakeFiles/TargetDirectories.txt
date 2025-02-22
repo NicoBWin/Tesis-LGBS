@@ -1,0 +1,3 @@
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Tests/build/debug/CMakeFiles/Tests.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Tests/build/debug/CMakeFiles/edit_cache.dir
+/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Tests/build/debug/CMakeFiles/rebuild_cache.dir
