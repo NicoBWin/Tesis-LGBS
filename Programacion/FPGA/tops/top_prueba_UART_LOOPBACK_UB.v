@@ -16,7 +16,7 @@
 
 module top(
     input wire gpio_23,
-    output wire gpio_10,
+    output wire gpio_12,
     //output wire gpio_25,
 
     output wire led_red,
@@ -33,7 +33,7 @@ module top(
     wire tx;
     wire rx;
 
-    assign tx = gpio_10;
+    assign tx = gpio_12;
     assign rx = gpio_23;
 
     //assign cs_1 = gpio_12;

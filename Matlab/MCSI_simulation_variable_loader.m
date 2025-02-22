@@ -11,7 +11,7 @@ cfg.c    = 3*(3e-6+0.1e-6);
 cfg.l    = 20e-3;
 cfg.w    = 2*pi*cfg.fl;
 cfg.sharing_L = 2E-3;
-cfg.main_L = 0E-3;
+cfg.main_L = 0.00000000001E-3;
 cfg.cs_soft_start_time = 1E-2;
 
 cfg.tri_phase_shift = 360/modules_number;

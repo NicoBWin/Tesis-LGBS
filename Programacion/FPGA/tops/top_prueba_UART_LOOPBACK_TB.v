@@ -15,20 +15,27 @@
 `include "./src/UART/UART.vh"
 
 module top(
-    input wire gpio_23,
+    input wire gpio_26,
     output wire gpio_25,
-    output wire gpio_10,
+    output wire gpio_27,
 
     output wire led_red,
     output wire led_green,
     output wire led_blue,
 
-    output wire gpio_34,
-    output wire gpio_43,
-    output wire gpio_36,
-    output wire gpio_42,
-    output wire gpio_38,
-    output wire gpio_28
+    //output wire gpio_34,
+    //output wire gpio_43,
+    //output wire gpio_36,
+    //output wire gpio_42,
+    //output wire gpio_38,
+    //output wire gpio_28
+    output wire gpio_21,
+    output wire gpio_13,
+    output wire gpio_18,
+    output wire gpio_19,
+    output wire gpio_20,
+    output wire gpio_9
+
 );
 
 /*
@@ -41,8 +48,8 @@ module top(
     wire rx;
     wire shoot;
 
-    assign tx = gpio_10;
-    assign rx = gpio_23;
+    assign tx = gpio_27;
+    assign rx = gpio_26;
     assign shoot = gpio_25;
 /*
 *********************
@@ -152,18 +159,28 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
 
-    //assign gpio_34 = data_received[5];
-    wire error_pin = gpio_34;
-    // assign gpio_43 = data_received[4];
-    assign rx = gpio_43;
-    // assign gpio_36 = data_received[3];
-    assign gpio_36 = parity_error;
-    // assign gpio_42 = data_received[2];
-    assign gpio_42 = tx;
-    // assign gpio_38 = data_received[1];
-    assign gpio_38 = rx_done;
-    assign gpio_28 = data_received[0];
+        //assign gpio_34 = data_received[5];
+    //wire error_pin = gpio_34;
+        // assign gpio_43 = data_received[4];
+    //assign rx = gpio_43;
+        // assign gpio_36 = data_received[3];
+    //assign gpio_36 = parity_error;
+        // assign gpio_42 = data_received[2];
+    //assign gpio_42 = tx;
+        // assign gpio_38 = data_received[1];
+    //assign gpio_38 = rx_done;
+    //assign gpio_28 = data_received[0];
 
+
+    // Assignment pins for testing in MAINBOARD- EXPANSIONBOARD Communication
+    // Using the pins reserved for micro-fpga SPI communication as outputs for the AD2 logic analyzer
+
+    wire error_pin = gpio_21;
+    assign rx = gpio_13;
+    assign gpio_18 = parity_error;
+    assign gpio_19 = tx;
+    assign gpio_20 = rx_done;
+    assign gpio_9 = data_received[0];
 
 /*
 *************************************
