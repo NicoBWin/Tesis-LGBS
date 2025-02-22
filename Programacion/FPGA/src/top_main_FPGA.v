@@ -93,10 +93,10 @@ module top(
 
     wire shoot = gpio_44;
 
-    wire spi_clk_1 = gpio_37;
-    wire mosi_1 = gpio_34;
-    wire miso_1 = gpio_43;
-    wire cs_1 = gpio_36;
+    wire spi_clk_1 = gpio_13;
+    wire mosi_1 = gpio_6; // not used
+    wire miso_1 = gpio_21;
+    wire cs_1 = gpio_19;
 
     reg led_r = OFF;
     reg led_g = OFF;
