@@ -10,55 +10,53 @@
 
 module top(
 
-    //TODO: Revisar pines para dejarlo como el final
+    //Revisado segun la version final de la placa
 
     // UART 1
-    input wire gpio_23,
-    output wire gpio_10,
-
-    // UART 2
     input wire gpio_26,
     output wire gpio_27,
 
-    // UART 3
+    // UART 2
     input wire gpio_32,
     output wire gpio_35,
 
-    // UART 4
+    // UART 3
     input wire gpio_31,
-    output wire gpio_2,
+    output wire gpio_37,
+
+    // UART 4
+    input wire gpio_34,
+    output wire gpio_43,
 
     // UART 5
-    input wire gpio_42,
-    output wire gpio_38,
+    input wire gpio_36,
+    output wire gpio_42,
 
     // UART 6
-    input wire gpio_28,
-    output wire gpio_12,
+    input wire gpio_38,
+    output wire gpio_28,
 
     // UART 7
-    input wire gpio_21,
-    output wire gpio_13,
+    input wire gpio_3,
+    output wire gpio_48,
 
     // UART 8
-    input wire gpio_9,
-    output wire gpio_6,
+    input wire gpio_45,
+    output wire gpio_47,
 
     // UART 9
-    input wire gpio_19,
-    output wire gpio_18,
+    input wire gpio_46,
+    output wire gpio_2,
 
     //Signal from SPI 1
-    output wire gpio_37,
-    output wire gpio_34,
-    input wire gpio_43,
-    output wire gpio_36,
+    output wire gpio_13,
+    output wire gpio_19,
+    input wire gpio_21,
 
-    //TODO: Poner bien -> Signal from SPI 2
-    output wire gpio_37,
-    output wire gpio_34,
-    input wire gpio_43,
-    output wire gpio_36,
+    //Signal from SPI 2
+    output wire gpio_11,
+    output wire gpio_9,
+    input wire gpio_18,
 
     //LEDs
     output wire led_red,
@@ -82,29 +80,23 @@ module top(
 *   Ports setup   *
 *******************
 */  
+    //UART_MAP: uart_id/rx_gpio/tx_gpio
+    `UART_MAP(1, gpio_26, gpio_27)
+    `UART_MAP(2, gpio_32, gpio_35)
+    `UART_MAP(3, gpio_31, gpio_37)
+    `UART_MAP(4, gpio_34, gpio_43)
+    `UART_MAP(5, gpio_36, gpio_42)
+    `UART_MAP(6, gpio_38, gpio_28)
+    `UART_MAP(7, gpio_3, gpio_48)
+    `UART_MAP(8, gpio_45, gpio_47)
+    `UART_MAP(9, gpio_46, gpio_2)
 
-    `UART_MAP(1, gpio_23, gpio_10)
-    `UART_MAP(2, gpio_26, gpio_27)
-    `UART_MAP(3, gpio_32, gpio_35)
-    `UART_MAP(4, gpio_31, gpio_2)
-    `UART_MAP(5, gpio_42, gpio_38)
-    `UART_MAP(6, gpio_28, gpio_12)
-    `UART_MAP(7, gpio_21, gpio_13)
-    `UART_MAP(8, gpio_9, gpio_6)
-    `UART_MAP(9, gpio_19, gpio_18)
+    wire shoot = gpio_44;
 
-    wire shoot = gpio_25;
-
-    wire spi_clk_1 = gpio_37;
-    wire mosi_1 = gpio_34;
-    wire miso_1 = gpio_43;
-    wire cs_1 = gpio_36;
-
-    //TODO: Poner bien esto
-    wire spi_clk_2 = gpio_37;
-    wire mosi_2 = gpio_34;
-    wire miso_2 = gpio_43;
-    wire cs_2 = gpio_36;
+    wire spi_clk_1 = gpio_13;
+    wire mosi_1 = gpio_6; // not used
+    wire miso_1 = gpio_21;
+    wire cs_1 = gpio_19;
 
     reg led_r = OFF;
     reg led_g = OFF;
@@ -120,7 +112,7 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b00")) hf_osc (
+    SB_HFOSC  #(.CLKHF_DIV("0b01")) hf_osc (
         .CLKHFPU(1'b1), 
         .CLKHFEN(1'b1), 
         .CLKHF(clk)

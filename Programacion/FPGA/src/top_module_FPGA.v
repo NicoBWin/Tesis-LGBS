@@ -16,7 +16,7 @@
 
 module top(
 
-    //TODO: Revisar pines para dejarlo como el final
+    //Revisado segun la version final de la placa
 
     // UART
     input wire gpio_23,
@@ -67,6 +67,7 @@ module top(
 *******************
 */  
 
+    //UART_MAP: uart_id/rx_gpio/tx_gpio
     `UART_MAP(1, gpio_23, gpio_12)
 
     reg led_r = OFF;
@@ -86,19 +87,19 @@ module top(
     assign led_green = led_g;
     assign led_blue = led_b;
 
-    wire sdo_1 = gpio_13;
-    wire cs_1 = gpio_19;
-    wire sclk_1 = gpio_18;
-    wire sdo_2 = gpio_11;
-    wire cs_2 = gpio_9;
-    wire sclk_2 = gpio_6;
+    wire sdo_1 = gpio_9;
+    wire cs_1 = gpio_11;
+    wire sclk_1 = gpio_6;
+    wire sdo_2 = gpio_19;
+    wire cs_2 = gpio_13;
+    wire sclk_2 = gpio_18;
 
-    assign gpio_3 = g1_a;
-    assign gpio_48 = g1_b;
-    assign gpio_45 = g2_a;
+    assign gpio_46 = g1_a;
+    assign gpio_45 = g1_b;
+    assign gpio_3 = g1_c;
+    assign gpio_2 = g2_a;
     assign gpio_47 = g2_b;
-    assign gpio_46 = g3_a;
-    assign gpio_2 = g3_b;
+    assign gpio_48 = g2_c;
 
     wire code_received;
     wire uart_code;
