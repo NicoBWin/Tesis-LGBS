@@ -11,9 +11,9 @@ Pasos para programar:
 En cada directorio donde querramos trabajar:
 
 4) Correr apio init -b upduino3
-5) Correr apio verify
-6) Correr apio build
-7) Correr apio upload
+5) Correr apio clean
+6) Correr apio verify
+7) Correr apio prog
     Nota: Si les aparece ftdi_usb_get_strings failed: -4 (libusb_open() failed) sigan
 
 8) Instalen el driver de ftdi con Zadig desde:

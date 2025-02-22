@@ -1,0 +1,9 @@
+Count - 3
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/tabla_spwm_g1
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/tabla_spwm_g2
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/tabla_spwm_g3
+
+Count - 2
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/Maximum Calculator/Decoder
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/tabla_spwm_g1/Decoder
+

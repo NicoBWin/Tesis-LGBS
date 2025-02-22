@@ -1,0 +1,4 @@
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/Maximum Calculator/Decoder --> Decoder
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/Maximum Calculator --> Maximum_Calculator
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl/tabla_spwm_g1 --> tabla_spwm_g1
+SPWM_HDLCoder_MCSI2024/SPWM_3mod_hdl --> SPWM_3mod_hdl

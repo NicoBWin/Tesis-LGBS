@@ -1,0 +1,8 @@
+
+top_prueba_UART_TB_final.v
+top_prueba_UART_UB_final.v
+
+Este TB se usa para probar que ande la TX y la RX. UB envia un codigo que incrementa
+en 1 en cada iteracion, el RX del TB lo recibe y muestra los 6 bits menos significativos que recibio del
+UB.
+

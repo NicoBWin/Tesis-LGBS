@@ -12,15 +12,12 @@ module ADC(
     output wire sclk,
 
     output wire [11:0] value,
-    output reg read_done,
-
-    output wire state_0,
-    output wire state_1
+    output reg read_done
 );
 
     // Config
-    parameter CLK_FREQ = 24000000;
-    parameter COMM_RATE = `SAMPLE2M4_CLK24M;
+    parameter COMM_RATE = `SAMPLE2M4_CLK48M;
+    
     localparam RECEIVE_COUNT = 14;
     localparam CALIBRATE_COUNT = 32;
 
@@ -36,9 +33,6 @@ module ADC(
     reg calibrate_reset;
     reg receive_reset;
 
-    assign state_0 = state[0];
-    assign state_1 = state[1];
-
     wire inner_clk;
     wire[$clog2(RECEIVE_COUNT)-1:0] r_counter;
     wire[$clog2(CALIBRATE_COUNT)-1:0] c_counter;
@@ -51,13 +45,13 @@ module ADC(
     );
 
     up_counter #(RECEIVE_COUNT) receive_counter (
-        .clk_in(inner_clk),
+        .clk(inner_clk),
         .reset(receive_reset),
         .counter(r_counter)
     );
 
     up_counter #(CALIBRATE_COUNT) calibrate_counter(
-        .clk_in(inner_clk),
+        .clk(inner_clk),
         .reset(calibrate_reset),
         .counter(c_counter)
     );
