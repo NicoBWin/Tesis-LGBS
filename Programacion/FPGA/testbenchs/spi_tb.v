@@ -59,11 +59,17 @@ module SPI_tb;
         // Test case 1: Send and receive data
         data_to_tx <= 16'hA5A5;  // Transmit pattern 10100101 
         start_transfer <= 1;
-
         #20
         start_transfer <= 0;
 
-        #800
+        #829
+
+        data_to_tx <= 16'h1234;
+        start_transfer <= 1;
+        #37
+        start_transfer <= 0;
+
+        #799
         $finish;
     end
 
