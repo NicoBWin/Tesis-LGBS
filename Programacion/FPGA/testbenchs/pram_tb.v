@@ -40,8 +40,6 @@ module pram_tb;
         #10;
         $display("Address: %h, Data: %h", address, data);
 
-        // Add more addresses as needed
-
         // Finish simulation
         $finish;
     end
