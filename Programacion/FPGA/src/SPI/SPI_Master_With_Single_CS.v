@@ -57,7 +57,7 @@ module SPI_Master_With_Single_CS
    output o_SPI_Clk,
    input  i_SPI_MISO,
    output o_SPI_MOSI,
-   output o_SPI_CS_n,
+   output o_SPI_CS_n
    );
 
   localparam IDLE        = 2'b00;
