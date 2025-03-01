@@ -9,10 +9,10 @@
 #include "stdbool.h"
 
 
-
+static int16_t adc_value;
 static float i_ref_float = 0.0;
-static uint16_t i_ref_int = 0;
-static uint16_t i_offset = 0;
+static int16_t i_ref_int = 0;
+static int16_t i_offset = 0;
 static bool calibrated = false;
 
 
@@ -42,6 +42,10 @@ void curr_control_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim)
 
 }
 
+float get_I_meas()
+{
+	return (float)(adc_value-i_offset)/(float)SENS_SENSITIVITY;
+}
 
 float get_I()
 {
@@ -61,7 +65,6 @@ void set_I(float i)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	static uint16_t adc_value;
 	adc_value = HAL_ADC_GetValue(hadc);
 	if (!calibrated)
 	{

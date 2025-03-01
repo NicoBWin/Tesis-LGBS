@@ -9,17 +9,18 @@
 #define INC_CURRENTCONTROL_H_
 #include "stm32f1xx_hal.h"
 
-#define MAX_CURR 3.0
+#define MAX_CURR 5.0
 
-#define SENS_SENSITIVITY 248	// ADC Units per Ampere = 200mV/A
+#define SENS_SENSITIVITY 496	// ADC Units per Ampere = 400mV/A
 
 #define H_BRIDGE_GPIO_PORT GPIOA
-#define H_BRIDGE_1_A 0	// Arriba izquierda
-#define H_BRIDGE_1_B 2	// Arriba derecha
-#define H_BRIDGE_2_A 1	// Abajo izquierda
-#define H_BRIDGE_2_B 3	// Abajo derecha
+#define H_BRIDGE_1_A GPIO_PIN_0	// Arriba izquierda
+#define H_BRIDGE_1_B GPIO_PIN_2	// Arriba derecha
+#define H_BRIDGE_2_A GPIO_PIN_1	// Abajo izquierda
+#define H_BRIDGE_2_B GPIO_PIN_3	// Abajo derecha
 
 void curr_control_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
+float get_I_meas();
 float get_I();
 void set_I(float);
 

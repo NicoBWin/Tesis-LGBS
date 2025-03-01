@@ -27,6 +27,12 @@ void command_I(uint8_t *buff, uint16_t size){
 		i = atof(&buff[2]);
 		set_I(i);
 	}
+	else if (buff[1] == 'm')
+	{
+		gcvt(get_I_meas(), 3, buff);
+		buff[4] = '\n';
+		CDC_Transmit_FS(buff, 5);
+	}
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }
 
