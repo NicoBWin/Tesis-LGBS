@@ -1,0 +1,24 @@
+/*
+ * CurrentControl.h
+ *
+ *  Created on: Feb 23, 2025
+ *      Author: gullino18
+ */
+
+#ifndef INC_CURRENTCONTROL_H_
+#define INC_CURRENTCONTROL_H_
+#include "stm32f1xx_hal.h"
+
+#define SENS_SENSITIVITY 248	// ADC Units per Ampere = 200mV/A
+
+#define H_BRIDGE_GPIO_PORT GPIOA
+#define H_BRIDGE_1_A 0	// Arriba izquierda
+#define H_BRIDGE_1_B 2	// Arriba derecha
+#define H_BRIDGE_2_A 1	// Abajo izquierda
+#define H_BRIDGE_2_B 3	// Abajo derecha
+
+void curr_control_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
+float get_I();
+void set_I(float);
+
+#endif /* INC_CURRENTCONTROL_H_ */

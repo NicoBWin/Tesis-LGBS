@@ -60,8 +60,8 @@ all: main-build
 main-build: Test_CAN_SPI.elf secondary-outputs
 
 # Tool invocations
-Test_CAN_SPI.elf Test_CAN_SPI.map: $(OBJS) $(USER_OBJS) /home/gullino18/Documents/github/Tesis-LGBS/Programacion/uC/Test/Test_CAN_SPI/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Test_CAN_SPI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/gullino18/Documents/github/Tesis-LGBS/Programacion/uC/Test/Test_CAN_SPI/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Test_CAN_SPI.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Test_CAN_SPI.elf Test_CAN_SPI.map: $(OBJS) $(USER_OBJS) /home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Test_CAN_SPI/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Test_CAN_SPI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Test/Test_CAN_SPI/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Test_CAN_SPI.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

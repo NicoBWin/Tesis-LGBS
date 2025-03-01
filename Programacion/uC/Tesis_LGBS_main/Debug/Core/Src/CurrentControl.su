@@ -1,0 +1,4 @@
+../Core/Src/CurrentControl.c:19:6:curr_control_init	16	static
+../Core/Src/CurrentControl.c:46:7:get_I	4	static
+../Core/Src/CurrentControl.c:51:6:set_I	24	static
+../Core/Src/CurrentControl.c:58:6:HAL_ADC_ConvCpltCallback	16	static
