@@ -50,6 +50,10 @@ float get_I()
 
 void set_I(float i)
 {
+	if (i > MAX_CURR || i < 0.0)
+	{
+		return;
+	}
 	i_ref_float = i;
 	i_ref_int = i * SENS_SENSITIVITY + i_offset;
 }

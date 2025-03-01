@@ -9,6 +9,8 @@
 #define INC_CURRENTCONTROL_H_
 #include "stm32f1xx_hal.h"
 
+#define MAX_CURR 3.0
+
 #define SENS_SENSITIVITY 248	// ADC Units per Ampere = 200mV/A
 
 #define H_BRIDGE_GPIO_PORT GPIOA
