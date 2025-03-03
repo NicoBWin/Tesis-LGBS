@@ -1,22 +1,22 @@
 clear all
 
-modules_number = 9;
+modules_number = 3;
 
 %% SPWM_Mod_Block
 
 cfg.clk_freq = 48e6;
-cfg.tri_freq = 160e3;
+cfg.tri_freq = 187.5e3;
 cfg.mod_number = 3;
  
-cfg.sawtooth_counter = uint16(cfg.clk_freq/cfg.tri_freq - 1);
+cfg.sawtooth_counter = uint16(cfg.clk_freq/cfg.tri_freq - 1)
 
 %cfg.counter_word_length = ceil(log2(cfg.sawtooth_counter));
 %cfg.counter_tri_word_length = cfg.counter_word_length - 1;
-cfg.counter_word_length = 16;
-cfg.counter_tri_word_length = 16;
+cfg.counter_word_length = 8;
+cfg.counter_tri_word_length = 8;
 
 
-cfg.phase_mul_var = (uint16(cfg.sawtooth_counter/cfg.mod_number));
+cfg.phase_mul_var = (uint16(cfg.sawtooth_counter/cfg.mod_number))
 
 cfg.sawtooth_phase = [0*cfg.phase_mul_var
                       1*cfg.phase_mul_var
@@ -26,11 +26,11 @@ cfg.tri_counter_comp = uint16(cfg.sawtooth_counter / 2 - 1)
 
 %% Internal Parameters
 
-cfg.ts  = 1/cfg.clk_freq;
-cfg.fl  = 50;
+cfg.ts  = 1/cfg.clk_freq
+cfg.fl  = 100;
 cfg.r    = 10;
 cfg.c    = 3*(3e-6+0.1e-6);
-cfg.l    = 20e-3;
+cfg.l    = 1e-3;
 cfg.w    = 2*pi*cfg.fl;
 cfg.sharing_L = 2E-3;
 cfg.main_L = 0E-3;
