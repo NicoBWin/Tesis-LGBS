@@ -8,7 +8,7 @@ module PRAM (
 
     // Initialize the RAM with data
     initial begin
-        $readmemh("sine_wave.hex", memory); // Load data from a hex file
+        $readmemh("./src/PRAM/sine_wave.hex", memory); // Load data from a hex file
     end
 
     // Read operation

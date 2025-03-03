@@ -1,0 +1,10 @@
+18:59:12 **** Incremental Build of configuration Debug for project Test_CAN_SPI ****
+make -j4 all 
+arm-none-eabi-size  Test_CAN_SPI.elf 
+   text	   data	    bss	    dec	    hex	filename
+  11248	     12	   1876	  13136	   3350	Test_CAN_SPI.elf
+Finished building: default.size.stdout
+ 
+
+18:59:12 Build Finished. 0 errors, 0 warnings. (took 434ms)
+
