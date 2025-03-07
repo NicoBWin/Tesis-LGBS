@@ -1,22 +1,9 @@
-/*
-    Recibe por UART que gate debe prender y cual apagar en un codigo unico de 
-    8 bits (5 bits de datos + 3 bits de ECC). Debe reflejar los valores en 
-    los gates cuando recibe la señal de shoot. 
-
-    HACER ESTO DESPUES
-    Ademas, cada X ms debe enviar por las lectura de los ADC a traves 
-    de UART (Siempre en la ventana de tiempo que no se requiere enviar 
-    informacion desde FPGA main hacia FPGA modulo). 
-*/
 
 `include "./src/macros.vh"
 `include "./src/UART/UART.vh"
 `include "./src/timer/timer.vh"
-`include "./src/ADC/ADC.vh"
 
 module top(
-
-    //Revisado segun la version final de la placa
 
     // UART
     input wire gpio_23,
@@ -29,15 +16,6 @@ module top(
 
     //Shoot
     input wire gpio_26,
-
-    //ADCs
-    output wire gpio_11,
-    input wire gpio_9,
-    output wire gpio_6,
-
-    output wire gpio_13,
-    input wire gpio_19,
-    output wire gpio_18
 
     // Gates de los transistores
     output wire gpio_3,
@@ -52,15 +30,21 @@ module top(
 *****************************
 *   Variables declaration   *
 *****************************
-*/  
+*/   
+    //IMPORTANT: MODULE_ID must be unique for each module
+    localparam MODULE_ID = 1;
+
     localparam OFF = 1;
     localparam ON = 0;
     localparam TR_ON = 1;
     localparam TR_OFF = 0;
 
-    localparam INIT = 2'b00;
-    localparam IDLE = 2'b01;
-    localparam RX_ERROR = 2'b10;
+    localparam INIT = 3'b000;
+    localparam WAIT_VALUE_1 = 3'b001;
+    localparam WAIT_VALUE_2 = 3'b010;
+    localparam RX_ERROR = 3'b011;
+    localparam MODULATE = 3'b100;
+    
 /*
 *******************
 *   Ports setup   *
@@ -82,17 +66,6 @@ module top(
     reg g3_b = TR_OFF;
 
     wire shoot = gpio_26;
-    
-    assign led_red = led_r;
-    assign led_green = led_g;
-    assign led_blue = led_b;
-
-    wire sdo_1 = gpio_9;
-    wire cs_1 = gpio_11;
-    wire sclk_1 = gpio_6;
-    wire sdo_2 = gpio_19;
-    wire cs_2 = gpio_13;
-    wire sclk_2 = gpio_18;
 
     assign gpio_46 = g1_a;
     assign gpio_45 = g1_b;
@@ -100,9 +73,6 @@ module top(
     assign gpio_2 = g2_a;
     assign gpio_47 = g2_b;
     assign gpio_48 = g2_c;
-
-    wire code_received;
-    wire uart_code;
 
 /*
 *********************
@@ -121,6 +91,7 @@ module top(
 */
     // General purpose
     reg reset = 0;
+    reg [15:0] uart_msg = 16'h0000;
 
     // UART
     reg start_tx;
@@ -131,34 +102,16 @@ module top(
     wire parity_error; 
     wire tx; 
     wire rx; 
-    assign uart_code = data_received[6:3];
 
     // Timers
     reg start_1_sec = 0;
     wire done_1_sec;
 
-    // Signals for ADC 1
-    wire adc_1_read;
-    wire adc_1_recalibrate;
-    wire [11:0] adc_1_value;
-    wire adc_1_done;
-
-    // Signals for ADC 2
-    wire adc_2_read;
-    wire adc_2_recalibrate;
-    wire [11:0] adc_2_value;
-    wire adc_2_done;
 /*
 *************************************
 *        Functions declarations     *
 *************************************
 */
-
-task uart_code_received(input logic [3:0] code);
-    begin
-        code_received = (rx_done && uart_code == code) ? 1 : 0;
-    end
-endtask
 
 /*
 *************************************
@@ -186,31 +139,15 @@ endtask
         .parity_error(parity_error)
     );
 
-    ADC #(.COMM_RATE(`SAMPLE2M4_CLK48M)) adc_1 (
-        .clk(clk),
-        .reset(reset),
-        .read(adc_1_read),
-        .recalibrate(adc_1_recalibrate),
-        .sdo(sdo_1),
-        .cs(cs_1),
-        .sclk(sclk_1),
-        .value(adc_1_value),
-        .read_done(adc_1_done)
+
+    rgb_color_selector color_selector(
+        .color_index(MODULE_ID),
+        .led_r(led_red),
+        .led_g(led_green),
+        .led_b(led_blue)
     );
 
-    ADC #(.COMM_RATE(`SAMPLE2M4_CLK48M)) adc_2 (
-        .clk(clk),
-        .reset(reset),
-        .read(adc_2_read),
-        .recalibrate(adc_2_recalibrate),
-        .sdo(sdo_2),
-        .cs(cs_2),
-        .sclk(sclk_2),
-        .value(adc_2_value),
-        .read_done(adc_2_done)
-    );
-
-
+    
 /*
 ******************
 *   Statements   *
@@ -223,7 +160,8 @@ endtask
                 if (done_1_sec) begin
                     reset <= 0;
                     start_1_sec <= 0;
-                    state <= IDLE;
+                    led_b <= ON;
+                    state <= WAIT_VALUE_1;
                 end
                 else begin
                     reset <= 1;
@@ -231,15 +169,32 @@ endtask
                 end
             end
 
-            IDLE: begin
+            WAIT_VALUE_1: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        
+                        uart_msg[15:8] <= data_received;
+                        state <= WAIT_VALUE_2;
                     end
                     else begin
                         state <= RX_ERROR;
                     end 
                 end
+            end
+
+            WAIT_VALUE_2: begin
+                if (rx_done) begin
+                    if (!parity_error) begin
+                        uart_msg[7:0] <= data_received;
+                        state <= MODULATE;
+                    end
+                    else begin
+                        state <= RX_ERROR;
+                    end 
+                end
+            end
+
+            MODULATE: begin
+                
             end
 
             RX_ERROR: begin

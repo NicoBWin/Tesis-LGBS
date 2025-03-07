@@ -1,10 +1,10 @@
 module PRAM (
-    input wire [15:0] address, // 16-bit address line
-    output reg [7:0] data     // 8-bit data output
+    input wire [11:0] address, // 12-bit address line
+    output reg [6:0] data     // 7-bit data output
 );
 
     // Declare the RAM content
-    reg [7:0] memory [65535:0];
+    reg [6:0] memory [4095:0];
 
     // Initialize the RAM with data
     initial begin
