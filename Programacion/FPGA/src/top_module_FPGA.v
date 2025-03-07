@@ -43,7 +43,6 @@ module top(
     localparam WAIT_VALUE_1 = 3'b001;
     localparam WAIT_VALUE_2 = 3'b010;
     localparam RX_ERROR = 3'b011;
-    localparam MODULATE = 3'b100;
     
 /*
 *******************
@@ -147,7 +146,19 @@ module top(
         .led_b(led_blue)
     );
 
-    
+    modulator modulator(
+        .clk(clk),
+        .reset(reset),
+        .shoot(shoot),
+        .angle(uart_msg[11:0]),
+        .g1_a(g1_a),
+        .g2_a(g2_a),
+        .g1_b(g1_b),
+        .g2_b(g2_b),
+        .g1_c(g1_c),
+        .g2_c(g2_c)
+    );
+
 /*
 ******************
 *   Statements   *
@@ -185,16 +196,12 @@ module top(
                 if (rx_done) begin
                     if (!parity_error) begin
                         uart_msg[7:0] <= data_received;
-                        state <= MODULATE;
+                        state <= WAIT_VALUE_1;
                     end
                     else begin
                         state <= RX_ERROR;
                     end 
                 end
-            end
-
-            MODULATE: begin
-                
             end
 
             RX_ERROR: begin

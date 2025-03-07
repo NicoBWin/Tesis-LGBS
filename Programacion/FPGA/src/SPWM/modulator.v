@@ -1,7 +1,15 @@
 module modulator (
     input wire clk,
     input wire reset,
+    input wire shoot,
     input [11:0] wire angle,   // Angle of the sine wave
+
+    output reg g1_a,   // Gate 1 of the phase A
+    output reg g2_a,   // Gate 2 of the phase A
+    output reg g1_b,   // Gate 1 of the phase B
+    output reg g2_b,   // Gate 2 of the phase B
+    output reg g1_c,   // Gate 1 of the phase C
+    output reg g2_c,   // Gate 2 of the phase C
 );  
 
     // Triangular wave generator outputs
@@ -31,8 +39,6 @@ module modulator (
         .address(angle),
         .data(sine_value)
     );
-
-    
 
     always @(posedge clk) begin
         if (reset) begin
