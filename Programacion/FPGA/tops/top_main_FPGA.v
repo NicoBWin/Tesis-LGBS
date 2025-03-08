@@ -233,14 +233,14 @@ module top(
 
     timer #(`SEC_1) timer_1(
         .clk(clk),
-        .reset(reset),
+        .reset(1'b0),
         .start(start_1_sec),
         .done(done_1_sec)
     );
 
     timer #(`SEC_5) timer_2(
         .clk(clk),
-        .reset(reset),
+        .reset(1'b0),
         .start(start_5_sec),
         .done(done_5_sec)
     );
