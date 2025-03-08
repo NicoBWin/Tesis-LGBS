@@ -31,7 +31,7 @@ module SPI_request_data (
 
     // SPI Master instantiation (no TX used here)
     SPI_Master_With_Single_CS u_spi (
-        .i_Rst_L(reset),              // Reset signal
+        .i_Rst_L(~reset),              // Reset signal
         .i_Clk(clk),                  // Clock signal
         .i_TX_Count(2'd2),               // Two bytes per transfer
         .i_TX_Byte(8'd33),               // Example data to send
