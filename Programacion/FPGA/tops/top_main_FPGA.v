@@ -131,7 +131,7 @@ module top(
 
     wire [11:0] sin_index;
     wire [3:0] uart_id;
-    reg [7:0] request_next_counter;
+    reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
 
     // Timers
     reg start_1_sec = 0;
@@ -157,11 +157,13 @@ module top(
     reg [1:0] pipe_state = IDLE_PIPE;
 
     //Normal mode FSM
-    localparam REQUEST_SINE  = 3'b000;
-    localparam SEND_NORMAL_1 = 3'b001;
-    localparam WAIT_1        = 3'b010;
-    localparam SEND_NORMAL_2 = 3'b011;
-    localparam WAIT_2        = 3'b100;
+    localparam REQUEST_SINE     = 3'b000;
+    localparam SEND_NORMAL_1    = 3'b001;
+    localparam WAIT_1           = 3'b010;
+    localparam SEND_NORMAL_2    = 3'b011;
+    localparam WAIT_2           = 3'b100;
+    localparam WAIT_FOR_REQUEST = 3'b101;
+
     reg [2:0] normal_state = REQUEST_SINE;
 
     // UART
@@ -250,6 +252,16 @@ module top(
 *   Statements   *
 ******************
 */
+    always @(posedge clk) begin
+        if (reset) begin
+            request_next_counter <= 0;
+        end
+        else begin
+            if (state == NORMAL_MODE) begin
+                request_next_counter <= request_next_counter < `TRIAG_T ? request_next_counter + 1 : 0;
+            end
+        end
+    end
     
     always @(posedge clk) begin
         case (state)
@@ -290,7 +302,10 @@ module top(
             end
 
             NORMAL_MODE: begin
+
+
                 case (normal_state)
+
                     REQUEST_SINE: begin
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
@@ -335,18 +350,16 @@ module top(
                     end
 
                     WAIT_2: begin
-
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             start_tx[k] <= 0;
                         end
+                        normal_state <= WAIT_FOR_REQUEST;
+                    end
 
-                        if (request_next_counter == 255) begin
-                            request_next_counter <= 0;
+                    WAIT_FOR_REQUEST: begin
+                        if (request_next_counter == `TRIAG_T-1) begin
                             normal_state <= REQUEST_SINE;
-                        end
-                        else begin
-                            request_next_counter <= request_next_counter + 1;
-                        end
+                        end                        
                     end
                 endcase
             end
