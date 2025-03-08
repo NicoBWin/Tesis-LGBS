@@ -3,7 +3,7 @@
     transistores prender de cada modulo y envia al final un pulso de shoot.
 */
 
-`include "./src/macros.vh"
+`include "./src/config/config.vh"
 `include "./src/UART/UART.vh"
 `include "./src/SPI/SPI.vh"
 `include "./src/timer/timer.vh"
