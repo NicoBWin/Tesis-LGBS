@@ -59,7 +59,7 @@ module top(
     output wire led_blue,
 
     //Shoot
-    output wire gpio_25
+    output wire gpio_44
 );
 
 /*
@@ -89,7 +89,6 @@ module top(
     wire shoot = gpio_44;
 
     wire spi_clk_1 = gpio_13;
-    wire mosi_1 = gpio_6;
     wire miso_1 = gpio_21;
     wire cs_1 = gpio_19;
 
@@ -107,7 +106,8 @@ module top(
 *********************
 */  
     wire clk;
-    SB_HFOSC  #(.CLKHF_DIV("0b01")) hf_osc (
+    wire clk_24;
+    SB_HFOSC  #(.CLKHF_DIV("0b00")) hf_osc (
         .CLKHFPU(1'b1), 
         .CLKHFEN(1'b1), 
         .CLKHF(clk)
@@ -118,14 +118,20 @@ module top(
 *   External Modules Variables      *
 *************************************
 */
-
+    clk_divider #(.BAUD_DIV(2)) clk_divider_1(
+        .clk_in(clk),
+        .reset(reset),
+        .clk_out(clk_24)
+    );
+    
     // General purpose
     genvar i, j;
+    integer k;
     reg reset;
 
     wire [11:0] sin_index;
     wire [3:0] uart_id;
-    wire [7:0] request_next_counter;
+    reg [7:0] request_next_counter;
 
     // Timers
     reg start_1_sec = 0;
@@ -135,7 +141,6 @@ module top(
 
     // General FSM
     localparam INIT         = 3'b000;
-    localparam REQUEST_SINE = 3'b001;
     localparam DEBUG_MODE   = 3'b010;
     localparam NORMAL_MODE  = 3'b100;
 
@@ -194,7 +199,7 @@ module top(
 
             // UART TX module
             uart_tx to_modules_tx(
-                .clk(clk),
+                .clk(clk_24),
                 .reset(reset),
                 .data_to_tx(data_to_tx[i]), 
                 .start_tx(start_tx[i]), 
@@ -204,7 +209,7 @@ module top(
 
             // UART RX module
             uart_rx from_modules_rx(
-                .clk(clk),
+                .clk(clk_24),
                 .reset(reset),
                 .rx(rx[i]),
                 .data_received(data_received[i]), 
@@ -294,9 +299,9 @@ module top(
                     end
                     
                     SEND_NORMAL_1: begin
-                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                            data_to_tx[i] <= sin_index[11:4];
-                            start_tx[i] <= 1;
+                        for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
+                            data_to_tx[k] <= sin_index[11:4];
+                            start_tx[k] <= 1;
                             if (tx_busy[0]) begin
                                 normal_state <= WAIT_1;
                             end
@@ -307,22 +312,22 @@ module top(
                         
                         // Suponemos que todos los modulos terminan al mismo tiempo
                         if (!tx_busy[0]) begin
-                            for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                                start_tx[i] <= 0;
+                            for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
+                                start_tx[k] <= 0;
                             end
                             normal_state <= SEND_NORMAL_2;
                         end
                         else begin
-                            for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                                start_tx[i] <= 0;
+                            for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
+                                start_tx[k] <= 0;
                             end
                         end
                     end
                     
                     SEND_NORMAL_2: begin
-                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                            data_to_tx[i] <= {sin_index[3:0], uart_id};
-                            start_tx[i] <= 1;
+                        for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
+                            data_to_tx[k] <= {sin_index[3:0], uart_id};
+                            start_tx[k] <= 1;
                             if (tx_busy[0]) begin
                                 normal_state <= WAIT_2;
                             end
@@ -331,8 +336,8 @@ module top(
 
                     WAIT_2: begin
 
-                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                            start_tx[i] <= 0;
+                        for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
+                            start_tx[k] <= 0;
                         end
 
                         if (request_next_counter == 255) begin

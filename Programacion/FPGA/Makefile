@@ -27,10 +27,10 @@ ifeq ($(uname_S), Darwin)
 	OSSCAD_ICE40_PREDEFMODULES = "$(APIOPKGFOLDER)/packages/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v"
 endif
 
-LIB_SRC = ./src/PRAM/PRAM.v ./src/timer/timer.v ./src/SPI/SPI_Master.v ./src/SPI/SPI_Master_With_Single_CS.v ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v ./src/SPWM/modulator.v ./src/SPWM/system_output.v ./src/SPWM/phase2transistors.v ./src/SPWM/triangular_3ph_gen.v ./src/SPWM/triangular_gen.v ./src/utils/rgb_color_selector.v ./src/SPWM/maximum_calculator.v ./src/utils/Decoder.v
-SOURCES = ./tops/top_module_FPGA.v $(LIB_SRC)
+LIB_SRC = ./src/SPI/SPI_request_data.v ./src/PRAM/PRAM.v ./src/timer/timer.v ./src/SPI/SPI_Master.v ./src/SPI/SPI_Master_With_Single_CS.v ./src/utils/hamming_decoder.v ./src/utils/hamming_encoder.v ./src/ADC/ADC.v ./src/utils/clk_divider.v ./src/utils/up_counter.v ./src/utils/shift_register.v ./src/UART/uart_tx.v ./src/UART/uart_rx.v 
+SOURCES = ./tops/top_main_FPGA.v $(LIB_SRC)
 TBNAME = pram_tb
-MODULE_TO_DRAW = top_prueba_SPI.v
+MODULE_TO_DRAW = top_main_FPGA.v
 SOURCES_TB = ./testbenchs/pram_tb.v $(LIB_SRC)
 PCF = upduino.pcf
 #QUIET = -q

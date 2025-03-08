@@ -6,9 +6,9 @@ module SPI_request_data (
     output wire spi_clk_1,          // SPI Clock
     output wire cs_1,               // Chip Select
 
-    output reg data_valid;
-    output wire [11:0] sin_index;        // 12 bits for Sin Index (MSB)
-    output wire [3:0] uart_id;           // 4 bits for UART ID (LSB)
+    output reg data_valid,
+    output wire [11:0] sin_index,        // 12 bits for Sin Index (MSB)
+    output wire [3:0] uart_id           // 4 bits for UART ID (LSB)
 );
 
     // State machine states
@@ -33,8 +33,8 @@ module SPI_request_data (
     SPI_Master_With_Single_CS u_spi (
         .i_Rst_L(reset),              // Reset signal
         .i_Clk(clk),                  // Clock signal
-        .i_TX_Count(2),               // Two bytes per transfer
-        .i_TX_Byte(33),               // Example data to send
+        .i_TX_Count(2'd2),               // Two bytes per transfer
+        .i_TX_Byte(8'd33),               // Example data to send
         .i_TX_DV(start_transfer),     // Data valid signal for transmission
         .o_RX_DV(transfer_done),      // Data valid signal for received data
         .o_RX_Byte(data_received),    // Received byte
