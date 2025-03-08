@@ -58,7 +58,7 @@ hardware.json: $(SOURCES) ./src/config/config.vh
 	$(YOSYS) -p "synth_ice40 -dsp -json hardware.json -top top" $(QUIET) $(SOURCES)'
 
 hardware.asc: $(PCF) hardware.json
-	$(ICE40) --up5k --package sg48 --json hardware.json --asc hardware.asc --pcf $(PCF) --freq 24 $(QUIET)'
+	$(ICE40) --up5k --package sg48 --json hardware.json --asc hardware.asc --placer-heap-cell-placement-timeout 0 --pcf $(PCF) --freq 24 $(QUIET)'
 
 hardware.bin: hardware.asc
 	$(ICEPACK) hardware.asc hardware.bin'
