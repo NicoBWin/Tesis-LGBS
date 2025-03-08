@@ -25,34 +25,19 @@ module maximum_calculator
            g_max);
 
 
-  input   [7:0] alpha3_phase_Vab0;  // uint8
-  input   [7:0] alpha3_phase_Vab120;  // uint8
-  input   [7:0] alpha3_phase_Vab240;  // uint8
+  input   [6:0] alpha3_phase_Vab0;  // uint8
+  input   [6:0] alpha3_phase_Vab120;  // uint8
+  input   [6:0] alpha3_phase_Vab240;  // uint8
   output  [5:0] g_max;  // ufix6
 
 
-  wire signed [31:0] Subtract_sub_temp;  // sfix32
-  wire signed [31:0] Subtract_1;  // sfix32
-  wire signed [31:0] Subtract_2;  // sfix32
-  wire signed [15:0] Subtract_out1;  // int16
-  wire signed [16:0] Abs1_y;  // sfix17
-  wire signed [16:0] Abs1_1;  // sfix17
-  wire signed [15:0] Abs1_out1;  // int16
-  wire signed [31:0] Subtract1_sub_temp;  // sfix32
-  wire signed [31:0] Subtract1_1;  // sfix32
-  wire signed [31:0] Subtract1_2;  // sfix32
-  wire signed [15:0] Subtract1_out1;  // int16
-  wire signed [16:0] Abs_y;  // sfix17
-  wire signed [16:0] Abs_1;  // sfix17
-  wire signed [15:0] Abs_out1;  // int16
+  wire signed [7:0] Subtract_out_1;  // int8
+  wire signed [7:0] Abs_out_1;  // uint8
+  wire signed [7:0] Subtract_out_2;  // int8
+  wire signed [7:0] Abs_out_2;  // uint8
+  wire signed [7:0] Subtract_out_3;  // int8
+  wire signed [7:0] Abs_out_3;  // uint16
   wire Relational_Operator_relop1;
-  wire signed [31:0] Subtract2_sub_temp;  // sfix32
-  wire signed [31:0] Subtract2_1;  // sfix32
-  wire signed [31:0] Subtract2_2;  // sfix32
-  wire signed [15:0] Subtract2_out1;  // int16
-  wire signed [16:0] Abs2_y;  // sfix17
-  wire signed [16:0] Abs2_1;  // sfix17
-  wire signed [15:0] Abs2_out1;  // int16
   wire Relational_Operator1_relop1;
   wire Relational_Operator2_relop1;
   wire Decoder_out1;
@@ -72,49 +57,21 @@ module maximum_calculator
   wire [5:0] Bit_Concat_out1;  // ufix6
 
 
-  assign Subtract_1 = {24'b0, alpha3_phase_Vab0};
-  assign Subtract_2 = {24'b0, alpha3_phase_Vab120};
-  assign Subtract_sub_temp = Subtract_1 - Subtract_2;
-  assign Subtract_out1 = Subtract_sub_temp[15:0];
+  assign Subtract_out_1 = {1'b0, alpha3_phase_Vab0} - {1'b0, alpha3_phase_Vab120};
+  assign Abs_out_1 = (Subtract_out_1[7] ?  - (Subtract_out_1) : Subtract_out_1);
 
 
-  assign Abs1_1 = {Subtract_out1[15], Subtract_out1};
-  assign Abs1_y = (Subtract_out1 < 16'sb0000000000000000 ?  - (Abs1_1) :
-              {Subtract_out1[15], Subtract_out1});
-  assign Abs1_out1 = Abs1_y[15:0];
+  assign Subtract1_out_2 = {1'b0, alpha3_phase_Vab120} - {1'b0, alpha3_phase_Vab240};
+  assign Abs_out_2 = (Subtract_out_2[7] ?  - (Subtract_out_2) : Subtract_out_2);
 
 
-  assign Subtract1_1 = {24'b0, alpha3_phase_Vab120};
-  assign Subtract1_2 = {24'b0, alpha3_phase_Vab240};
-  assign Subtract1_sub_temp = Subtract1_1 - Subtract1_2;
-  assign Subtract1_out1 = Subtract1_sub_temp[15:0];
+  assign Subtract_out_3 = {1'b0, alpha3_phase_Vab240} - {1'b0, alpha3_phase_Vab0};
+  assign Abs_out_3 = (Subtract_out_3[7] ?  - (Subtract_out_3) : Subtract_out_3);
 
 
-  assign Abs_1 = {Subtract1_out1[15], Subtract1_out1};
-  assign Abs_y = (Subtract1_out1 < 16'sb0000000000000000 ?  - (Abs_1) :
-              {Subtract1_out1[15], Subtract1_out1});
-  assign Abs_out1 = Abs_y[15:0];
-
-
-  assign Relational_Operator_relop1 = Abs1_out1 >= Abs_out1;
-
-
-  assign Subtract2_1 = {24'b0, alpha3_phase_Vab240};
-  assign Subtract2_2 = {24'b0, alpha3_phase_Vab0};
-  assign Subtract2_sub_temp = Subtract2_1 - Subtract2_2;
-  assign Subtract2_out1 = Subtract2_sub_temp[15:0];
-
-
-  assign Abs2_1 = {Subtract2_out1[15], Subtract2_out1};
-  assign Abs2_y = (Subtract2_out1 < 16'sb0000000000000000 ?  - (Abs2_1) :
-              {Subtract2_out1[15], Subtract2_out1});
-  assign Abs2_out1 = Abs2_y[15:0];
-
-
-  assign Relational_Operator1_relop1 = Abs_out1 >= Abs2_out1;
-
-
-  assign Relational_Operator2_relop1 = Abs2_out1 >= Abs1_out1;
+  assign Relational_Operator_relop1 = Abs_out_1 >= Abs_out_2;
+  assign Relational_Operator1_relop1 = Abs_out_2 >= Abs_out_3;
+  assign Relational_Operator2_relop1 = Abs_out_3 >= Abs_out_1;
 
 
   Decoder u_Decoder (.b2(Relational_Operator_relop1),
@@ -147,9 +104,6 @@ module maximum_calculator
   assign Logical_Operator5_out1 = Decoder_out8 | (Decoder_out6 | (Decoder_out1 | Decoder_out2));
 
 
-  assign Bit_Concat_out1 = {Logical_Operator_out1, Logical_Operator1_out1, Logical_Operator2_out1, Logical_Operator3_out1, Logical_Operator4_out1, Logical_Operator5_out1};
-
-
-  assign g_max = Bit_Concat_out1;
+  assign g_max = {Logical_Operator_out1, Logical_Operator1_out1, Logical_Operator2_out1, Logical_Operator3_out1, Logical_Operator4_out1, Logical_Operator5_out1};
 
 endmodule  // maximum_calculator

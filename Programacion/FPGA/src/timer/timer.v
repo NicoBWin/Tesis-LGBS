@@ -8,7 +8,7 @@ module timer #(parameter MAX_COUNT = `SEC_1)
     output reg done         // Done signal
 );
 
-    reg [$clog2(MAX_COUNT)-1:0] counter; // Counter
+    reg [$clog2(MAX_COUNT)-1:0] counter = 0; // Counter
 
     always @(posedge clk) begin
         if (reset) begin

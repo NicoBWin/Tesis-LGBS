@@ -10,7 +10,7 @@
 #include "stdint.h"
 #include "stm32f1xx_hal.h"
 
-#define LUT_SIZE
+#define LUT_SIZE 4096
 
 void init_LUT_comms(SPI_HandleTypeDef *hspi);
 

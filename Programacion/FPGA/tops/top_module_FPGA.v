@@ -31,8 +31,6 @@ module top(
 *   Variables declaration   *
 *****************************
 */   
-    //IMPORTANT: MODULE_ID must be unique for each module
-    localparam MODULE_ID = 1;
 
     localparam OFF = 1;
     localparam ON = 0;
@@ -57,12 +55,13 @@ module top(
     reg led_g = OFF;
     reg led_b = OFF;
 
-    reg g1_a = TR_OFF;
-    reg g1_b = TR_OFF;
-    reg g2_a = TR_OFF;
-    reg g2_b = TR_OFF;
-    reg g3_a = TR_OFF;
-    reg g3_b = TR_OFF;
+    wire g1_a;
+    wire g1_b;
+    wire g2_a;
+    wire g2_b;
+    wire g3_a;
+    wire g3_b;
+    wire clk24;
 
     wire shoot = gpio_26;
 
@@ -89,6 +88,7 @@ module top(
 *************************************
 */
     // General purpose
+    reg state = INIT;
     reg reset = 0;
     reg [15:0] uart_msg = 16'h0000;
 
@@ -117,10 +117,22 @@ module top(
 *   External Modules declarations   *
 *************************************
 */
-    
+    // timer timer_u(
+    //     .clk(clk),
+    //     .reset(1'b0),
+    //     .start(start_1_sec),
+    //     .done(done_1_sec)
+    // );
+    clk_divider #(.BAUD_DIV(2)) clk_div_u
+    (   
+        .clk_in(clk),       // Input clock
+        .reset(reset),
+        .clk_out(clk24)       // Output divided clock
+    );
+
     // UART TX module
     uart_tx to_modules_tx(
-        .clk(clk),
+        .clk(clk24),
         .reset(reset),
         .data_to_tx(data_to_tx), 
         .start_tx(start_tx), 
@@ -130,7 +142,7 @@ module top(
 
     // UART RX module
     uart_rx from_modules_rx(
-        .clk(clk),
+        .clk(clk24),
         .reset(reset),
         .rx(rx),
         .data_received(data_received), 
@@ -140,13 +152,15 @@ module top(
 
 
     rgb_color_selector color_selector(
-        .color_index(MODULE_ID),
-        .led_r(led_red),
-        .led_g(led_green),
-        .led_b(led_blue)
+        .color_index(`MODULE_ID+1),
+        .led_red(led_red),
+        .led_green(led_green),
+        .led_blue(led_blue)
     );
 
-    modulator modulator(
+    modulator #(.MODULE_ID(`MODULE_ID))
+    modulator_u
+    (
         .clk(clk),
         .reset(reset),
         .shoot(shoot),
