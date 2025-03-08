@@ -15,7 +15,7 @@ module uart_rx(
 );
 
     // Config
-    parameter BAUD_RATE = `BAUD6M_CLK48M;     // Desired baud rate
+    parameter BAUD_RATE = `BAUD6M_CLK24M;     // Desired baud rate
     parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
     
     // States
