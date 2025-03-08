@@ -121,8 +121,7 @@ module top(
 
     // General purpose
     genvar i, j;
-    reg reset = 0;
-    reg is_code_received = 0;
+    reg reset;
 
     wire [11:0] sin_index;
     wire [3:0] uart_id;
@@ -151,10 +150,10 @@ module top(
     reg [1:0] pipe_state = IDLE_PIPE;
 
     //Normal mode
-    localparam REQUEST_NORMAL  = 2'b00;
+    localparam REQUEST_SINE  = 2'b00;
     localparam PROCESS_NORMAL  = 2'b01;
     localparam SEND_NORMAL     = 2'b10;
-    reg [1:0] normal_state = REQUEST_NORMAL;
+    reg [1:0] normal_state = REQUEST_SINE;
 
     // UART
     reg [`NUM_OF_MODULES-1:0] start_tx; // One start_tx signal for each UART
@@ -260,7 +259,7 @@ module top(
             end
 
             STARTUP: begin
-                state <= 
+                state <= IDLE;
             end
 
             IDLE: begin
@@ -276,8 +275,26 @@ module top(
                 else if(done_5_sec == 1) begin
                     //Entramos al modo normal de funcionamiento del inverter
                     state <= NORMAL_MODE;
+                    normal_state <= REQUEST_SINE;
                     led_g <= ON;
                 end
+            end
+
+            NORMAL_MODE: begin
+                case (normal_state)
+                    REQUEST_SINE: begin
+                        tx_rx_spi_1 <= 1;
+                        if (data_valid_spi_1) begin
+                            normal_state <= SEND_NORMAL;
+                        end
+                    end
+                    
+                    SEND_NORMAL: begin
+                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+                            data_to_tx[i] <= {sin_index, uart_id};
+                        end
+                    end
+                endcase
             end
 
             PIPE_MODE: begin
@@ -288,33 +305,7 @@ module top(
                 endcase
             end
 
-            NORMAL_MODE: begin
-                case (normal_state)
-                    REQUEST_NORMAL: begin
-                        
-                        if (data_valid_spi_1) begin
-                            //Entramos al modo pipe del inverter
-                            state <= PIPE_MODE;
-                            pipe_state <= IDLE_PIPE;
-                            led_b <= ON;
-                        end
-                        else if(done_5_sec == 1) begin
-                            //Entramos al modo normal de funcionamiento del inverter
-                            state <= NORMAL_MODE;
-                            led_g <= ON;
-                        end
-
-                    end
-                    
-                    PROCESS_NORMAL: begin
-
-                    end
-
-                    RETRANSMIT_NORMAL: begin
-                        
-                    end
-                endcase
-            end
+            
         endcase
     end
 
