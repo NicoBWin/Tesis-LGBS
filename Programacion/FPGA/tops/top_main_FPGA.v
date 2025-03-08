@@ -125,6 +125,7 @@ module top(
 
     wire [11:0] sin_index;
     wire [3:0] uart_id;
+    wire [7:0] request_next_counter;
 
     // Timers
     reg start_1_sec = 0;
@@ -132,6 +133,7 @@ module top(
     wire done_1_sec;
     wire done_5_sec;
 
+    // General FSM
     localparam INIT         = 3'b000;
     localparam REQUEST_SINE = 3'b001;
     localparam DEBUG_MODE   = 3'b010;
@@ -142,18 +144,20 @@ module top(
     localparam IDLE = 3'b111;
     reg [2:0] state = INIT;
 
-    //Pipe mode
+    //Pipe mode FSM
     localparam IDLE_PIPE        = 2'b00;
     localparam SEND_PIPE        = 2'b01;
     localparam RECEIVE_PIPE     = 2'b10;
     localparam RETRANSMIT_PIPE  = 2'b11;
     reg [1:0] pipe_state = IDLE_PIPE;
 
-    //Normal mode
-    localparam REQUEST_SINE  = 2'b00;
-    localparam PROCESS_NORMAL  = 2'b01;
-    localparam SEND_NORMAL     = 2'b10;
-    reg [1:0] normal_state = REQUEST_SINE;
+    //Normal mode FSM
+    localparam REQUEST_SINE  = 3'b000;
+    localparam SEND_NORMAL_1 = 3'b001;
+    localparam WAIT_1        = 3'b010;
+    localparam SEND_NORMAL_2 = 3'b011;
+    localparam WAIT_2        = 3'b100;
+    reg [2:0] normal_state = REQUEST_SINE;
 
     // UART
     reg [`NUM_OF_MODULES-1:0] start_tx; // One start_tx signal for each UART
@@ -266,7 +270,7 @@ module top(
                 
                 tx_rx_spi_1 <= 0;
                 //Si termino la transferencia y se recibio modo pipe
-                if (data_valid_spi_1 & sin_index == `PIPE_MODE_SPI) begin
+                if (data_valid_spi_1 & sin_index == `PIPE_MODE_SPI && uart_id == 4'hA) begin
                     //Entramos al modo pipe del inverter
                     state <= PIPE_MODE;
                     pipe_state <= IDLE_PIPE;
@@ -285,13 +289,58 @@ module top(
                     REQUEST_SINE: begin
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
-                            normal_state <= SEND_NORMAL;
+                            normal_state <= SEND_NORMAL_1;
                         end
                     end
                     
-                    SEND_NORMAL: begin
+                    SEND_NORMAL_1: begin
                         for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-                            data_to_tx[i] <= {sin_index, uart_id};
+                            data_to_tx[i] <= sin_index[11:4];
+                            start_tx[i] <= 1;
+                            if (tx_busy[0]) begin
+                                normal_state <= WAIT_1;
+                            end
+                        end
+                    end
+
+                    WAIT_1: begin
+                        
+                        // Suponemos que todos los modulos terminan al mismo tiempo
+                        if (!tx_busy[0]) begin
+                            for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+                                start_tx[i] <= 0;
+                            end
+                            normal_state <= SEND_NORMAL_2;
+                        end
+                        else begin
+                            for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+                                start_tx[i] <= 0;
+                            end
+                        end
+                    end
+                    
+                    SEND_NORMAL_2: begin
+                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+                            data_to_tx[i] <= {sin_index[3:0], uart_id};
+                            start_tx[i] <= 1;
+                            if (tx_busy[0]) begin
+                                normal_state <= WAIT_2;
+                            end
+                        end
+                    end
+
+                    WAIT_2: begin
+
+                        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
+                            start_tx[i] <= 0;
+                        end
+
+                        if (request_next_counter == 255) begin
+                            request_next_counter <= 0;
+                            normal_state <= REQUEST_SINE;
+                        end
+                        else begin
+                            request_next_counter <= request_next_counter + 1;
                         end
                     end
                 endcase
@@ -304,8 +353,6 @@ module top(
                     end
                 endcase
             end
-
-            
         endcase
     end
 
