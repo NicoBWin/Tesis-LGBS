@@ -7,6 +7,8 @@
 
 
 #include "LUT_comms.h"
+
+uint16_t offset = 50;
 uint16_t spi_data = 0;
 
 
@@ -17,7 +19,12 @@ void init_LUT_comms(SPI_HandleTypeDef *hspi)
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	spi_data++;
+	if (spi_data + offset > LUT_SIZE-1) {
+		spi_data = spi_data + offset - (LUT_SIZE - 1);
+	}
+	else {
+		spi_data += offset;
+	}
 }
 
 

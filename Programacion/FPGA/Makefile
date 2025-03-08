@@ -53,7 +53,7 @@ endif
 
 all: hardware.bin
 
-hardware.json: $(SOURCES)
+hardware.json: $(SOURCES) ./src/config/config.vh
 #	yosys -p "synth_ice40 -dsp -json hardware.json -abc9 -device u" C $(SOURCES)
 	$(YOSYS) -p "synth_ice40 -dsp -json hardware.json -top top" $(QUIET) $(SOURCES)'
 

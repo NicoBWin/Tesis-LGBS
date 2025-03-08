@@ -1,0 +1,31 @@
+/*
+ * LUT_comms.c
+ *
+ *  Created on: Mar 7, 2025
+ *      Author: gullino18
+ */
+
+
+#include "LUT_comms.h"
+
+uint16_t offset = 50;
+uint16_t spi_data = 0;
+
+
+void init_LUT_comms(SPI_HandleTypeDef *hspi)
+{
+	HAL_SPI_Transmit_DMA(hspi, &spi_data, 1);
+}
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	if (spi_data + offset > LUT_SIZE-1) {
+		spi_data = offset - (LUT_SIZE-1-spi_data);
+	}
+	else {
+		spi_data += offset;
+	}
+}
+
+
+

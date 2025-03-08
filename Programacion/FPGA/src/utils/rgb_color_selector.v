@@ -40,8 +40,8 @@ module rgb_color_selector (
         .RGB2(led_red)
     );
 
-    defparam RGB_DRIVER.RGB0_CURRENT = "0b000" | rgb_current;
-    defparam RGB_DRIVER.RGB1_CURRENT = "0b000" | rgb_current;
-    defparam RGB_DRIVER.RGB2_CURRENT = "0b000" | rgb_current;
+    defparam RGB_DRIVER.RGB0_CURRENT = "0b010";
+    defparam RGB_DRIVER.RGB1_CURRENT = "0b010";
+    defparam RGB_DRIVER.RGB2_CURRENT = "0b010";
 
 endmodule
