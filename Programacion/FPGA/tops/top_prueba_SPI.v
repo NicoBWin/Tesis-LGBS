@@ -133,7 +133,7 @@ module top(
     wire [7:0] data_received;
     wire [1:0] byte_received;
     wire [1:0]debug = {gpio_18, spi_clk_2};
-    assign gpio_4 = data_rx[0];
+    assign gpio_4 = data_rx[1];
 /*
 *************************************
 *   External Modules declarations   *
