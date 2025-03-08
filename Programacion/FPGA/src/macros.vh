@@ -11,8 +11,8 @@
 */
 
 // SPI codes
-`define PIPE_MODE_SPI 16'hB0CA
-`define IDLE_SPI 16'h0001
+`define PIPE_MODE_SPI 12'hB0C
+`define IDLE_SPI 12'h000
 
 `define UART_MAP(uart_id, rx_gpio, tx_gpio) \
     wire tx_mod_``uart_id`` = tx_gpio;      \

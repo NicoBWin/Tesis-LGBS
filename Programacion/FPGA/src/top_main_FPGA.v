@@ -53,11 +53,6 @@ module top(
     output wire gpio_19,
     input wire gpio_21,
 
-    //Signal from SPI 2
-    output wire gpio_11,
-    output wire gpio_9,
-    input wire gpio_18,
-
     //LEDs
     output wire led_red,
     output wire led_green,
@@ -94,7 +89,7 @@ module top(
     wire shoot = gpio_44;
 
     wire spi_clk_1 = gpio_13;
-    wire mosi_1 = gpio_6; // not used
+    wire mosi_1 = gpio_6;
     wire miso_1 = gpio_21;
     wire cs_1 = gpio_19;
 
@@ -128,15 +123,9 @@ module top(
     genvar i, j;
     reg reset = 0;
     reg is_code_received = 0;
-    reg [$clog2(`NUM_OF_MODULES)-1:0] debug_uart_index = 0;
-    reg [7:0] spi_to_uart_id;
-    wire [15:0] sin_index;
-    wire [15:0] ma_mult;
-    wire [31:0] scaled_sin_value;
-    wire ma_mult_received;
-    wire sin_index_received;
 
-    reg [7:0] sin_value;
+    wire [11:0] sin_index;
+    wire [3:0] uart_id;
 
     // Timers
     reg start_1_sec = 0;
@@ -145,10 +134,13 @@ module top(
     wire done_5_sec;
 
     localparam INIT         = 3'b000;
-    localparam IDLE         = 3'b001;
+    localparam REQUEST_SINE = 3'b001;
     localparam DEBUG_MODE   = 3'b010;
     localparam NORMAL_MODE  = 3'b100;
+
+    localparam STARTUP      = 3'b101;
     localparam PIPE_MODE    = 3'b110;
+    localparam IDLE = 3'b111;
     reg [2:0] state = INIT;
 
     //Pipe mode
@@ -179,13 +171,7 @@ module top(
     reg [15:0] to_tx_spi_1;
     wire [15:0] received_from_spi_1;
     wire transfer_done_spi_1;
-
-    //SPI 2
-    reg tx_rx_spi_2;
-    reg [15:0] to_tx_spi_2;
-    wire [15:0] received_from_spi_2;
-    wire transfer_done_spi_2;
-
+    wire data_valid_spi_1;
 
 /*
 *************************************
@@ -193,30 +179,6 @@ module top(
 *************************************
 */
 
-task check_condition;
-    input wire [15:0] code;
-    input wire [15:0] received_spi;
-    input wire transfer_done_spi;
-
-    begin
-        is_code_received = (transfer_done_spi == 1 && received_spi == code) ? 1 : 0;
-    end
-endtask
-
-task sin_value_send;
-    wire [15:0] sin_index = i * `MODULE_OFFSET + j * `PHASE_OFFSET; 
-
-    begin
-        for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin
-            for (j = 0; j < `NUM_OF_PHASES; j = j + 1) begin
-                data_to_tx[i] = sin_value;
-                start_tx = 1;
-                wait(tx_busy == 0);
-                start_tx = 0;
-            end
-        end
-    end
-endtask
 
 /*
 *************************************
@@ -237,8 +199,6 @@ endtask
                 .tx_busy(tx_busy[i])
             );
 
-            assign tx[i] = scaled_sin_value[31:16];
-
             // UART RX module
             uart_rx from_modules_rx(
                 .clk(clk),
@@ -251,30 +211,16 @@ endtask
         end
     endgenerate
 
-    SPI from_uC_spi_1(
+    SPI_request_data spi_1(
         .clk(clk),
         .reset(reset),
         .start_transfer(tx_rx_spi_1),
-        .transfer_done(transfer_done_spi_1),
-        .data_to_tx(to_tx_spi_1),
-        .data_rx(received_from_spi_1),
-        .sclk(spi_clk_1),
-        .mosi(mosi_1),
-        .miso(miso_1),
-        .cs(cs_1)
-    );
-
-    SPI from_uC_spi_2(
-        .clk(clk),
-        .reset(reset),
-        .start_transfer(tx_rx_spi_2),
-        .transfer_done(transfer_done_spi_2),
-        .data_to_tx(to_tx_spi_2),
-        .data_rx(received_from_spi_2),
-        .sclk(spi_clk_2),
-        .mosi(mosi_2),
-        .miso(miso_2),
-        .cs(cs_2)
+        .miso_1(miso_1),
+        .spi_clk_1(spi_clk_1),
+        .cs_1(cs_1),
+        .data_valid(data_valid_spi_1),
+        .sin_index(sin_index),
+        .uart_id(uart_id)
     );
 
     timer #(`SEC_1) timer_1(
@@ -291,11 +237,6 @@ endtask
         .done(done_5_sec)
     );
 
-    PRAM pram (
-        .address(sin_index),
-        .data(sin_value)
-    );
-
 /*
 ******************
 *   Statements   *
@@ -305,24 +246,28 @@ endtask
     always @(posedge clk) begin
         case (state)
             INIT: begin
-                reset <= 1;
-                start_1_sec <= 1;
-                start_5_sec <= 1;
-                tx_rx_spi_1 <= 0;
-                tx_rx_spi_2 <= 0;
-                
                 if (done_1_sec == 1) begin
-                    state <= IDLE;
+                    reset <= 0;
+                    tx_rx_spi_1 <= 1;
+                    state <= STARTUP;
                 end
-                
+                else begin
+                    reset <= 1;
+                    start_1_sec <= 1;
+                    start_5_sec <= 1;
+                    tx_rx_spi_1 <= 0;
+                end
+            end
+
+            STARTUP: begin
+                state <= 
             end
 
             IDLE: begin
-                reset <= 0;
-                is_code_received = check_condition(`PIPE_MODE_SPI);
-
+                
+                tx_rx_spi_1 <= 0;
                 //Si termino la transferencia y se recibio modo pipe
-                if (is_code_received) begin
+                if (data_valid_spi_1 & sin_index == `PIPE_MODE_SPI) begin
                     //Entramos al modo pipe del inverter
                     state <= PIPE_MODE;
                     pipe_state <= IDLE_PIPE;
@@ -338,26 +283,7 @@ endtask
             PIPE_MODE: begin
                 case (pipe_state)
                     IDLE_PIPE: begin
-                        if (transfer_done_spi_1) begin
-                            spi_to_uart_id <= received_from_spi_1[15:8];
-                            data_to_tx[spi_to_uart_id] <= received_from_spi_1[7:0];
-                            pipe_state <= SEND_PIPE;
-                        end
-                    end
-                    
-                    SEND_PIPE: begin
-                        //TODO: Continuar de aca ...
-                        if (!tx_busy[spi_to_uart_id]) begin
-                            start_tx[spi_to_uart_id] = 1;
-                            pipe_state <= RECEIVE_PIPE;
-                        end
-                    end
-
-                    RECEIVE_PIPE: begin
-                        if (!rx_busy[spi_to_uart_id]) begin
-                            start_tx[spi_to_uart_id] = 1;
-                            pipe_state <= RECEIVE_PIPE;
-                        end
+                       
                     end
                 endcase
             end
@@ -365,25 +291,19 @@ endtask
             NORMAL_MODE: begin
                 case (normal_state)
                     REQUEST_NORMAL: begin
-                        tx_rx_spi_1 <= 1;
-                        tx_rx_spi_2 <= 1;
-
-                        // Obtenemos el indice
-                        if (transfer_done_spi_1) begin
-                            sin_index <= received_from_spi_1;
-                            sin_index_received <= 1;
+                        
+                        if (data_valid_spi_1) begin
+                            //Entramos al modo pipe del inverter
+                            state <= PIPE_MODE;
+                            pipe_state <= IDLE_PIPE;
+                            led_b <= ON;
+                        end
+                        else if(done_5_sec == 1) begin
+                            //Entramos al modo normal de funcionamiento del inverter
+                            state <= NORMAL_MODE;
+                            led_g <= ON;
                         end
 
-                        // Obtenemos el ma como potencia negativa de 2
-                        if (transfer_done_spi_2) begin
-                            ma_mult <= received_from_spi_2;
-                            ma_mult_received <= 1;
-                        end
-
-                        if (sin_index_received & ma_mult_received) begin
-                            scaled_sin_value <= sin_index * ma_mult;
-                            normal_state <= PROCESS_NORMAL;
-                        end
                     end
                     
                     PROCESS_NORMAL: begin
