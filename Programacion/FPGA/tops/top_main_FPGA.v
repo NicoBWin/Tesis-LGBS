@@ -121,7 +121,7 @@ module top(
 *   External Modules Variables      *
 *************************************
 */
-    clk_divider #(.BAUD_DIV(2)) clk_divider_1(
+    clk_divider #(.BAUD_DIV(1)) clk_divider_1(
         .clk_in(clk),
         .reset(reset),
         .clk_out(clk_24)
@@ -135,7 +135,7 @@ module top(
     wire [11:0] sin_index;
     wire [3:0] uart_id;
     reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
-    assign gpio_4 = normal_state != REQUEST_SINE;
+    assign gpio_4 = clk_24;
 
     // Timers
     reg start_1_sec = 0;
