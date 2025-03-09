@@ -123,7 +123,7 @@ module top(
     //     .start(start_1_sec),
     //     .done(done_1_sec)
     // );
-    clk_divider #(.BAUD_DIV(2)) clk_div_u
+    clk_divider #(.BAUD_DIV(1)) clk_div_u
     (   
         .clk_in(clk),       // Input clock
         .reset(reset),
