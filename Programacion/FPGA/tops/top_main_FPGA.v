@@ -89,7 +89,7 @@ module top(
     `UART_MAP(8, gpio_45, gpio_47)
     `UART_MAP(9, gpio_46, gpio_2)
 
-    wire shoot = gpio_44;
+    reg shoot = gpio_44;
 
     wire spi_clk_1 = gpio_13;
     wire miso_1 = gpio_21;
@@ -310,6 +310,7 @@ module top(
                 case (normal_state)
 
                     REQUEST_SINE: begin
+                        shoot <= 0;
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
                             tx_rx_spi_1 <= 0;
@@ -362,6 +363,7 @@ module top(
 
                     WAIT_FOR_REQUEST: begin
                         if (request_next_counter == 0) begin
+                            shoot <= 1;
                             normal_state <= REQUEST_SINE;
                         end                        
                     end
