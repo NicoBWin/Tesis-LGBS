@@ -177,8 +177,8 @@ module top(
     wire [`NUM_OF_MODULES-1:0] tx_busy; // TX busy signal for each UART
     wire [`NUM_OF_MODULES-1:0] rx_done; // RX done signal for each UART
     wire [`NUM_OF_MODULES-1:0] parity_error; // Parity error signal for each UART
-    wire [`NUM_OF_MODULES-1:0] tx; // TX wire for each UART
-    wire [`NUM_OF_MODULES-1:0] rx; // RX wire for each UART
+    wire [`NUM_OF_MODULES-1:0] tx = {tx_uart_3, tx_uart_2, tx_uart_1}; // TX wire for each UART
+    wire [`NUM_OF_MODULES-1:0] rx = {rx_uart_3, rx_uart_2, rx_uart_1}; // RX wire for each UART
 
     //SPI 1
     reg tx_rx_spi_1;
