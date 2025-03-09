@@ -59,7 +59,10 @@ module top(
     output wire led_blue,
 
     //Shoot
-    output wire gpio_44
+    output wire gpio_44,
+
+    // debug
+    output wire gpio_4
 );
 
 /*
@@ -132,6 +135,7 @@ module top(
     wire [11:0] sin_index;
     wire [3:0] uart_id;
     reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
+    assign gpio_4 = normal_state != REQUEST_SINE;
 
     // Timers
     reg start_1_sec = 0;
@@ -281,6 +285,7 @@ module top(
 
             STARTUP: begin
                 state <= IDLE;
+                tx_rx_spi_1 <= 1;
             end
 
             IDLE: begin
@@ -309,6 +314,7 @@ module top(
                     REQUEST_SINE: begin
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
+                            tx_rx_spi_1 <= 0;
                             normal_state <= SEND_NORMAL_1;
                         end
                     end
@@ -317,9 +323,9 @@ module top(
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             data_to_tx[k] <= sin_index[11:4];
                             start_tx[k] <= 1;
-                            if (tx_busy[0]) begin
-                                normal_state <= WAIT_1;
-                            end
+                        end
+                        if (tx_busy[0]) begin
+                            normal_state <= WAIT_1;
                         end
                     end
 
@@ -343,9 +349,9 @@ module top(
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             data_to_tx[k] <= {sin_index[3:0], uart_id};
                             start_tx[k] <= 1;
-                            if (tx_busy[0]) begin
-                                normal_state <= WAIT_2;
                             end
+                        if (tx_busy[0]) begin
+                            normal_state <= WAIT_2;
                         end
                     end
 
@@ -357,7 +363,7 @@ module top(
                     end
 
                     WAIT_FOR_REQUEST: begin
-                        if (request_next_counter == `TRIAG_T-1) begin
+                        if (request_next_counter == 0) begin
                             normal_state <= REQUEST_SINE;
                         end                        
                     end

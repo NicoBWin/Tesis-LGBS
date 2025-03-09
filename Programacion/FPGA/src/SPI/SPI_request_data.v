@@ -20,7 +20,7 @@ module SPI_request_data (
     // Registers for state machine
     reg [1:0] state = INIT;
     reg [15:0] data_rx = 0;         // To store received SPI data (16 bits)
-    reg start_transfer_again;
+    reg start_transfer_a;
     
     // SPI transfer signals
     wire transfer_done;
@@ -36,7 +36,7 @@ module SPI_request_data (
         .i_Clk(clk),                  // Clock signal
         .i_TX_Count(2'd2),               // Two bytes per transfer
         .i_TX_Byte(8'd33),               // Example data to send
-        .i_TX_DV(start_transfer | start_transfer_again),     // Data valid signal for transmission
+        .i_TX_DV(start_transfer_a),     // Data valid signal for transmission
         .o_RX_DV(transfer_done),      // Data valid signal for received data
         .o_RX_Byte(data_received),    // Received byte
         .o_SPI_Clk(spi_clk_1),        // SPI clock output
@@ -54,30 +54,37 @@ module SPI_request_data (
             case (state)
                 INIT: begin
                     data_valid <= 0; 
-                    start_transfer_again <= 0;
+                    start_transfer_a <= 0;
                     if(start_transfer) begin
                         state <= TRANSF_1_WAITING;
+                        start_transfer_a <=1;
                     end
                 end
 
                 TRANSF_1_WAITING: begin
+                    start_transfer_a <= 0;
                     if (transfer_done) begin
                         state <= TRANSF_2_WAITING;
                         data_rx[15:8] <= data_received;   // Store first byte
-                        start_transfer_again <= 1;
+                        start_transfer_a <= 1;
                     end
                 end
 
                 TRANSF_2_WAITING: begin
+                    start_transfer_a <= 0;
                     if (transfer_done) begin
                         state <= TRANSF_RESET;
                         data_rx[7:0] <= data_received;    // Store second byte
+                        data_valid <= 1;
+
                     end
                 end
 
                 TRANSF_RESET: begin
-                    data_valid <= 1;
-                    state <= INIT;
+                    if (cs_1) begin
+                        state <= INIT;
+                    end
+                    
                 end
             endcase
         end
