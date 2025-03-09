@@ -99,8 +99,8 @@ module top(
     wire tx_busy; 
     wire rx_done; 
     wire parity_error; 
-    wire tx; 
-    wire rx; 
+    wire tx = tx_uart_1; 
+    wire rx = rx_uart_1; 
 
     // Timers
     reg start_1_sec = 0;
