@@ -307,8 +307,6 @@ module top(
             end
 
             NORMAL_MODE: begin
-
-
                 case (normal_state)
 
                     REQUEST_SINE: begin
