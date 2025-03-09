@@ -89,8 +89,7 @@ module top(
     `UART_MAP(8, gpio_45, gpio_47)
     `UART_MAP(9, gpio_46, gpio_2)
 
-    reg shoot = gpio_44;
-
+    reg shoot = 0;
     wire spi_clk_1 = gpio_13;
     wire miso_1 = gpio_21;
     wire cs_1 = gpio_19;
@@ -179,6 +178,7 @@ module top(
     wire [`NUM_OF_MODULES-1:0] parity_error; // Parity error signal for each UART
     wire [`NUM_OF_MODULES-1:0] tx = {tx_uart_3, tx_uart_2, tx_uart_1}; // TX wire for each UART
     wire [`NUM_OF_MODULES-1:0] rx = {rx_uart_3, rx_uart_2, rx_uart_1}; // RX wire for each UART
+    assign gpio_44 = shoot;
 
     //SPI 1
     reg tx_rx_spi_1;
