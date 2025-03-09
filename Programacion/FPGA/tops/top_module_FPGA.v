@@ -152,7 +152,7 @@ module top(
 
 
     rgb_color_selector color_selector(
-        .color_index(`MODULE_ID+1),
+        .color_index(`MODULE_ID),
         .led_red(led_red),
         .led_green(led_green),
         .led_blue(led_blue)
