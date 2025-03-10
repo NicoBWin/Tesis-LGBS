@@ -17,6 +17,8 @@ always #1 clk = ~clk;
 */  
     localparam STEP = 10;
 
+    integer i;
+
     reg reset = 0;
     reg shoot = 0;
     reg [11:0] angle = 0;
@@ -68,7 +70,7 @@ initial begin
         shoot <= 0;
         
         // probamos recorer la tabla
-        for(integer i; i < 4095; i = i + STEP) begin
+        for (i = 0; i < 4095; i = i + STEP) begin
             angle <= i;
             shoot <= 1;
             #100

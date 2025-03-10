@@ -1,5 +1,5 @@
 
-module triangular_gen #(parameter INITIAL_T = 0, parameter MAX_A = 128, parameter MAX_T = 4096)
+module triangular_gen
 (
     input wire clk,             // Input clock
     input wire reset,           // Reset signal
@@ -7,6 +7,10 @@ module triangular_gen #(parameter INITIAL_T = 0, parameter MAX_A = 128, paramete
     output reg [$clog2(MAX_A)-1:0] value // value output
 );
     
+    parameter INITIAL_T = 0;
+    parameter MAX_A = 128;
+    parameter MAX_T = 4096;
+
     localparam UP = 1;
     localparam DOWN = 0;
 
