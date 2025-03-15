@@ -1,33 +1,43 @@
 `include "./src/ADC/ADC.vh"
 
+/* 
+ * Este módulo controla un convertidor analógico a digital ADS7042 para transformar la señal analogica de los sensores de
+ * efecto hall a una señal digital que pueda ser utilizada en el sistema para controlarlo. Utiliza un reloj interno 
+ * para la comunicación SPI y varios estados para manejar la calibración, lectura y espera.
+ * Se usa proporcionando señales de reloj, reset, lectura y recalibración, y refleja la lectura en el bus value.
+ */
+
 module ADC(
+
+    // Señales de control
     input wire clk,            
     input wire reset,
     input wire read,
     input wire recalibrate,
 
-    // Control reg
+    // Pines de SPI
     input wire sdo,
     output reg cs,
     output wire sclk,
 
+    // Salida de datos
     output wire [11:0] value,
     output reg read_done
 );
 
-    // Config
+    // Configuracion
     parameter COMM_RATE = `SAMPLE2M4_CLK48M;
     
     localparam RECEIVE_COUNT = 14;
     localparam CALIBRATE_COUNT = 32;
-
-    // States
+    
+    // Estados
     localparam INIT      = 2'b00;
     localparam CALIBRATE = 2'b01;
     localparam IDLE      = 2'b10;
     localparam RECEIVE   = 2'b11;
 
-    // Local variables
+    // Variables locales
     reg [1:0] state = INIT;
     reg [11:0] signal_val = 0; 
     reg calibrate_reset;
@@ -37,7 +47,7 @@ module ADC(
     wire[$clog2(RECEIVE_COUNT)-1:0] r_counter;
     wire[$clog2(CALIBRATE_COUNT)-1:0] c_counter;
 
-    // Modules
+    // Modulos de soporte
     clk_divider #(COMM_RATE) inner_freq(
         .clk_in(clk),
         .reset(reset),
@@ -66,6 +76,7 @@ module ADC(
             end
             else begin
                 case (state)
+                    // Inicializacion de pines y variables
                     INIT: begin
                         cs <= 1;
                         read_done <= 0;
@@ -74,6 +85,7 @@ module ADC(
                         state <= CALIBRATE;
                     end
 
+                    // Secuencia de calibracion
                     CALIBRATE: begin
                         cs <= 0;
                         calibrate_reset <= 0;
@@ -82,6 +94,7 @@ module ADC(
                         end
                     end
 
+                    // Estado de espera
                     IDLE: begin
                         read_done <= 0;
                         receive_reset <= 1;
@@ -95,6 +108,7 @@ module ADC(
                         end
                     end
 
+                    // Secuencia de lectura y recepcion del valor medido
                     RECEIVE: begin
                         cs <= 0;
                         receive_reset <= 0;
