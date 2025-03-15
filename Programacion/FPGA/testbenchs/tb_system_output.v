@@ -12,8 +12,10 @@ module tb_system_output;
   wire [5:0] transistor_out;
 
   // Integer variables for loops
-  integer i;
-  integer phase_count;
+  integer i, sine_index;
+
+  // Sine wave LUT (7-bit depth, 16 samples per cycle)
+  reg [6:0] sine_wave_LUT [0:15];
 
   // Instantiate the DUT
   system_output DUT (
@@ -26,16 +28,35 @@ module tb_system_output;
     .transistor_out(transistor_out)
   );
 
+  // LUT Initialization
+  initial begin
+    // 7-bit sinewave approximated over 16 samples (0-127 range)
+    sine_wave_LUT[ 0] = 7'd64;  // sin(0°)   =  0
+    sine_wave_LUT[ 1] = 7'd91;  // sin(22.5°)
+    sine_wave_LUT[ 2] = 7'd113; // sin(45°)
+    sine_wave_LUT[ 3] = 7'd126; // sin(67.5°)
+    sine_wave_LUT[ 4] = 7'd127; // sin(90°)
+    sine_wave_LUT[ 5] = 7'd126; // sin(112.5°)
+    sine_wave_LUT[ 6] = 7'd113; // sin(135°)
+    sine_wave_LUT[ 7] = 7'd91;  // sin(157.5°)
+    sine_wave_LUT[ 8] = 7'd64;  // sin(180°)
+    sine_wave_LUT[ 9] = 7'd36;  // sin(202.5°)
+    sine_wave_LUT[10] = 7'd14;  // sin(225°)
+    sine_wave_LUT[11] = 7'd1;   // sin(247.5°)
+    sine_wave_LUT[12] = 7'd0;   // sin(270°)
+    sine_wave_LUT[13] = 7'd1;   // sin(292.5°)
+    sine_wave_LUT[14] = 7'd14;  // sin(315°)
+    sine_wave_LUT[15] = 7'd36;  // sin(337.5°)
+  end
+
   initial begin
     // Initialize signals
-    va       = 7'd0;
-    vb       = 7'd0;
-    vc       = 7'd0;
     tri_wave = 7'd0;
     shoot    = 1'b0;
     reset    = 1'b1;
+    sine_index = 0; // Start at LUT index 0
 
-    // Optional: waveform dump for visualization
+    // Enable waveform dump for visualization
     $dumpfile("tb_system_output.vcd");
     $dumpvars(0, tb_system_output);
 
@@ -43,14 +64,12 @@ module tb_system_output;
     #20 reset = 1'b0;
     #10;
 
-    // Loop over different sine-wave settings (va, vb, vc).
-    // Each iteration sets new constant values, then does a full tri_wave up/down cycle.
-    for (phase_count = 0; phase_count < 5; phase_count = phase_count + 1) begin
-
-      // Pick new constant values for the 3-phase signals
-      va = (phase_count * 20) % 128;
-      vb = (phase_count * 50) % 128;
-      vc = (phase_count * 90) % 128;
+    // Main test loop iterating over sine wave LUT
+    for (sine_index = 0; sine_index < 16; sine_index = sine_index + 1) begin
+      // Assign 3-phase sine waves with 120° phase shifts
+      va = 125;                     // 0° phase
+      vb = 48;          // 120° phase
+      vc = 17;         // 240° phase
 
       // ----------------------------
       //  Tri_wave goes 0 -> 127
@@ -74,8 +93,7 @@ module tb_system_output;
         #5;
       end
 
-      // After this up/down tri_wave cycle,
-      // we move to the next set of va, vb, vc.
+      // After this up/down tri_wave cycle, move to the next sine sample
     end
 
     // Finish simulation
