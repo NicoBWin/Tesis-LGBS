@@ -61,7 +61,7 @@ module maximum_calculator
   assign Abs_out_1 = (Subtract_out_1[7] ?  - (Subtract_out_1) : Subtract_out_1);
 
 
-  assign Subtract1_out_2 = {1'b0, alpha3_phase_Vab120} - {1'b0, alpha3_phase_Vab240};
+  assign Subtract_out_2 = {1'b0, alpha3_phase_Vab120} - {1'b0, alpha3_phase_Vab240};
   assign Abs_out_2 = (Subtract_out_2[7] ?  - (Subtract_out_2) : Subtract_out_2);
 
 

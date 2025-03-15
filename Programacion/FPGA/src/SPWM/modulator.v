@@ -48,7 +48,7 @@ module modulator #(parameter MODULE_ID = 0) (
         .vc(sine_value_C),
         .tri_wave(tri_wave),
         .shoot(shoot),
-        .transistor_out({g1_a, g2_a, g1_b, g2_b, g1_c, g2_c})
+        .transistor_out({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
     );
     
 
