@@ -1,0 +1,181 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" version="26.1.1">
+  <diagram name="Página-1" id="gxYwuZKx87il2h6Ky2n3">
+    <mxGraphModel dx="2284" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="d_58Si0Jf4WMHXA5GLhI-1" target="2dIiGaRsNIYD0TAiqmqW-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-4" value="&lt;font face=&quot;Verdana&quot;&gt;5 seg&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-3">
+          <mxGeometry x="-0.1667" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d_58Si0Jf4WMHXA5GLhI-1" value="&lt;font face=&quot;Verdana&quot;&gt;Inicio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=none;glass=0;shadow=0;" parent="1" vertex="1">
+          <mxGeometry x="59.94" y="35" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-2" target="2dIiGaRsNIYD0TAiqmqW-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-2" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA main&lt;br&gt;modo normal&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="59.94" y="135" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-5" target="2dIiGaRsNIYD0TAiqmqW-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-27" value="&lt;font face=&quot;Verdana&quot;&gt;Recepcion del índice&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-8">
+          <mxGeometry x="-0.05" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-5" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA main&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;solicita al uC el siguiente índice de la tabla por SPI&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="49.94" y="235" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-7" target="2dIiGaRsNIYD0TAiqmqW-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-0.060000000000002274" y="455" />
+              <mxPoint x="-0.060000000000002274" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;shape=flexArrow;width=18;endSize=7.67;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-7" target="2dIiGaRsNIYD0TAiqmqW-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-65" value="UART" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-61">
+          <mxGeometry x="0.115" y="-2" relative="1" as="geometry">
+            <mxPoint x="-9" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-7" target="2dIiGaRsNIYD0TAiqmqW-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-63" value="Shoot" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Verdana;" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-62">
+          <mxGeometry x="-0.3647" y="2" relative="1" as="geometry">
+            <mxPoint x="11" y="2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-7" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA main&lt;/font&gt;&lt;div&gt;&lt;font face=&quot;Verdana&quot;&gt;reenvia el índice de la tabla a cada FPGA módulo&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="49.94" y="415" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-21" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="260" y="415" width="220" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-9" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-10" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="10" y="10" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-11" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="20" y="20" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-12" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="30" y="30" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-13" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="40" y="40" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-14" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="50" y="50" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-15" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="60" y="60" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-16" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA modulo&lt;br&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="70" y="70" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-17" value="&lt;span style=&quot;font-family: Verdana;&quot;&gt;FPGA módulo n&lt;/span&gt;&lt;span style=&quot;font-family: Verdana; font-size: 10px;&quot;&gt;&lt;sup&gt;o&lt;/sup&gt;&lt;/span&gt;&lt;font style=&quot;font-family: Verdana;&quot;&gt;N&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="2dIiGaRsNIYD0TAiqmqW-21">
+          <mxGeometry x="80" y="80" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-29" target="2dIiGaRsNIYD0TAiqmqW-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-29" value="&lt;font face=&quot;Verdana&quot;&gt;Inicio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=none;glass=0;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="589.94" y="35" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-30" target="2dIiGaRsNIYD0TAiqmqW-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-30" value="&lt;font face=&quot;Verdana&quot;&gt;FPGA módulo n&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;sup&gt;o&lt;/sup&gt;&lt;/span&gt;&lt;font&gt;N&lt;/font&gt;&lt;br&gt;modo normal&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="589.94" y="135" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-33" target="2dIiGaRsNIYD0TAiqmqW-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-46" value="Si" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-42">
+          <mxGeometry x="-0.0667" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-33" value="¿Llegó un mensaje&lt;div&gt;&amp;nbsp;por UART?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="577.44" y="230" width="145" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-68" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-40" target="2dIiGaRsNIYD0TAiqmqW-67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-40" value="&lt;font face=&quot;Verdana&quot;&gt;Ejecuto la modulación con el nuevo índice de tabla&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="589.94" y="360" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-41" target="2dIiGaRsNIYD0TAiqmqW-33">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="635" />
+              <mxPoint x="540" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-41" value="&lt;font face=&quot;Verdana&quot;&gt;Actualizo la salida de los transistores&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="589.94" y="600" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-47" target="2dIiGaRsNIYD0TAiqmqW-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-47" value="&lt;font face=&quot;Verdana&quot;&gt;uC&lt;br&gt;modo normal&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-49" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-48" target="2dIiGaRsNIYD0TAiqmqW-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-48" value="&lt;font face=&quot;Verdana&quot;&gt;Inicio&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=none;glass=0;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-50" target="2dIiGaRsNIYD0TAiqmqW-51">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-280" y="540" />
+              <mxPoint x="-280" y="305" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-50" value="Enviar índice de tabla a través de SPI" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-56" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-51" target="2dIiGaRsNIYD0TAiqmqW-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-51" value="¿Llegó una&amp;nbsp;&lt;div&gt;solicitud por SPI&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;?&lt;/span&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-242.5" y="260" width="145" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-57" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-55" target="2dIiGaRsNIYD0TAiqmqW-50">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-55" value="Ajuste de la corriente de la fuente principal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="400" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-69" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="2dIiGaRsNIYD0TAiqmqW-67" target="2dIiGaRsNIYD0TAiqmqW-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-70" value="Si" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2dIiGaRsNIYD0TAiqmqW-69">
+          <mxGeometry x="-0.1143" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2dIiGaRsNIYD0TAiqmqW-67" value="¿Llegó la señal&amp;nbsp;&lt;div&gt;de shoot&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;?&lt;/span&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="577.44" y="460" width="145" height="90" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
