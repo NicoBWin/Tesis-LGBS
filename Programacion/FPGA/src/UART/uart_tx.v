@@ -1,43 +1,45 @@
 /*
-    Para usarlo, enviamos la informacion a transmitir a data_to_tx y ponemos start_tx en 1. 
-    Automaticamente el tx_busy = 1 indicando que la transmision esta en progreso. 
-    Un clk despues ya es posible cambiar el valor de data_to_tx. El bit de tx_busy se pone en 1 y 
-    hasta que termine la transmision que se pone en 0.
-*/
+ * Este módulo implementa un transmisor UART. Fue probado hasta 6Mb/s utilizando un reloj de 24MHz.
+ * Para usarlo, enviamos la información a transmitir a data_to_tx y ponemos start_tx en 1.
+ * Automáticamente, tx_busy se pone en 1 indicando que la transmisión está en progreso.
+ * Un ciclo de reloj después, ya es posible cambiar el valor de data_to_tx. El bit tx_busy se pone en 1
+ * hasta que termine la transmisión, momento en el cual se pone en 0.
+ */
 
 `include "./src/UART/UART.vh"
 
 module uart_tx(
-    input wire clk,             // Clock signal
+    input wire clk,             
     input wire reset,
-    input wire [7:0] data_to_tx,// 8-bit data in
-    input wire start_tx,        // Start transmission
-    output wire tx,             // UART transmit line
-    output reg tx_busy
+    input wire [7:0] data_to_tx, // Datos a transmitir de 8 bits
+    input wire start_tx,         // Señal de inicio de transmisión
+    output wire tx,              // Señal del modulo donde se envian los datos
+    output reg tx_busy           // Señal que indica que la transmisión está en progreso
 );
 
-    // Config
-    parameter BAUD_RATE = `BAUD6M_CLK24M;      // Desired baud rate
-    parameter PARITY = 0;               // 0 for even parity, 1 for odd parity
-    parameter STOP_SIZE = 2;   //Creo que si cambiamos esto se rompe el transmisor
+    // Configuración
+    parameter BAUD_RATE = `BAUD6M_CLK24M;      // Baud rate
+    parameter PARITY = 0;                      // Configuracion de la paridad (0 para paridad par, 1 para impar)
+    parameter STOP_SIZE = 2;                   // Cantidad de bits de stop
 
-    // States
+    // Estados de la máquina de estados
     localparam INIT = 2'b00;
     localparam IDLE = 2'b01;
     localparam TX   = 2'b10;
 
-    localparam PKG_SIZE = STOP_SIZE + 9;
+    localparam PKG_SIZE = STOP_SIZE + 9;        // Tamaño del paquete a enviar
 
-    reg [PKG_SIZE-1:0] to_transmit;         // STOP(N), PARITY(1), DATA(8), START(0)
-    reg [$clog2(PKG_SIZE)-1:0] bit_index;            // Index for the bits being sent
+    reg [PKG_SIZE-1:0] to_transmit;             // STOP(N), PARITY(1), DATA(8), START(1)
+    reg [$clog2(PKG_SIZE)-1:0] bit_index;       // Indice del bit actual
     reg [1:0] state = INIT;
 
-    wire parity;                    // Current parity
+    wire parity;                  
     wire baud_clk;
     
-    assign tx = to_transmit[0];
-    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx;  // XOR for even parity, inverted XOR for odd parity
+    assign tx = to_transmit[0];                             // Señal de transmisión
+    assign parity = PARITY ? ~(^data_to_tx) :  ^data_to_tx; // Generacion del bit de paridad
     
+    // Generacion del reloj de baudios
     clk_divider #(BAUD_RATE) baudrate_gen(
         .clk_in(clk),
         .reset(reset),
@@ -54,6 +56,7 @@ module uart_tx(
             end
             else
                 case (state)
+                    // Inicializacion
                     INIT: begin
                         tx_busy <= 0;
                         bit_index <= 0;
@@ -61,6 +64,7 @@ module uart_tx(
                         state <= IDLE;
                     end
 
+                    // Espera de inicio
                     IDLE: begin
                         bit_index <= 1;
                         if (start_tx) begin
@@ -70,6 +74,7 @@ module uart_tx(
                         end
                     end
 
+                    // Transmision
                     TX: begin
                         to_transmit <= {1'b1, to_transmit[PKG_SIZE-1:1]};
                         if (bit_index >= PKG_SIZE) begin 
