@@ -1,3 +1,7 @@
+/*
+ * Este módulo implementa un decodificador de 3 a 8. Toma tres bits de entrada y genera un 1 en una unica salida.
+ * Cada salida corresponde a una combinación única de las entradas.
+ */
 
 module Decoder(
   input wire b2,

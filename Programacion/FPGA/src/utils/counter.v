@@ -1,20 +1,26 @@
+/*
+ * Este módulo implementa un contador parametrizable. El contador se incrementa en cada ciclo de reloj
+ * cuando la señal de habilitación está activa. Cuando el contador alcanza el valor máximo especificado
+ * por max_count, se reinicia a 0.
+ */
+
 module counter (
-    input clk,                // Clock signal
-    input reset,              // Reset signal (active high)
-    input enable,             // Enable signal to increment the counter
-    input [WIDTH-1:0] max_count,  // Maximum count value
-    output reg [WIDTH-1:0] count  // Counter output
+    input clk,               
+    input reset,              
+    input enable,                   // Habilitación del contador
+    input [WIDTH-1:0] max_count,    // Valor máximo del contador
+    output reg [WIDTH-1:0] count    // Salida del contador
 );
-    parameter WIDTH = 8;       // Width of the counter (default 8 bits)
+    parameter WIDTH = 8;       // Tamaño del contador
 
     always @(posedge clk) begin
         if (reset) begin
-            count <= 0;        // Reset the counter to 0
+            count <= 0;        
         end else if (enable) begin
             if (count == max_count)
-                count <= 0;    // Reset the counter when max_count is reached
+                count <= 0;    
             else
-                count <= count + 1;  // Increment the counter
+                count <= count + 1;
         end
     end
 endmodule
