@@ -23,7 +23,10 @@ module top(
     output wire gpio_45,
     output wire gpio_47,
     output wire gpio_46,
-    output wire gpio_2
+    output wire gpio_2,
+    output wire gpio_28,
+    output wire gpio_38,
+    output wire gpio_42
 );
 
 /*
@@ -40,7 +43,8 @@ module top(
     localparam INIT = 3'b000;
     localparam WAIT_VALUE_1 = 3'b001;
     localparam WAIT_VALUE_2 = 3'b010;
-    localparam RX_ERROR = 3'b011;
+    localparam DELAY = 3'b011;
+    localparam RX_ERROR = 3'b111;
     
 /*
 *******************
@@ -88,10 +92,10 @@ module top(
 *************************************
 */
     // General purpose
-    reg state = INIT;
+    reg [2:0]state = INIT;
     reg reset = 0;
     reg [15:0] uart_msg = 16'h0000;
-
+    assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; 
     // UART
     reg start_tx;
     reg [7:0] data_to_tx;
@@ -117,16 +121,16 @@ module top(
 *   External Modules declarations   *
 *************************************
 */
-    // timer timer_u(
-    //     .clk(clk),
-    //     .reset(1'b0),
-    //     .start(start_1_sec),
-    //     .done(done_1_sec)
-    // );
+    timer timer_u(
+        .clk(clk24),
+        .reset(1'b0),
+        .start(start_1_sec),
+        .done(done_1_sec)
+    );
     clk_divider #(.BAUD_DIV(1)) clk_div_u
     (   
         .clk_in(clk),       // Input clock
-        .reset(reset),
+        .reset(1'b0),
         .clk_out(clk24)       // Output divided clock
     );
 
@@ -179,7 +183,7 @@ module top(
 ******************
 */
     
-    always @(posedge clk) begin
+    always @(posedge clk24) begin
         case (state)
             INIT: begin
                 if (done_1_sec) begin
@@ -198,14 +202,16 @@ module top(
                 if (rx_done) begin
                     if (!parity_error) begin
                         uart_msg[15:8] <= data_received;
-                        state <= WAIT_VALUE_2;
+                        state <= DELAY;
                     end
                     else begin
                         state <= RX_ERROR;
                     end 
                 end
             end
-
+            DELAY: begin
+                state <= WAIT_VALUE_2;
+            end
             WAIT_VALUE_2: begin
                 if (rx_done) begin
                     if (!parity_error) begin
@@ -213,7 +219,7 @@ module top(
                         state <= WAIT_VALUE_1;
                     end
                     else begin
-                        state <= RX_ERROR;
+                        state <= WAIT_VALUE_1;
                     end 
                 end
             end

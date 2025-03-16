@@ -54,28 +54,28 @@ always #1 clk = ~clk;
 */
 initial begin
         $dumpfile("top_tb.vcd");
-        $dumpvars(0, top_tb);   // module to dump
+        $dumpvars(0, top_modulacion_tb);   // module to dump
 
         //Transmit
         reset <= 1; 
-        #10
+        #10;
         reset <= 0;
-        #10
+        #10;
 
         // verificamos que no se muestre a la salida la modulacion a menos que se produzca el shoot
         angle <= 12'h999;
-        #100
+        #100;
         shoot <= 1;
-        #100
+        #100;
         shoot <= 0;
         
         // probamos recorer la tabla
         for (i = 0; i < 4095; i = i + STEP) begin
             angle <= i;
             shoot <= 1;
-            #100
+            #100;
             shoot <= 0;
-            #100
+            #100;
         end
         
         

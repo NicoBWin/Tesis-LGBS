@@ -23,7 +23,7 @@ module modulator #(parameter MODULE_ID = 0) (
 
     // Instantiate the triangular wave generator
 
-    triangular_gen #(.INITIAL_T(0), .MAX_A(`MAX_SIN_VALUE), .MAX_T(`TRIAG_T)) triangular_A (
+    triangular_gen #(.INITIAL_T(`TRIAG_T/`NUM_OF_MODULES * `MODULE_ID), .MAX_A(`MAX_SIN_VALUE), .MAX_T(`TRIAG_T)) triangular_A (
         .clk(clk),
         .reset(reset),
         .step(1'b1),
@@ -47,6 +47,7 @@ module modulator #(parameter MODULE_ID = 0) (
         .vb(sine_value_B),
         .vc(sine_value_C),
         .tri_wave(tri_wave),
+        .reset(reset),
         .shoot(shoot),
         .transistor_out({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
     );

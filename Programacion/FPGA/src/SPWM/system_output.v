@@ -17,7 +17,8 @@ module system_output (
     assign raw_phase_a_pwm = reset ? 1'b0 : (va_reg >= tri_wave);
     assign raw_phase_b_pwm = reset ? 1'b0 : (vb_reg >= tri_wave);
     assign raw_phase_c_pwm = reset ? 1'b0 : (vc_reg >= tri_wave);
-    assign transistor_out = g[5:3] == 0 || g[2:0] == 0 ? 6'b100100 : g;
+    assign g = (g_out != 0) ? g_out : g_max;
+    assign transistor_out = (g[5:3] == 0 || g[2:0] == 0) ? 6'b100100 : g;
     
     maximum_calculator sine_max (
         .alpha3_phase_Vab0(va_reg),

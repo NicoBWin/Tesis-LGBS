@@ -12,7 +12,7 @@ module clk_divider #(parameter BAUD_DIV = 16)
     output reg clk_out       // Reloj de salida dividido
 );
 
-    reg [$clog2(BAUD_DIV)-1:0] counter; // Contador para dividir el reloj
+    reg [$clog2(BAUD_DIV)-1:0] counter = 0; // Contador para dividir el reloj
 
     always @(posedge clk_in) begin
         if (reset) begin

@@ -88,7 +88,7 @@ module top(
     `UART_MAP(9, gpio_46, gpio_2)
 
     // Asignacion de pines fisicos a pines logicos
-    reg shoot = 0;
+    wire shoot;
     wire spi_clk_1 = gpio_13;
     wire miso_1 = gpio_21;
     wire cs_1 = gpio_19;
@@ -135,7 +135,7 @@ module top(
     wire [3:0] uart_id;
     reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
     assign gpio_4 = clk_24;
-
+    assign shoot = request_next_counter >= 0 && request_next_counter < 10;
     // Temporizadores
     reg start_1_sec = 0;
     reg start_5_sec = 0;
@@ -313,7 +313,6 @@ module top(
 
                     // Pedimos el siguiente indice de la tabla de senos
                     REQUEST_SINE: begin
-                        shoot <= 0;
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
                             tx_rx_spi_1 <= 0;
@@ -371,7 +370,6 @@ module top(
                     // Esperamos a que se solicite el siguiente indice
                     WAIT_FOR_REQUEST: begin
                         if (request_next_counter == 0) begin
-                            shoot <= 1;
                             normal_state <= REQUEST_SINE;
                         end                        
                     end
