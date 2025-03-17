@@ -16,7 +16,8 @@ module modulator #(parameter MODULE_ID = 0) (
     wire [6:0] sine_value_A;
     wire [6:0] sine_value_B;
     wire [6:0] sine_value_C;
-
+    wire [5:0] glitched_g;
+    wire [5:0] deglitched_g;
     wire raw_phase_a_pwm;
     wire raw_phase_b_pwm;
     wire raw_phase_c_pwm;
@@ -49,10 +50,27 @@ module modulator #(parameter MODULE_ID = 0) (
         .tri_wave(tri_wave),
         .reset(reset),
         .shoot(shoot),
-        .transistor_out({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
+        .transistor_out(glitched_g)
     );
     
+    glitch_filter #(
+        .DATA_WIDTH(6),
+        .N(10)  // 10 cycles of 48MHz -> 208.33ns
+    ) glitch_filter_U (
+        .clk(clk),
+        .reset(reset),
+        .in_signal(glitched_g),
+        .out_signal({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
+    );
 
+    // dead_time_inv #(
+    //     .DT(2)
+    // ) dead_time_inv_U (
+    //     .clk(clk),
+    //     .rst(reset),
+    //     .g_in(deglitched_g),
+    //     .g_out()
+    // );
     
 
 endmodule
