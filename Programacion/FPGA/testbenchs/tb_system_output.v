@@ -67,9 +67,9 @@ module tb_system_output;
     // Main test loop iterating over sine wave LUT
     for (sine_index = 0; sine_index < 16; sine_index = sine_index + 1) begin
       // Assign 3-phase sine waves with 120° phase shifts
-      va = 125;                     // 0° phase
-      vb = 48;          // 120° phase
-      vc = 17;         // 240° phase
+      va = 0;                     // 0° phase
+      vb = 127;          // 120° phase
+      vc = 9;         // 240° phase
 
       // ----------------------------
       //  Tri_wave goes 0 -> 127

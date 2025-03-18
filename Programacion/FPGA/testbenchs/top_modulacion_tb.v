@@ -37,6 +37,7 @@ always #1 clk = ~clk;
 */
     modulator #( .MODULE_ID(0) ) modulacion (
         .clk(clk),
+        .clk24(clk),
         .reset(reset),
         .shoot(shoot),
         .angle(angle),
@@ -71,7 +72,7 @@ initial begin
         
         // probamos recorer la tabla
         for (i = 0; i < 4095; i = i + STEP) begin
-            angle <= i;
+            angle <= 3000;
             shoot <= 1;
             #100;
             shoot <= 0;

@@ -12,5 +12,5 @@
 
 
 void command_I(uint8_t *buff, uint16_t size);
-
+void command_S(uint8_t *buff, uint16_t size);
 #endif /* INC_COMMAND_CONTROL_H_ */

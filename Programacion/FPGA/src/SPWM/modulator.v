@@ -1,5 +1,6 @@
 module modulator #(parameter MODULE_ID = 0) (
     input wire clk,
+    input wire clk24,
     input wire reset,
     input wire shoot,
     input wire [11:0] angle,   // Angle of the sine wave
@@ -55,9 +56,9 @@ module modulator #(parameter MODULE_ID = 0) (
     
     glitch_filter #(
         .DATA_WIDTH(6),
-        .N(10)  // 10 cycles of 48MHz -> 208.33ns
+        .N(5)  // 5 cycles of 24MHz -> 208.33ns
     ) glitch_filter_U (
-        .clk(clk),
+        .clk(clk24),
         .reset(reset),
         .in_signal(glitched_g),
         .out_signal({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})

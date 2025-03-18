@@ -7,6 +7,7 @@
 
 #include "command_control.h"
 #include "CurrentControl.h"
+#include "LUT_comms.h"
 
 #include "usbd_cdc_if.h"
 
@@ -36,5 +37,21 @@ void command_I(uint8_t *buff, uint16_t size){
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }
 
+void command_S(uint8_t *buff, uint16_t size){
+	static uint16_t data;
+	if (buff[1] == '?')
+	{
+		itoa(get_spi_data(), buff, 10);
+		auto len = strlen(buff);
+		buff[len] = '\n';
+		CDC_Transmit_FS(buff, len + 1);
+	}
+	else if (buff[1] == '=')
+	{
+		data = atoi(&buff[2]);
+		set_spi_data(data);
+	}
+	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
+}
 
 

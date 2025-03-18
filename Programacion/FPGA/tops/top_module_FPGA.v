@@ -69,12 +69,12 @@ module top(
 
     wire shoot = gpio_26;
 
-    assign gpio_46 = g1_a;
+    assign gpio_46 = g1_c;
     assign gpio_45 = g1_b;
-    assign gpio_3 = g1_c;
-    assign gpio_2 = g2_a;
+    assign gpio_3 = g1_a;
+    assign gpio_2 = g2_c;
     assign gpio_47 = g2_b;
-    assign gpio_48 = g2_c;
+    assign gpio_48 = g2_a;
 
 /*
 *********************
@@ -166,6 +166,7 @@ module top(
     modulator_u
     (
         .clk(clk),
+        .clk24(clk24),
         .reset(reset),
         .shoot(shoot),
         .angle(uart_msg[11:0]),
@@ -205,7 +206,7 @@ module top(
                         state <= DELAY;
                     end
                     else begin
-                        state <= RX_ERROR;
+                        state <= DELAY;
                     end 
                 end
             end

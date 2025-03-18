@@ -18,7 +18,7 @@
 
 // CAMBIAR SEGUN LA APLICACION
 `define NUM_OF_MODULES 3  // Declaracion de la cantidad de modulos conectados
-`define MODULE_ID 4'd0    // ID del modulo (entre 0 y 8)
+`define MODULE_ID 4'd1    // ID del modulo (entre 0 y 8)
 
 // codigos de SPI
 `define PIPE_MODE_SPI 12'hB0C
