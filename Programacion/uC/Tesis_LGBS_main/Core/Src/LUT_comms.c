@@ -14,7 +14,7 @@ uint16_t spi_data = 0;
 
 void init_LUT_comms(SPI_HandleTypeDef *hspi)
 {
-	HAL_SPI_Transmit_DMA(hspi, &spi_data, 1);
+	HAL_SPI_Transmit_DMA(hspi, &spi_data, 40);
 }
 
 void set_spi_data(uint16_t value)
@@ -30,12 +30,13 @@ uint16_t get_spi_data(void)
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 
-//	if (spi_data + offset > LUT_SIZE-1) {
-//		spi_data = spi_data + offset - (LUT_SIZE - 1);
-//	}
-//	else {
-//		spi_data += offset;
-//	}
+	if (spi_data + offset > LUT_SIZE-1) {
+		spi_data = spi_data + offset - (LUT_SIZE - 1);
+	}
+	else {
+		spi_data += offset;
+	}
+
 }
 
 

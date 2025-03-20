@@ -72,7 +72,7 @@ initial begin
         
         // probamos recorer la tabla
         for (i = 0; i < 4095; i = i + STEP) begin
-            angle <= 3000;
+            angle <= i;
             shoot <= 1;
             #100;
             shoot <= 0;

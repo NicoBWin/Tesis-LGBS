@@ -861,3 +861,18 @@ java.lang.Exception: localhost:61234: Connection timed out.
 
 !ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2025-03-17 21:35:16.639
 !MESSAGE Existing sessions are:
+!SESSION 2025-03-20 20:08:52.818 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-03-20 20:09:07.535
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-03-20 20:09:07.537
+!MESSAGE Log4j2 initialized with config file /home/gullino18/Documents/github/Tesis-LGBS/Programacion/uC/Test/.metadata/.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-03-20 20:09:16.144
+!MESSAGE Started RMI Server, listening on port 41337

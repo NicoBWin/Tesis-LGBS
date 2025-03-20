@@ -11,19 +11,14 @@ module PRAM (
     output reg [6:0] sine_C    // Salida de datos de 7 bits
 );
 
-    // Declaración del contenido de la RAM
-    reg [6:0] memory [0:(`SIN_SIZE - 1)];
-
     // Inicialización de la RAM con datos
-    initial begin
-        $readmemh("./src/PRAM/sine_wave.hex", memory); // Cargar datos desde un archivo hexadecimal
-    end
+    `include "./src/PRAM/sine_wave.v"
 
     // Operación de lectura
     always @(address) begin
-        sine_A <= memory[address];
-        sine_B <= memory[(address) < `SIN_SIZE - `SIN_SIZE / 3 ? address + `SIN_SIZE / 3 :  address - (`SIN_SIZE - 1) + `SIN_SIZE / 3];
-        sine_C <= memory[(address) < `SIN_SIZE - 2 * `SIN_SIZE / 3 ? address + 2 * `SIN_SIZE / 3 :  address - (`SIN_SIZE - 1) + 2 * `SIN_SIZE / 3];
+        sine_A <= lut[address];
+        sine_B <= lut[(address) < `SIN_SIZE - `SIN_SIZE / 3 ? address + `SIN_SIZE / 3 :  address - (`SIN_SIZE - 1) + `SIN_SIZE / 3];
+        sine_C <= lut[(address) < `SIN_SIZE - 2 * `SIN_SIZE / 3 ? address + 2 * `SIN_SIZE / 3 :  address - (`SIN_SIZE - 1) + 2 * `SIN_SIZE / 3];
     end
 
 endmodule
