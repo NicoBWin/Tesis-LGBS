@@ -323,7 +323,7 @@ module top(
                     // Enviamos el primer byte a los modulos UART
                     SEND_NORMAL_1: begin
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
-                            data_to_tx[k] <= sin_index[11:4];
+                            data_to_tx[k] <= {uart_id, sin_index[11:8]};
                             start_tx[k] <= 1;
                         end
                         if (tx_busy[0]) begin
@@ -351,7 +351,7 @@ module top(
                     // Enviamos el segundo byte a los modulos UART
                     SEND_NORMAL_2: begin
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
-                            data_to_tx[k] <= {sin_index[3:0], uart_id};
+                            data_to_tx[k] <= sin_index[7:0];
                             start_tx[k] <= 1;
                             end
                         if (tx_busy[0]) begin

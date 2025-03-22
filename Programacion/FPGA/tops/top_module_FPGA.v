@@ -95,7 +95,7 @@ module top(
     reg [2:0]state = INIT;
     reg reset = 0;
     reg [15:0] uart_msg = 16'h0000;
-    assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; 
+    assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; //TODO: Me
     // UART
     reg start_tx;
     reg [7:0] data_to_tx;
