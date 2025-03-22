@@ -165,8 +165,7 @@ module top(
         .led_blue(led_blue)
     );
 
-    modulator #(.MODULE_ID(`MODULE_ID))
-    modulator_u
+    modulator modulator_u
     (
         .clk(clk),
         .clk24(clk24),
@@ -214,9 +213,9 @@ module top(
                 end
             end
             DELAY: begin
-                if (!rx_done) begin
-                    state <= WAIT_VALUE_2;
-                end
+                
+                state <= WAIT_VALUE_2;
+                
             end
             WAIT_VALUE_2: begin
                 if (rx_done) begin
