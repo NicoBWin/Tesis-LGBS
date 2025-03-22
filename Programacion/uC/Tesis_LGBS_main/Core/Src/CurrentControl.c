@@ -73,6 +73,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	}
 	else
 	{
+		if (i_ref_int == i_offset)
+		{
+			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_1_A, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_2_A, GPIO_PIN_SET);
+			return;
+		}
 		if (adc_value > i_ref_int)
 		{
 			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_1_A, GPIO_PIN_RESET);

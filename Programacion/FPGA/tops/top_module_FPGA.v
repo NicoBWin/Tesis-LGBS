@@ -166,8 +166,7 @@ module top(
         .led_blue(led_blue)
     );
 
-    modulator #(.MODULE_ID(`MODULE_ID))
-    modulator_u
+    modulator modulator_u
     (
         .clk(clk),
         .clk24(clk24),
