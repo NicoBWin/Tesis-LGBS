@@ -1,7 +1,5 @@
 `timescale 1ns/1ns
 
-`include "./src/config/config.vh"
-
 module top_modulacion_tb;
 
 /*
@@ -37,7 +35,7 @@ always #1 clk = ~clk;
 *   External Modules declarations   *
 *************************************
 */
-    modulator #( .MODULE_ID(`MODULE_ID) ) modulacion (
+    modulator modulacion (
         .clk(clk),
         .clk24(clk),
         .reset(reset),

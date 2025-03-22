@@ -190,10 +190,12 @@ module top(
         case (state)
             INIT: begin
                 if (done_1_sec) begin
-                    reset <= 0;
-                    start_1_sec <= 0;
-                    led_b <= ON;
-                    state <= WAIT_VALUE_1;
+                    if (shoot) begin
+                        reset <= 0;
+                        start_1_sec <= 0;
+                        led_b <= ON;
+                        state <= WAIT_VALUE_1;
+                    end
                 end
                 else begin
                     reset <= 1;

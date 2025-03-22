@@ -13,21 +13,13 @@ module triangular_gen
 
     localparam UP = 1;
     localparam DOWN = 0;
-
-    reg [$clog2(MAX_T)-1:0] slope = 2 * MAX_A / MAX_T;  // pendiente de la triangular
+    localparam INITIAL_A = (INITIAL_T < MAX_T/2) ? (2 * MAX_A/MAX_T * INITIAL_T): (MAX_A - 2 * MAX_A * (INITIAL_T - MAX_T/2)/MAX_T) - 1;  // pendiente de la triangular
     reg up_down = UP;
 
     always @(posedge clk) begin
         if (reset) begin
-            up_down <= UP;
-
-            if (INITIAL_T < MAX_A/2 - 1) begin
-                value <= slope * INITIAL_T;             //Lado creciente de la triangular
-            end
-            else begin
-                value <= 2 * MAX_A - slope * INITIAL_T; //Lado decreciente de la triangular
-            end
-
+            up_down <= (INITIAL_T < MAX_T/2) ? UP : DOWN;
+            value <= INITIAL_A;
         end else if (up_down == UP) begin
             if (value + step < MAX_A)
                 value <= value + step; // Count up
