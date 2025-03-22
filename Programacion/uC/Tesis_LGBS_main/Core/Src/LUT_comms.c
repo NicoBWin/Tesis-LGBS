@@ -36,7 +36,6 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	else {
 		spi_data += offset;
 	}
-
 }
 
 

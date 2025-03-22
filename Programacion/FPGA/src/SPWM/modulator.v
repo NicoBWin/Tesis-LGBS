@@ -1,4 +1,4 @@
-module modulator #(parameter MODULE_ID = 0) (
+module modulator (
     input wire clk,
     input wire clk24,
     input wire reset,
@@ -61,17 +61,17 @@ module modulator #(parameter MODULE_ID = 0) (
         .clk(clk24),
         .reset(reset),
         .in_signal(glitched_g),
-        .out_signal({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
+        .out_signal(deglitched_g)
     );
 
-    // dead_time_inv #(
-    //     .DT(2)
-    // ) dead_time_inv_U (
-    //     .clk(clk),
-    //     .rst(reset),
-    //     .g_in(deglitched_g),
-    //     .g_out()
-    // );
+    dead_time_inv #(
+        .DT(2)
+    ) dead_time_inv_U (
+        .clk(clk),
+        .rst(reset),
+        .g_in(deglitched_g),
+        .g_out({g1_a, g1_b, g1_c, g2_a, g2_b, g2_c})
+    );
     
 
 endmodule

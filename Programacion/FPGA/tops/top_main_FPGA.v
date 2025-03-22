@@ -6,7 +6,6 @@
 
 `include "./src/config/config.vh"
 `include "./src/UART/UART.vh"
-`include "./src/SPI/SPI.vh"
 `include "./src/timer/timer.vh"
 
 module top(
