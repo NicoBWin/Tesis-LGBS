@@ -98,7 +98,6 @@ module top(
     reg [2:0]state = INIT;
     reg reset = 0;
     reg [15:0] uart_msg = 16'h0000;
-    reg [15:0] last_uart_msg = 16'h0000;
     assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; //TODO: Me
     // UART
     reg start_tx;
@@ -166,7 +165,8 @@ module top(
         .led_blue(led_blue)
     );
 
-    modulator modulator_u
+    modulator #(.MODULE_ID(`MODULE_ID))
+    modulator_u
     (
         .clk(clk),
         .clk24(clk24),
@@ -206,8 +206,11 @@ module top(
                 if (rx_done) begin
                     if (!parity_error) begin
                         uart_msg[15:8] <= data_received;
+                        state <= DELAY;
                     end
-                    state <= DELAY;
+                    else begin
+                        state <= DELAY;
+                    end 
                 end
             end
             DELAY: begin
@@ -219,10 +222,11 @@ module top(
                 if (rx_done) begin
                     if (!parity_error) begin
                         uart_msg[7:0] <= data_received;
+                        state <= WAIT_VALUE_1;
                     end
-
-                    uart_msg <= last_uart_msg;
-                    state <= WAIT_VALUE_1;
+                    else begin
+                        state <= WAIT_VALUE_1;
+                    end 
                 end
             end
 
