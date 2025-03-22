@@ -1,3 +1,5 @@
+`include "./src/config/config.vh"
+
 module modulator (
     input wire clk,
     input wire clk24,
