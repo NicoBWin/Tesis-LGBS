@@ -1,7 +1,8 @@
-/*
-    Recibe por los 2 SPIs los valores de las 3 señales. Manda por UART que 
-    transistores prender de cada modulo y envia al final un pulso de shoot.
-*/
+/* 
+ * Este módulo implementa una máquina de estados para manejar la comunicación entre varios módulos UART y un módulo SPI.
+ * Utiliza un reloj interno para sincronizar las operaciones y varios estados para manejar la comunicación. Recibe el indice
+ * de la tabla de senos y envia a cada modulo el indice a través de UART.
+ */
 
 `include "./src/config/config.vh"
 `include "./src/UART/UART.vh"
@@ -9,8 +10,6 @@
 `include "./src/timer/timer.vh"
 
 module top(
-
-    //Revisado segun la version final de la placa
 
     // UART 1
     input wire gpio_26,
@@ -48,20 +47,20 @@ module top(
     input wire gpio_46,
     output wire gpio_2,
 
-    //Signal from SPI 1
+    // Señales de SPI
     output wire gpio_13,
     output wire gpio_19,
     input wire gpio_21,
 
-    //LEDs
+    // LEDs
     output wire led_red,
     output wire led_green,
     output wire led_blue,
 
-    //Shoot
+    // Shoot
     output wire gpio_44,
 
-    // debug
+    // Señal de debugging
     output wire gpio_4
 );
 
@@ -70,16 +69,15 @@ module top(
 *   Variables declaration   *
 *****************************
 */  
-    localparam OFF = 1;
+    localparam OFF = 1;     // LEDs activos en bajo
     localparam ON = 0;
-
 /*
 *******************
 *   Ports setup   *
 *******************
 */  
     //UART_MAP: uart_id/rx_gpio/tx_gpio
-    `UART_MAP(1, gpio_26, gpio_27)
+    `UART_MAP(1, gpio_26, gpio_27)      // Asignacion de pines para cada UART
     `UART_MAP(2, gpio_32, gpio_35)
     `UART_MAP(3, gpio_31, gpio_37)
     `UART_MAP(4, gpio_34, gpio_43)
@@ -89,8 +87,8 @@ module top(
     `UART_MAP(8, gpio_45, gpio_47)
     `UART_MAP(9, gpio_46, gpio_2)
 
-    reg shoot = gpio_44;
-
+    // Asignacion de pines fisicos a pines logicos
+    wire shoot;
     wire spi_clk_1 = gpio_13;
     wire miso_1 = gpio_21;
     wire cs_1 = gpio_19;
@@ -108,6 +106,7 @@ module top(
 *   HFClock setup   *
 *********************
 */  
+    // Configuracion del reloj principal y secundario
     wire clk;
     wire clk_24;
     SB_HFOSC  #(.CLKHF_DIV("0b00")) hf_osc (
@@ -127,7 +126,7 @@ module top(
         .clk_out(clk_24)
     );
     
-    // General purpose
+    // De proposito general
     genvar i, j;
     integer k;
     reg reset;
@@ -136,14 +135,14 @@ module top(
     wire [3:0] uart_id;
     reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
     assign gpio_4 = clk_24;
-
-    // Timers
+    assign shoot = request_next_counter >= 0 && request_next_counter < 10;
+    // Temporizadores
     reg start_1_sec = 0;
     reg start_5_sec = 0;
     wire done_1_sec;
     wire done_5_sec;
 
-    // General FSM
+    // FSM principal
     localparam INIT         = 3'b000;
     localparam DEBUG_MODE   = 3'b010;
     localparam NORMAL_MODE  = 3'b100;
@@ -153,21 +152,20 @@ module top(
     localparam IDLE = 3'b111;
     reg [2:0] state = INIT;
 
-    //Pipe mode FSM
+    // FSM en modo tuberia
     localparam IDLE_PIPE        = 2'b00;
     localparam SEND_PIPE        = 2'b01;
     localparam RECEIVE_PIPE     = 2'b10;
     localparam RETRANSMIT_PIPE  = 2'b11;
     reg [1:0] pipe_state = IDLE_PIPE;
 
-    //Normal mode FSM
+    // FSM en modo normal
     localparam REQUEST_SINE     = 3'b000;
     localparam SEND_NORMAL_1    = 3'b001;
     localparam WAIT_1           = 3'b010;
     localparam SEND_NORMAL_2    = 3'b011;
     localparam WAIT_2           = 3'b100;
     localparam WAIT_FOR_REQUEST = 3'b101;
-
     reg [2:0] normal_state = REQUEST_SINE;
 
     // UART
@@ -180,26 +178,21 @@ module top(
     wire [`NUM_OF_MODULES-1:0] tx = {tx_uart_3, tx_uart_2, tx_uart_1}; // TX wire for each UART
     wire [`NUM_OF_MODULES-1:0] rx = {rx_uart_3, rx_uart_2, rx_uart_1}; // RX wire for each UART
 
+    // Disparo de transistores
+    assign gpio_44 = shoot;
+
     //SPI 1
     reg tx_rx_spi_1;
     reg [15:0] to_tx_spi_1;
     wire [15:0] received_from_spi_1;
     wire transfer_done_spi_1;
     wire data_valid_spi_1;
-
-/*
-*************************************
-*        Functions declarations     *
-*************************************
-*/
-
-
 /*
 *************************************
 *   External Modules declarations   *
 *************************************
 */
-    
+    // Generamos la instancias de los modulos de UART
     generate
         for (i = 0; i < `NUM_OF_MODULES; i = i + 1) begin : uart_modules
 
@@ -225,6 +218,7 @@ module top(
         end
     endgenerate
 
+    // Instanciamos un modulo SPI
     SPI_request_data spi_1(
         .clk(clk),
         .reset(reset),
@@ -237,6 +231,7 @@ module top(
         .uart_id(uart_id)
     );
 
+    // Generamos contadores
     timer #(`SEC_1) timer_1(
         .clk(clk),
         .reset(1'b0),
@@ -255,7 +250,8 @@ module top(
 ******************
 *   Statements   *
 ******************
-*/
+*/  
+    // Controlamos el contador de solicitudes
     always @(posedge clk) begin
         if (reset) begin
             request_next_counter <= 0;
@@ -267,8 +263,11 @@ module top(
         end
     end
     
+    // FSM principal
     always @(posedge clk) begin
         case (state)
+
+            // Inicializacion
             INIT: begin
                 if (done_1_sec == 1) begin
                     reset <= 0;
@@ -283,34 +282,37 @@ module top(
                 end
             end
 
+            // Pedimos datos para seleccionar el modo de funcionamiento
             STARTUP: begin
                 state <= IDLE;
                 tx_rx_spi_1 <= 1;
             end
 
+            // Seleccion de modo de funcionamiento
             IDLE: begin
                 
                 tx_rx_spi_1 <= 0;
+
                 //Si termino la transferencia y se recibio modo pipe
                 if (data_valid_spi_1 & sin_index == `PIPE_MODE_SPI && uart_id == 4'hA) begin
                     //Entramos al modo pipe del inverter
                     state <= PIPE_MODE;
                     pipe_state <= IDLE_PIPE;
-                    led_b <= ON;
+                    led_b <= ON;                //Indicamos que estamos en modo pipe
                 end
-                else if(done_5_sec == 1) begin
+                else if(done_5_sec == 1) begin // Si no se recibio modo pipe, entramos al modo normal
                     //Entramos al modo normal de funcionamiento del inverter
                     state <= NORMAL_MODE;
                     normal_state <= REQUEST_SINE;
-                    led_g <= ON;
+                    led_g <= ON;                //Indicamos que estamos en modo normal
                 end
             end
 
             NORMAL_MODE: begin
                 case (normal_state)
 
+                    // Pedimos el siguiente indice de la tabla de senos
                     REQUEST_SINE: begin
-                        shoot <= 0;
                         tx_rx_spi_1 <= 1;
                         if (data_valid_spi_1) begin
                             tx_rx_spi_1 <= 0;
@@ -318,6 +320,7 @@ module top(
                         end
                     end
                     
+                    // Enviamos el primer byte a los modulos UART
                     SEND_NORMAL_1: begin
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             data_to_tx[k] <= sin_index[11:4];
@@ -328,9 +331,10 @@ module top(
                         end
                     end
 
+                    // Esperamos a que terminen de enviar los datos
                     WAIT_1: begin
                         
-                        // Suponemos que todos los modulos terminan al mismo tiempo
+                        // Nota: Suponemos que todos los modulos terminan al mismo tiempo
                         if (!tx_busy[0]) begin
                             for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                                 start_tx[k] <= 0;
@@ -344,6 +348,7 @@ module top(
                         end
                     end
                     
+                    // Enviamos el segundo byte a los modulos UART
                     SEND_NORMAL_2: begin
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             data_to_tx[k] <= {sin_index[3:0], uart_id};
@@ -354,6 +359,7 @@ module top(
                         end
                     end
 
+                    // Esperamos a que terminen de enviar los datos
                     WAIT_2: begin
                         for (k = 0; k < `NUM_OF_MODULES; k = k + 1) begin
                             start_tx[k] <= 0;
@@ -361,9 +367,9 @@ module top(
                         normal_state <= WAIT_FOR_REQUEST;
                     end
 
+                    // Esperamos a que se solicite el siguiente indice
                     WAIT_FOR_REQUEST: begin
                         if (request_next_counter == 0) begin
-                            shoot <= 1;
                             normal_state <= REQUEST_SINE;
                         end                        
                     end
@@ -373,7 +379,7 @@ module top(
             PIPE_MODE: begin
                 case (pipe_state)
                     IDLE_PIPE: begin
-                       
+                        // No implementado aun
                     end
                 endcase
             end

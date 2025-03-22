@@ -1,2 +1,4 @@
 ../Core/Src/LUT_comms.c:15:6:init_LUT_comms	1
-../Core/Src/LUT_comms.c:20:6:HAL_SPI_TxCpltCallback	2
+../Core/Src/LUT_comms.c:20:6:set_spi_data	1
+../Core/Src/LUT_comms.c:25:10:get_spi_data	1
+../Core/Src/LUT_comms.c:30:6:HAL_SPI_TxCpltCallback	1

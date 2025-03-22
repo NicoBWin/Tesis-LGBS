@@ -1,5 +1,10 @@
+/*
+ * Este módulo selecciona el color de un LED RGB basado en un índice de color de 4 bits.
+ * Cada combinación de bits de entrada corresponde a un color específico o a un estado de apagado.
+ */
+
 module rgb_color_selector (
-    input wire [3:0] color_index,
+    input wire [3:0] color_index,  // Índice de color de 4 bits
     output wire led_red,
     output wire led_blue,
     output wire led_green
@@ -29,6 +34,7 @@ module rgb_color_selector (
         endcase
     end
 
+    // Controlador del LED RGB
     SB_RGBA_DRV RGB_DRIVER (
         .RGBLEDEN(1'b1),
         .RGB0PWM(rgb_pwm[1]),
@@ -40,6 +46,7 @@ module rgb_color_selector (
         .RGB2(led_red)
     );
 
+    // Configuración de la corriente de los LEDs
     defparam RGB_DRIVER.RGB0_CURRENT = "0b010";
     defparam RGB_DRIVER.RGB1_CURRENT = "0b010";
     defparam RGB_DRIVER.RGB2_CURRENT = "0b010";

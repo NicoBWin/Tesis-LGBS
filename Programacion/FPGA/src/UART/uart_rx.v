@@ -1,24 +1,28 @@
 /*
-    Receptor de UART. Fue probado hasta 6Mb/s utilizando un clock de 24MHz.
-    A cada modulo va a ir un cable ethernet que contiene el tx y rx de cada modulo.
-*/
+ * Este módulo implementa un receptor UART. Fue probado hasta 6Mbps utilizando un reloj de 24MHz.
+ * Cada módulo se conecta mediante un cable ethernet que contiene las líneas tx y rx. La señal 
+ * rx se conecta a la entrada rx de la FPGA donde se recibira la señal de UART. En el bus de 
+ * salida data_received se obtiene el byte recibido y en rx_done se obtiene un pulso que indica
+ * que se recibió un byte completo. En parity_error se obtiene un pulso que indica que hubo un
+ * error de paridad en la recepción.
+ */
 
 `include "./src/UART/UART.vh"
 
 module uart_rx(
-    input wire clk,            // Clock signal
+    input wire clk,        
     input wire reset,
-    input wire rx,             // UART receive line
-    output reg [7:0] data_received,   // 8-bit data out
-    output reg rx_done,         // Indicates reception is complete
-    output wire parity_error     // Flag that indicates that there was a parity error
+    input wire rx,                  // Linea de recepcion de UART
+    output reg [7:0] data_received, // Datos de 8 bits recibidos
+    output reg rx_done,             // Pulso que indica que se recibio un byte completo
+    output wire parity_error        // Pulso que indica que se ocurrio un error en la paridad
 );
 
-    // Config
-    parameter BAUD_RATE = `BAUD6M_CLK24M;     // Desired baud rate
-    parameter PARITY = 0;           // 0 for even parity, 1 for odd parity
+    // Configuracion
+    parameter BAUD_RATE = `BAUD6M_CLK24M;     // Tasa de bits
+    parameter PARITY = 0;                     // Configuracion de la paridad (0 para paridad par, 1 para impar)
     
-    // States
+    // Estados de la maquina de estados
     localparam INIT         = 3'b000;
     localparam IDLE         = 3'b001;
     localparam START        = 3'b010;
@@ -28,17 +32,17 @@ module uart_rx(
 
     wire parity_error_done;
 
-    reg [5:0] clk_counter;          //TODO: Si ponemos celing log 2 se rompe
-    reg [8:0] rx_shift_reg;         // PARITY(1), DATA(8)
-    reg [3:0] bit_index;            // Index for the bits being received
+    reg [5:0] clk_counter;          // Contador de recepcion de datos. IMPORTANTE: El tamaño depende de la tasa de baudios.
+    reg [8:0] rx_shift_reg;         // Registros temporales para la paridad (1 bit) y el byte recibido (8 bits).
+    reg [3:0] bit_index;            // Indice del bit recibido
     reg [2:0] state = INIT;
 
-    reg [5:0] zero_counter = 0;
-    reg [5:0] one_counter = 0;
-    reg rx_desition = 0;
+    reg [5:0] zero_counter = 0;     // Contador de bits en 0
+    reg [5:0] one_counter = 0;      // Contador de bits en 1
+    reg rx_decision = 0;            // Decision de bit recibido
     
-    assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg);
-    assign parity_error = rx_done & parity_error_done;
+    assign parity_error_done = PARITY ? ~(^rx_shift_reg) : (^rx_shift_reg); // Calculo de la paridad
+    assign parity_error = rx_done & parity_error_done;                      // Señal de error de paridad
 
     always @(posedge clk) 
         begin
@@ -47,6 +51,8 @@ module uart_rx(
             end
             else
                 case (state)
+
+                    // Inicializacion
                     INIT: begin
                         bit_index <= 0;
                         rx_done <= 0;
@@ -55,21 +61,24 @@ module uart_rx(
                         state <= IDLE;
                     end
 
+                    // Espera de inicio
                     IDLE: begin
                         if (!rx) begin  // Se detecto el start
                             state <= CHECK_START;
                         end
                     end
 
+                    // Verificacion de inicio
                     CHECK_START: begin
-                        if (!rx) begin  // Se checkeo que sea start nuevamente (2 samples)
-                            state <= START; //TODO: CAMBIAR
+                        if (!rx) begin  // Se checkeo que sea start nuevamente (2 muestras)
+                            state <= START; 
                         end
                         else begin
                             state <= IDLE;
                         end
                     end
 
+                    // Recepcion del bit de start
                     START: begin
                         if (clk_counter >= BAUD_RATE+BAUD_RATE-2) begin
                             state <= RX;
@@ -80,24 +89,31 @@ module uart_rx(
                         end
                     end
 
+                    // Recepcion de datos
                     RX: begin
+
+                        // Contador de bits
                         if (rx) begin
                             one_counter <= one_counter + 1;
                         end
                         else begin
                             zero_counter <= zero_counter + 1;
                         end
+                        
+                        // Regla de decision
                         if (zero_counter > one_counter) begin
-                            rx_desition = 0;
+                            rx_decision = 0;
                         end
                         else begin
-                            rx_desition = 1;
+                            rx_decision = 1;
                         end
 
+                        // Para cada bit recibido   
                         if (clk_counter >= BAUD_RATE+BAUD_RATE-1) begin
                             clk_counter <= 0;
                             bit_index <= bit_index + 1;
 
+                            // Si se recibieron los 8 bits
                             if (bit_index >= 9) begin
                                 state <= RX_DONE;
                                 data_received <= rx_shift_reg[7:0];
@@ -106,14 +122,15 @@ module uart_rx(
                             else begin
                                 zero_counter <= 0;
                                 one_counter <= 0;
-                                rx_shift_reg <= {rx_desition, rx_shift_reg[8:1]};
+                                rx_shift_reg <= {rx_decision, rx_shift_reg[8:1]}; // Guardar el bit recibido
                             end
                         end 
                         else begin
-                            clk_counter <= clk_counter + 1;
+                            clk_counter <= clk_counter + 1; // Contar el tiempo de recepcion
                         end
                     end
 
+                    // Recepcion completa
                     RX_DONE: begin
                         bit_index <= 0;     
                         clk_counter <= 0;
