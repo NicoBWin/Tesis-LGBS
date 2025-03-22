@@ -26,7 +26,10 @@ module top(
     output wire gpio_2,
     output wire gpio_28,
     output wire gpio_38,
-    output wire gpio_42
+    output wire gpio_42,
+
+    // Debugging
+    output wire gpio_4 
 );
 
 /*
@@ -102,7 +105,7 @@ module top(
     wire [7:0] data_received; 
     wire tx_busy; 
     wire rx_done; 
-    wire parity_error; 
+    wire parity_error; assign gpio_4 = parity_error; //TODO: Borrar
     wire tx = tx_uart_1; 
     wire rx = rx_uart_1; 
 
