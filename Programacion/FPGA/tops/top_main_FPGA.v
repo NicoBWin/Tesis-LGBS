@@ -134,7 +134,7 @@ module top(
     wire [3:0] uart_id;
     reg [$clog2(`TRIAG_T)-1:0] request_next_counter;
     assign gpio_4 = clk_24;
-    assign shoot = request_next_counter >= 0 && request_next_counter < 10;
+    assign shoot = request_next_counter >= 0 && request_next_counter < 100;
     // Temporizadores
     reg start_1_sec = 0;
     reg start_5_sec = 0;
