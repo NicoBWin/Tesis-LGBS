@@ -1646,19 +1646,19 @@ Disassembly of section .text:
  80012f4:	f002 bbb0 	b.w	8003a58 <HAL_SPI_Transmit_DMA>
  80012f8:	20000372 	.word	0x20000372
 
-080012fc <set_spi_data>:
- 80012fc:	4b01      	ldr	r3, [pc, #4]	@ (8001304 <set_spi_data+0x8>)
+080012fc <set_offset>:
+ 80012fc:	4b01      	ldr	r3, [pc, #4]	@ (8001304 <set_offset+0x8>)
  80012fe:	8018      	strh	r0, [r3, #0]
  8001300:	4770      	bx	lr
  8001302:	bf00      	nop
- 8001304:	20000372 	.word	0x20000372
+ 8001304:	20000000 	.word	0x20000000
 
-08001308 <get_spi_data>:
- 8001308:	4b01      	ldr	r3, [pc, #4]	@ (8001310 <get_spi_data+0x8>)
+08001308 <get_offset>:
+ 8001308:	4b01      	ldr	r3, [pc, #4]	@ (8001310 <get_offset+0x8>)
  800130a:	8818      	ldrh	r0, [r3, #0]
  800130c:	4770      	bx	lr
  800130e:	bf00      	nop
- 8001310:	20000372 	.word	0x20000372
+ 8001310:	20000000 	.word	0x20000000
 
 08001314 <HAL_SPI_TxCpltCallback>:
  8001314:	4906      	ldr	r1, [pc, #24]	@ (8001330 <HAL_SPI_TxCpltCallback+0x1c>)
@@ -1710,13 +1710,13 @@ Disassembly of section .text:
  8001384:	f7ff ff3a 	bl	80011fc <get_I_meas>
  8001388:	e7dd      	b.n	8001346 <command_I+0xe>
 
-0800138a <command_S>:
+0800138a <command_O>:
  800138a:	b510      	push	{r4, lr}
  800138c:	7843      	ldrb	r3, [r0, #1]
  800138e:	4604      	mov	r4, r0
  8001390:	2b3f      	cmp	r3, #63	@ 0x3f
- 8001392:	d116      	bne.n	80013c2 <command_S+0x38>
- 8001394:	f7ff ffb8 	bl	8001308 <get_spi_data>
+ 8001392:	d116      	bne.n	80013c2 <command_O+0x38>
+ 8001394:	f7ff ffb8 	bl	8001308 <get_offset>
  8001398:	4621      	mov	r1, r4
  800139a:	220a      	movs	r2, #10
  800139c:	f004 fba1 	bl	8005ae2 <itoa>
@@ -1732,15 +1732,15 @@ Disassembly of section .text:
  80013b6:	200a      	movs	r0, #10
  80013b8:	f004 f9b2 	bl	8005720 <CDC_Transmit_FS>
  80013bc:	2801      	cmp	r0, #1
- 80013be:	d0f9      	beq.n	80013b4 <command_S+0x2a>
+ 80013be:	d0f9      	beq.n	80013b4 <command_O+0x2a>
  80013c0:	bd10      	pop	{r4, pc}
  80013c2:	2b3d      	cmp	r3, #61	@ 0x3d
- 80013c4:	d1f6      	bne.n	80013b4 <command_S+0x2a>
+ 80013c4:	d1f6      	bne.n	80013b4 <command_O+0x2a>
  80013c6:	3002      	adds	r0, #2
  80013c8:	f004 fb6f 	bl	8005aaa <atoi>
  80013cc:	b280      	uxth	r0, r0
- 80013ce:	f7ff ff95 	bl	80012fc <set_spi_data>
- 80013d2:	e7ef      	b.n	80013b4 <command_S+0x2a>
+ 80013ce:	f7ff ff95 	bl	80012fc <set_offset>
+ 80013d2:	e7ef      	b.n	80013b4 <command_O+0x2a>
 
 080013d4 <SystemClock_Config>:
  80013d4:	b510      	push	{r4, lr}
@@ -2002,7 +2002,7 @@ Disassembly of section .text:
  800166e:	2b49      	cmp	r3, #73	@ 0x49
  8001670:	8028      	strh	r0, [r5, #0]
  8001672:	d00c      	beq.n	800168e <main+0x236>
- 8001674:	2b53      	cmp	r3, #83	@ 0x53
+ 8001674:	2b4f      	cmp	r3, #79	@ 0x4f
  8001676:	d00e      	beq.n	8001696 <main+0x23e>
  8001678:	210f      	movs	r1, #15
  800167a:	4815      	ldr	r0, [pc, #84]	@ (80016d0 <main+0x278>)
@@ -2017,7 +2017,7 @@ Disassembly of section .text:
  8001690:	f7ff fe52 	bl	8001338 <command_I>
  8001694:	e7e1      	b.n	800165a <main+0x202>
  8001696:	4620      	mov	r0, r4
- 8001698:	f7ff fe77 	bl	800138a <command_S>
+ 8001698:	f7ff fe77 	bl	800138a <command_O>
  800169c:	e7dd      	b.n	800165a <main+0x202>
  800169e:	bf00      	nop
  80016a0:	40021000 	.word	0x40021000

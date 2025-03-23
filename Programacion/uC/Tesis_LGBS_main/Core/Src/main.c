@@ -135,8 +135,8 @@ int main(void)
 		  	  case 'I':
 		  		  command_I(msg, rx_usb_amount);
 		  		  break;
-		  	  case 'S':
-		  		  command_S(msg, rx_usb_amount);
+		  	  case 'O':
+		  		  command_O(msg, rx_usb_amount);
 		  		  break;
 		  	  default:
 		  		  CDC_Transmit_FS("\nNo reconocido\n", 15);

@@ -175,6 +175,10 @@ Discarded input sections
  .text          0x00000000        0x0 ./Core/Src/LUT_comms.o
  .data          0x00000000        0x0 ./Core/Src/LUT_comms.o
  .bss           0x00000000        0x0 ./Core/Src/LUT_comms.o
+ .text.set_spi_data
+                0x00000000        0xc ./Core/Src/LUT_comms.o
+ .text.get_spi_data
+                0x00000000        0xc ./Core/Src/LUT_comms.o
  .text          0x00000000        0x0 ./Core/Src/USB_comms.o
  .data          0x00000000        0x0 ./Core/Src/USB_comms.o
  .bss           0x00000000        0x0 ./Core/Src/USB_comms.o
@@ -1641,21 +1645,21 @@ LOAD /opt/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-
  .text.init_LUT_comms
                 0x080012f0        0xc ./Core/Src/LUT_comms.o
                 0x080012f0                init_LUT_comms
- .text.set_spi_data
+ .text.set_offset
                 0x080012fc        0xc ./Core/Src/LUT_comms.o
-                0x080012fc                set_spi_data
- .text.get_spi_data
+                0x080012fc                set_offset
+ .text.get_offset
                 0x08001308        0xc ./Core/Src/LUT_comms.o
-                0x08001308                get_spi_data
+                0x08001308                get_offset
  .text.HAL_SPI_TxCpltCallback
                 0x08001314       0x24 ./Core/Src/LUT_comms.o
                 0x08001314                HAL_SPI_TxCpltCallback
  .text.command_I
                 0x08001338       0x52 ./Core/Src/command_control.o
                 0x08001338                command_I
- .text.command_S
+ .text.command_O
                 0x0800138a       0x4a ./Core/Src/command_control.o
-                0x0800138a                command_S
+                0x0800138a                command_O
  .text.SystemClock_Config
                 0x080013d4       0x82 ./Core/Src/main.o
                 0x080013d4                SystemClock_Config

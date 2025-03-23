@@ -37,11 +37,11 @@ void command_I(uint8_t *buff, uint16_t size){
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }
 
-void command_S(uint8_t *buff, uint16_t size){
+void command_O(uint8_t *buff, uint16_t size){
 	static uint16_t data;
 	if (buff[1] == '?')
 	{
-		itoa(get_spi_data(), buff, 10);
+		itoa(get_offset(), buff, 10);
 		auto len = strlen(buff);
 		buff[len] = '\n';
 		CDC_Transmit_FS(buff, len + 1);
@@ -49,7 +49,7 @@ void command_S(uint8_t *buff, uint16_t size){
 	else if (buff[1] == '=')
 	{
 		data = atoi(&buff[2]);
-		set_spi_data(data);
+		set_offset(data);
 	}
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }

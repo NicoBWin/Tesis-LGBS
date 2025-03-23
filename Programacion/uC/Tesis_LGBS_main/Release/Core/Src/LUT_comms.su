@@ -1,4 +1,6 @@
 ../Core/Src/LUT_comms.c:15:6:init_LUT_comms	0	static
 ../Core/Src/LUT_comms.c:20:6:set_spi_data	0	static
 ../Core/Src/LUT_comms.c:25:10:get_spi_data	0	static
-../Core/Src/LUT_comms.c:30:6:HAL_SPI_TxCpltCallback	0	static
+../Core/Src/LUT_comms.c:30:6:set_offset	0	static
+../Core/Src/LUT_comms.c:35:10:get_offset	0	static
+../Core/Src/LUT_comms.c:41:6:HAL_SPI_TxCpltCallback	0	static

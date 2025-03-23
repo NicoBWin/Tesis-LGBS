@@ -27,6 +27,17 @@ uint16_t get_spi_data(void)
 	return spi_data;
 }
 
+void set_offset(uint16_t value)
+{
+	offset = value;
+}
+
+uint16_t get_offset(void)
+{
+	return offset;
+}
+
+
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 
