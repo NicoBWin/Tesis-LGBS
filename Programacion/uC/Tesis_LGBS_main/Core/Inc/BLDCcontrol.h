@@ -6,8 +6,8 @@
  *      Author: gullino18
  */
 
-#ifndef INC_COMMAND_CONTROL_H_
-#define INC_COMMAND_CONTROL_H_
+#ifndef BLDCCONTORL_H_
+#define BLDCCONTORL_H_
 #include "stdint.h"
 #include "CurrentControl.h"
 
@@ -15,6 +15,7 @@
 #define Ki 0.001
 #define SATURATION_INT (MAX_CURR*SENS_SENSITIVITY)
 
+float get_speed_meas(void);
 float get_speed(void);
 void set_speed(float value);
 #endif /* INC_BLDCCONTROL_H_ */

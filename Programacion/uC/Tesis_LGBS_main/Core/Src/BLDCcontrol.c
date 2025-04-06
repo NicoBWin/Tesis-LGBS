@@ -4,27 +4,28 @@
  *  Created on: Apr 6, 2025
  *      Author: gullino18
  */
-
+#include "math.h"
 #include "BLDCcontrol.h"
 uint32_t mot_speed_count = 0;
 uint32_t last_mot_speed_count = 0;
 uint32_t mot_speed_setpoint = 0;
 void set_speed(float value)
 {
-	mot_speed_setpoint = (value*18)/60;
+	mot_speed_setpoint = (value*18*18000)/60;
 }
 
 float get_speed(void)
 {
-	return mot_speed_setpoint*60.0/18.0;
+	return mot_speed_setpoint*60.0f/18.0f/18000.0f;
 }
 
 float get_speed_meas(void)
 {
-	return last_mot_speed_count*60.0/18.0;
+	float res = (float)(last_mot_speed_count)/18000.0f;
+	return res;
 }
 // Input compare
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+void HAL_TIMEx_CommutCallback(TIM_HandleTypeDef *htim)
 {
 	static int32_t p, i, aux_i, out_pi, err;
 
@@ -34,7 +35,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	 * In principle an error arround 1k cnts should increase the current by less than an amp to soften the current ramp.
 	 * ESTO SALIO A OJO, NO HAY MATEMATICA
 	 */
-	mot_speed_count += htim->Instance->CNT;
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
+	mot_speed_count += htim->Instance->CCR1;
 
 	err = mot_speed_setpoint - mot_speed_count;
 
@@ -49,7 +51,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 }
 
 // Overflow
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
 {
 	mot_speed_count += 65536;
 }

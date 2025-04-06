@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 # Parameters for the sine LUT
-num_entries = 4096   # Number of entries in the LUT
+num_entries = 4096*2   # Number of entries in the LUT
 max_value = 127     # Maximum value for the LUT (7-bit range)
 output_file = "./src/PRAM/sine_wave.v"
 

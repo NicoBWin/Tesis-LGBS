@@ -64,8 +64,8 @@ all: main-build
 main-build: Tesis_LGBS_main.elf secondary-outputs
 
 # Tool invocations
-Tesis_LGBS_main.elf Tesis_LGBS_main.map: $(OBJS) $(USER_OBJS) /home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Tesis_LGBS_main/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Tesis_LGBS_main.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/gullino18/Documents/Github/Tesis-LGBS/Programacion/uC/Tesis_LGBS_main/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Tesis_LGBS_main.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Tesis_LGBS_main.elf Tesis_LGBS_main.map: $(OBJS) $(USER_OBJS) /home/gullino18/Documents/github/Tesis-LGBS/Programacion/uC/Tesis_LGBS_main/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Tesis_LGBS_main.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/gullino18/Documents/github/Tesis-LGBS/Programacion/uC/Tesis_LGBS_main/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Tesis_LGBS_main.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

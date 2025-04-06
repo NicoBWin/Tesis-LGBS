@@ -53,7 +53,8 @@ void command_S(uint8_t *buff, uint16_t size){
 	}
 	else if (buff[1] == 'm')
 	{
-		gcvt(get_speed_meas(), 2, buff);
+		float speed = (float)get_speed_meas();
+		gcvt(speed, 2, buff);
 		auto len = strlen(buff);
 		buff[len] = '\n';
 		CDC_Transmit_FS(buff, len + 1);

@@ -121,7 +121,7 @@ module top(
 */
     clk_divider #(.BAUD_DIV(1)) clk_divider_1(
         .clk_in(clk),
-        .reset(reset),
+        .reset(1'b0),
         .clk_out(clk_24)
     );
     
@@ -174,8 +174,26 @@ module top(
     wire [`NUM_OF_MODULES-1:0] tx_busy; // TX busy signal for each UART
     wire [`NUM_OF_MODULES-1:0] rx_done; // RX done signal for each UART
     wire [`NUM_OF_MODULES-1:0] parity_error; // Parity error signal for each UART
-    wire [`NUM_OF_MODULES-1:0] tx = {tx_uart_3, tx_uart_2, tx_uart_1}; // TX wire for each UART
-    wire [`NUM_OF_MODULES-1:0] rx = {rx_uart_3, rx_uart_2, rx_uart_1}; // RX wire for each UART
+    wire [`NUM_OF_MODULES-1:0] tx; // TX wire for each UART
+    wire [`NUM_OF_MODULES-1:0] rx; // RX wire for each UART
+    assign tx[0] = tx_uart_1;
+    assign rx[0] = rx_uart_1;
+    assign tx[1] = tx_uart_2;
+    assign rx[1] = rx_uart_2;
+    assign tx[2] = tx_uart_3;
+    assign rx[2] = rx_uart_3;
+    assign tx[3] = tx_uart_4;
+    assign rx[3] = rx_uart_4;
+    assign tx[4] = tx_uart_5;
+    assign rx[4] = rx_uart_5;
+    assign tx[5] = tx_uart_6;
+    assign rx[5] = rx_uart_6;
+    assign tx[6] = tx_uart_7;
+    assign rx[6] = rx_uart_7;
+    assign tx[7] = tx_uart_8;
+    assign rx[7] = rx_uart_8;
+    assign tx[8] = tx_uart_9;
+    assign rx[8] = rx_uart_9;
 
     // Disparo de transistores
     assign gpio_44 = shoot;
@@ -232,14 +250,14 @@ module top(
 
     // Generamos contadores
     timer #(`SEC_1) timer_1(
-        .clk(clk),
+        .clk(clk_24),
         .reset(1'b0),
         .start(start_1_sec),
         .done(done_1_sec)
     );
 
     timer #(`SEC_5) timer_2(
-        .clk(clk),
+        .clk(clk_24),
         .reset(1'b0),
         .start(start_5_sec),
         .done(done_5_sec)

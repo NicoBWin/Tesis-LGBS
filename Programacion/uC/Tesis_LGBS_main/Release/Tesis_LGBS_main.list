@@ -1641,7 +1641,7 @@ Disassembly of section .text:
  80012ec:	40010800 	.word	0x40010800
 
 080012f0 <init_LUT_comms>:
- 80012f0:	2228      	movs	r2, #40	@ 0x28
+ 80012f0:	2217      	movs	r2, #23
  80012f2:	4901      	ldr	r1, [pc, #4]	@ (80012f8 <init_LUT_comms+0x8>)
  80012f4:	f002 bbb0 	b.w	8003a58 <HAL_SPI_Transmit_DMA>
  80012f8:	20000372 	.word	0x20000372
