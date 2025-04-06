@@ -1,0 +1,5 @@
+../Core/Src/BLDCcontrol.c:12:6:set_speed	16	static
+../Core/Src/BLDCcontrol.c:17:7:get_speed	8	static
+../Core/Src/BLDCcontrol.c:22:7:get_speed_meas	8	static
+../Core/Src/BLDCcontrol.c:27:6:HAL_TIM_IC_CaptureCallback	24	static
+../Core/Src/BLDCcontrol.c:52:6:HAL_TIM_PeriodElapsedCallback	16	static
