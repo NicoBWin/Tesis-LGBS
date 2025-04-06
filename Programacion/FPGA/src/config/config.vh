@@ -12,7 +12,7 @@
 
 // NO CAMBIAR SIN LEER EN DETALLE EL FUNCIONAMIENTO DEL SISTEMA
 `define NUM_OF_PHASES 3   // Declaracion de la cantidad de fases por modulo (NO cambiar)
-`define SIN_SIZE 4096     // Cantidad de puntos de la tabla senoidal (2^12)
+`define SIN_SIZE 8192     // Cantidad de puntos de la tabla senoidal (2^12)
 `define MAX_SIN_VALUE 128 // Valor maximo de amplitud de la tabla senoidal (2^7)
 `define TRIAG_T 256       // Perido en puntos de la tabla triangular 
 
