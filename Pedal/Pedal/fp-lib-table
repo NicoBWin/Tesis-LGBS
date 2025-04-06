@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "STM32surface")(type "KiCad")(uri "C:/Users/Gonzalo/Documents/Informatica/Tesis-LGBS/Pedal/Components/STM32/STM32surface.pretty")(options "")(descr ""))
+)
