@@ -1,3 +1,4 @@
+"./Core/Src/BLDCcontrol.o"
 "./Core/Src/CurrentControl.o"
 "./Core/Src/LUT_comms.o"
 "./Core/Src/USB_comms.o"

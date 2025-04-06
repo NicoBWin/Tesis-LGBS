@@ -49,5 +49,3 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 	}
 }
 
-
-

@@ -17,4 +17,5 @@ uint16_t get_spi_data(void);
 void set_spi_data(uint16_t value);
 uint16_t get_offset(void);
 void set_offset(uint16_t value);
+
 #endif /* INC_LUT_COMMS_H_ */

@@ -1,5 +1,7 @@
 ../Core/Src/CurrentControl.c:19:6:curr_control_init	16	static
 ../Core/Src/CurrentControl.c:45:7:get_I_meas	8	static
-../Core/Src/CurrentControl.c:50:7:get_I	4	static
-../Core/Src/CurrentControl.c:55:6:set_I	24	static
-../Core/Src/CurrentControl.c:66:6:HAL_ADC_ConvCpltCallback	16	static
+../Core/Src/CurrentControl.c:50:7:get_I_float	8	static
+../Core/Src/CurrentControl.c:54:10:get_I_int	4	static
+../Core/Src/CurrentControl.c:58:6:set_I_float	24	static
+../Core/Src/CurrentControl.c:67:6:set_I_int	16	static
+../Core/Src/CurrentControl.c:71:6:HAL_ADC_ConvCpltCallback	16	static
