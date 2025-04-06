@@ -14,7 +14,7 @@ uint16_t spi_data = 0;
 
 void init_LUT_comms(SPI_HandleTypeDef *hspi)
 {
-	HAL_SPI_Transmit_DMA(hspi, &spi_data, 40);
+	HAL_SPI_Transmit_DMA(hspi, &spi_data, 23);
 }
 
 void set_spi_data(uint16_t value)
