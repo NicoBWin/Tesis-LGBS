@@ -127,7 +127,7 @@ int main(void)
   //curr_control_init(&hadc1, &htim3);
   //init_LUT_comms(&hspi1);
   HAL_TIMEx_HallSensor_Start_IT(&htim1);
-  __HAL_TIM_ENABLE_IT(&htim4, TIM_IT_);
+  __HAL_TIM_ENABLE_IT(&htim4, TIM_IT_CC1);
   HAL_TIM_Base_Start_IT(&htim4);
   /* USER CODE END 2 */
 
