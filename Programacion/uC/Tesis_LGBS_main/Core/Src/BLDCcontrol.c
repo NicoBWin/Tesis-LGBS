@@ -5,27 +5,29 @@
  *      Author: gullino18
  */
 #include "math.h"
+#include "stdlib.h"
 #include "BLDCcontrol.h"
+
 uint32_t mot_speed_count = 0;
 uint32_t last_mot_speed_count = 0;
 uint32_t mot_speed_setpoint = 0;
 void set_speed(float value)
 {
-	mot_speed_setpoint = (value*18*18000)/60;
+	mot_speed_setpoint = 27.7778e3f/(value);
 }
 
 float get_speed(void)
 {
-	return mot_speed_setpoint*60.0f/18.0f/18000.0f;
+	return 27.7778e3f/(float)mot_speed_setpoint;
 }
 
 float get_speed_meas(void)
 {
-	float res = (float)(last_mot_speed_count)/18000.0f;
+	float res = 27.7778e3f/(float)(last_mot_speed_count);
 	return res;
 }
 // Input compare
-void HAL_TIMEx_CommutCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	static int32_t p, i, aux_i, out_pi, err;
 
@@ -51,7 +53,7 @@ void HAL_TIMEx_CommutCallback(TIM_HandleTypeDef *htim)
 }
 
 // Overflow
-void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	mot_speed_count += 65536;
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 }
