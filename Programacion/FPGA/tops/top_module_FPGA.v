@@ -29,7 +29,7 @@ module top(
     output wire gpio_42,
 
     // Debugging
-    output wire gpio_4 
+    output wire gpio_25 
 );
 
 /*
@@ -44,6 +44,7 @@ module top(
     localparam TR_OFF = 0;
 
     localparam INIT = 3'b000;
+    localparam WAIT_SHOOT = 3'b100;
     localparam WAIT_VALUE_1 = 3'b001;
     localparam WAIT_VALUE_2 = 3'b010;
     localparam DELAY = 3'b011;
@@ -105,7 +106,7 @@ module top(
     wire [7:0] data_received; 
     wire tx_busy; 
     wire rx_done; 
-    wire parity_error; assign gpio_4 = parity_error; //TODO: Borrar
+    wire parity_error; assign gpio_25 = parity_error; //TODO: Borrar
     wire tx = tx_uart_1; 
     wire rx = rx_uart_1; 
 
@@ -202,7 +203,11 @@ module top(
                     start_1_sec <= 1;
                 end
             end
-
+            WAIT_SHOOT: begin
+                if (shoot) begin
+                    state <= WAIT_VALUE_1;
+                end
+            end
             WAIT_VALUE_1: begin
                 if (rx_done) begin
                     if (!parity_error) begin
@@ -223,10 +228,10 @@ module top(
                 if (rx_done) begin
                     if (!parity_error) begin
                         uart_msg[7:0] <= data_received;
-                        state <= WAIT_VALUE_1;
+                        state <= WAIT_SHOOT;
                     end
                     else begin
-                        state <= WAIT_VALUE_1;
+                        state <= WAIT_SHOOT;
                     end 
                 end
             end
