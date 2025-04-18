@@ -1,5 +1,10 @@
-11:53:00 **** Incremental Build of configuration Debug for project Pedal ****
+13:04:16 **** Incremental Build of configuration Debug for project Pedal ****
 make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:104:18: warning: variable 'res' set but not used [-Wunused-but-set-variable]
+  104 |         uint32_t res = 0;
+      |                  ^~~
 arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Pedal.elf
  
@@ -7,20 +12,261 @@ arm-none-eabi-size  Pedal.elf
 arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
 arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
    text	   data	    bss	    dec	    hex	filename
-  10000	     12	   1684	  11696	   2db0	Pedal.elf
+  10112	     12	   1684	  11808	   2e20	Pedal.elf
+arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
+Finished building: default.size.stdout
+ 
+Finished building: Pedal.bin
+Finished building: Pedal.hex
+ 
+ 
+Finished building: Pedal.list
+ 
+13:05:00 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-size  Pedal.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10112	     12	   1684	  11808	   2e20	Pedal.elf
+Finished building: default.size.stdout
+ 
+13:18:02 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-size  Pedal.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10112	     12	   1684	  11808	   2e20	Pedal.elf
+Finished building: default.size.stdout
+ 
+13:32:00 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:120:54: error: 'txHandler' undeclared (first use in this function)
+  120 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                      ^~~~~~~~~
+../Core/Src/main.c:120:54: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:120:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  120 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+../Core/Src/main.c:103:18: warning: variable 'res' set but not used [-Wunused-but-set-variable]
+  103 |         uint32_t res = 0;
+      |                  ^~~
+../Core/Src/main.c: In function 'MX_CAN_Init':
+../Core/Src/main.c:280:9: error: 'txHandler' undeclared (first use in this function)
+  280 |         txHandler.DLC = 2; // 2 bytes
+      |         ^~~~~~~~~
+make: *** [Core/Src/subdir.mk:37: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+13:33:32 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:51:1: error: unknown type name 'CAN_TxHandlerTypeDef'; did you mean 'CAN_HandleTypeDef'?
+   51 | CAN_TxHandlerTypeDef txHandler;
+      | ^~~~~~~~~~~~~~~~~~~~
+      | CAN_HandleTypeDef
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:121:53: warning: passing argument 2 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  121 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                     ^~~~~~~~~~
+      |                                                     |
+      |                                                     int *
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:688:92: note: expected 'const CAN_TxHeaderTypeDef *' but argument is of type 'int *'
+  688 | HAL_StatusTypeDef HAL_CAN_AddTxMessage(CAN_HandleTypeDef *hcan, const CAN_TxHeaderTypeDef *pHeader,
+      |                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+../Core/Src/main.c:121:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  121 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+../Core/Src/main.c:104:18: warning: variable 'res' set but not used [-Wunused-but-set-variable]
+  104 |         uint32_t res = 0;
+      |                  ^~~
+../Core/Src/main.c: In function 'MX_CAN_Init':
+../Core/Src/main.c:281:18: error: request for member 'DLC' in something not a structure or union
+  281 |         txHandler.DLC = 2; // 2 bytes
+      |                  ^
+../Core/Src/main.c:282:18: error: request for member 'IDE' in something not a structure or union
+  282 |         txHandler.IDE = CAN_ID_STD;
+      |                  ^
+../Core/Src/main.c:283:18: error: request for member 'RTR' in something not a structure or union
+  283 |         txHandler.RTR = CAN_RTR_DATA;
+      |                  ^
+../Core/Src/main.c:284:18: error: request for member 'StdId' in something not a structure or union
+  284 |         txHandler.StdId = 0x321; // Arbitrary ID
+      |                  ^
+make: *** [Core/Src/subdir.mk:37: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+13:33:58 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:121:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  121 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+../Core/Src/main.c:104:18: warning: variable 'res' set but not used [-Wunused-but-set-variable]
+  104 |         uint32_t res = 0;
+      |                  ^~~
+arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Pedal.elf
+ 
+arm-none-eabi-size  Pedal.elf 
+arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
+arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
+   text	   data	    bss	    dec	    hex	filename
+  10092	     12	   1684	  11788	   2e0c	Pedal.elf
+arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
+Finished building: default.size.stdout
+ 
+Finished building: Pedal.bin
+Finished building: Pedal.hex
+Finished building: Pedal.list
+ 
+ 
+ 
+13:49:41 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc "../Core/Src/potentiometer.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/potentiometer.d" -MT"Core/Src/potentiometer.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/potentiometer.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:121:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  121 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+../Core/Src/main.c:104:18: warning: variable 'res' set but not used [-Wunused-but-set-variable]
+  104 |         uint32_t res = 0;
+      |                  ^~~
+arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Pedal.elf
+ 
+arm-none-eabi-size  Pedal.elf 
+arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
+arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
+arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
+   text	   data	    bss	    dec	    hex	filename
+  10092	     12	   1684	  11788	   2e0c	Pedal.elf
+Finished building: default.size.stdout
+ 
+Finished building: Pedal.bin
+Finished building: Pedal.hex
+ 
+ 
+Finished building: Pedal.list
+ 
+13:54:07 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:120:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  120 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Pedal.elf
+ 
+arm-none-eabi-size  Pedal.elf 
+arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
+arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
+   text	   data	    bss	    dec	    hex	filename
+  10164	     12	   1684	  11860	   2e54	Pedal.elf
+arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
+Finished building: default.size.stdout
+ 
+Finished building: Pedal.bin
+Finished building: Pedal.hex
+ 
+Finished building: Pedal.list
+ 
+ 
+13:57:50 **** Incremental Build of configuration Debug for project Pedal ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/potentiometer.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/potentiometer.d" -MT"Core/Src/potentiometer.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/potentiometer.o"
+arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Pedal.elf
+ 
+arm-none-eabi-size  Pedal.elf 
+arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
+arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
+   text	   data	    bss	    dec	    hex	filename
+  10172	     12	   1684	  11868	   2e5c	Pedal.elf
 arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
 Finished building: default.size.stdout
  
 Finished building: Pedal.hex
 Finished building: Pedal.bin
- 
- 
 Finished building: Pedal.list
  
-12:02:45 **** Incremental Build of configuration Debug for project Pedal ****
+ 
+ 
+13:58:56 **** Incremental Build of configuration Debug for project Pedal ****
 make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Device/ST/STM32F1xx/Include -IC:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:120:65: warning: passing argument 3 of 'HAL_CAN_AddTxMessage' from incompatible pointer type [-Wincompatible-pointer-types]
+  120 |                         HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
+      |                                                                 ^~~~~~
+      |                                                                 |
+      |                                                                 uint16_t * {aka short unsigned int *}
+In file included from ../Core/Inc/stm32f1xx_hal_conf.h:258,
+                 from C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+C:/Users/Gonzalo/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_can.h:689:54: note: expected 'const uint8_t *' {aka 'const unsigned char *'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
+  689 |                                        const uint8_t aData[], uint32_t *pTxMailbox);
+      |                                        ~~~~~~~~~~~~~~^~~~~~~
+arm-none-eabi-gcc -o "Pedal.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\Gonzalo\Downloads\Tesis-LGBS\Pedal\Programa\Pedal\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Pedal.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Pedal.elf
+ 
 arm-none-eabi-size  Pedal.elf 
+arm-none-eabi-objdump -h -S Pedal.elf  > "Pedal.list"
+arm-none-eabi-objcopy  -O ihex Pedal.elf  "Pedal.hex"
    text	   data	    bss	    dec	    hex	filename
-  10000	     12	   1684	  11696	   2db0	Pedal.elf
+  10172	     12	   1684	  11868	   2e5c	Pedal.elf
+arm-none-eabi-objcopy  -O binary Pedal.elf  "Pedal.bin"
 Finished building: default.size.stdout
+ 
+Finished building: Pedal.hex
+Finished building: Pedal.bin
+Finished building: Pedal.list
+ 
+ 
  

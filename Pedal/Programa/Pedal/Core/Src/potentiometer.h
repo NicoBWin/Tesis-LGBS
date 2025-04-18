@@ -9,6 +9,7 @@
 #define SRC_POTENTIOMETER_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "stm32f1xx_hal.h"
 
 uint16_t read_pote(ADC_HandleTypeDef *hadc1);

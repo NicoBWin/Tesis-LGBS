@@ -43,11 +43,12 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+
 CAN_HandleTypeDef hcan;
-CAN_TxHeaderTypeDef txHandler;
 
 /* USER CODE BEGIN PV */
 
+CAN_TxHeaderTypeDef txHandler;
 
 /* USER CODE END PV */
 
@@ -98,7 +99,6 @@ int main(void)
   MX_CAN_Init();
   /* USER CODE BEGIN 2 */
 
-	uint8_t TxData[2] = {0};
 	uint32_t TxMailbox = 0;
 	uint16_t speed = 0;
 
@@ -115,14 +115,16 @@ int main(void)
 
 		speed = read_pote(&hadc1);
 
-		// Pack 16-bit ADC value into CAN message
-		TxData[0] = speed >> 8;
-		TxData[1] = speed & 0xFF;
-
-		if (HAL_CAN_AddTxMessage(&hcan, &txHandler, TxData, &TxMailbox) != HAL_OK)
+		if (!HAL_CAN_IsTxMessagePending(&hcan, CAN_TX_MAILBOX0))
 		{
-			Error_Handler(); // Transmission error
+			HAL_CAN_AddTxMessage(&hcan, &txHandler, &speed, &TxMailbox);
 		}
+		else{
+			HAL_CAN_GetError(&hcan);
+		}
+
+		HAL_Delay(2); //Next sample in 1ms
+
 	}
   /* USER CODE END 3 */
 }

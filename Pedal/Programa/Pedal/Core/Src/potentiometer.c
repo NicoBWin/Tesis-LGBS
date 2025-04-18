@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include "potentiometer.h"
 
+#define INVERTED (1)
 
 uint16_t read_pote(ADC_HandleTypeDef *hadc1){
 
@@ -17,5 +18,10 @@ uint16_t read_pote(ADC_HandleTypeDef *hadc1){
 	{
 		value = HAL_ADC_GetValue(hadc1);
 	}
+
+	if (INVERTED) {
+		value = 4095 - value;  // Invert the 12-bit ADC value
+	}
+
 	return value;
 }
