@@ -25,15 +25,14 @@ cfg.tri_counter_comp = uint16(cfg.sawtooth_counter / 2 - 1)
 
 cfg.ts  = 2.083333333e-8;
 cfg.fl  = 100;
-cfg.r    = 10;
-cfg.c    = 3*(3e-6+0.1e-6);
-cfg.l    = 1e-3;
+cfg.r    = 0.45;
+cfg.c    = 3*(100E-9);%3*(3e-6+0.1e-6);
+cfg.l    = 100E-6;
 cfg.w    = 2*pi*cfg.fl;
-cfg.sharing_L = 1E-3;
+cfg.sharing_L = 15E-3;
 cfg.sharing_R = 14;
-cfg.main_L = 4E-3;
+cfg.main_L = 0E-3;
 cfg.cs_soft_start_time = 1E-5;
-
 cfg.tri_phase_shift = 360/modules_number;
 
 %% Controlled values
