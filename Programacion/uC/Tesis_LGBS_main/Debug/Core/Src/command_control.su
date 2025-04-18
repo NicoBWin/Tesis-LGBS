@@ -1,2 +1,11 @@
+<<<<<<< HEAD
 ../Core/Src/command_control.c:17:6:command_I	16	static
 ../Core/Src/command_control.c:23:6:command_S	16	static
+=======
+../Core/Src/command_control.c:18:6:command_I	16	static
+<<<<<<< HEAD
+../Core/Src/command_control.c:40:6:command_O	24	static
+=======
+../Core/Src/command_control.c:40:6:command_S	32	static
+>>>>>>> 3d4e69e16e3d861dda4a0c62773c1923932ebc68
+>>>>>>> a45dd575b5af8d3cf90758c4a1d4cf636a6e0e27

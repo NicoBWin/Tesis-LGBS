@@ -29,7 +29,7 @@ module top(
     output wire gpio_42,
 
     // Debugging
-    output wire gpio_4 
+    output wire gpio_25 
 );
 
 /*
@@ -44,6 +44,7 @@ module top(
     localparam TR_OFF = 0;
 
     localparam INIT = 3'b000;
+    localparam WAIT_SHOOT = 3'b100;
     localparam WAIT_VALUE_1 = 3'b001;
     localparam WAIT_VALUE_2 = 3'b010;
     localparam DELAY = 3'b011;
@@ -71,6 +72,7 @@ module top(
     wire clk24;
 
     wire shoot = gpio_26;
+    reg last_shoot_value = 0;
 
     assign gpio_46 = g1_c;
     assign gpio_45 = g1_b;
@@ -105,7 +107,7 @@ module top(
     wire [7:0] data_received; 
     wire tx_busy; 
     wire rx_done; 
-    wire parity_error; assign gpio_4 = parity_error; //TODO: Borrar
+    wire parity_error; assign gpio_25 = parity_error; //TODO: Borrar
     wire tx = tx_uart_1; 
     wire rx = rx_uart_1; 
 
@@ -202,11 +204,18 @@ module top(
                     start_1_sec <= 1;
                 end
             end
-
+            WAIT_SHOOT: begin
+                if (last_shoot_value != shoot) begin
+                    last_shoot_value <= shoot;
+                    if (shoot) begin
+                        state <= WAIT_VALUE_1;
+                    end
+                end
+            end
             WAIT_VALUE_1: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        uart_msg[15:8] <= data_received;
+                        uart_msg[7:0] <= data_received;
                         state <= DELAY;
                     end
                     else begin
@@ -222,11 +231,11 @@ module top(
             WAIT_VALUE_2: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        uart_msg[7:0] <= data_received;
-                        state <= WAIT_VALUE_1;
+                        uart_msg[15:8] <= data_received;
+                        state <= WAIT_SHOOT;
                     end
                     else begin
-                        state <= WAIT_VALUE_1;
+                        state <= WAIT_SHOOT;
                     end 
                 end
             end
@@ -237,5 +246,4 @@ module top(
 
         endcase
     end
-
 endmodule

@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file         stm32f1xx_hal_msp.c
-  * @brief        This file provides code for the MSP Initialization
-  *               and de-Initialization codes.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file         stm32f1xx_hal_msp.c
+ * @brief        This file provides code for the MSP Initialization
+ *               and de-Initialization codes.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -59,8 +59,8 @@ extern DMA_HandleTypeDef hdma_spi1_tx;
 
 /* USER CODE END 0 */
 /**
-  * Initializes the Global MSP.
-  */
+ * Initializes the Global MSP.
+ */
 void HAL_MspInit(void)
 {
 
@@ -74,7 +74,7 @@ void HAL_MspInit(void)
   /* System interrupt init*/
 
   /** NOJTAG: JTAG-DP Disabled and SW-DP Enabled
-  */
+   */
   __HAL_AFIO_REMAP_SWJ_NOJTAG();
 
   /* USER CODE BEGIN MspInit 1 */
@@ -83,15 +83,15 @@ void HAL_MspInit(void)
 }
 
 /**
-  * @brief ADC MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param hadc: ADC handle pointer
-  * @retval None
-  */
-void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
+ * @brief ADC MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param hadc: ADC handle pointer
+ * @retval None
+ */
+void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hadc->Instance==ADC1)
+  if (hadc->Instance == ADC1)
   {
     /* USER CODE BEGIN ADC1_MspInit 0 */
 
@@ -113,20 +113,18 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     /* USER CODE BEGIN ADC1_MspInit 1 */
 
     /* USER CODE END ADC1_MspInit 1 */
-
   }
-
 }
 
 /**
-  * @brief ADC MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param hadc: ADC handle pointer
-  * @retval None
-  */
-void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
+ * @brief ADC MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param hadc: ADC handle pointer
+ * @retval None
+ */
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 {
-  if(hadc->Instance==ADC1)
+  if (hadc->Instance == ADC1)
   {
     /* USER CODE BEGIN ADC1_MspDeInit 0 */
 
@@ -232,15 +230,15 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
 }
 
 /**
-  * @brief SPI MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param hspi: SPI handle pointer
-  * @retval None
-  */
-void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
+ * @brief SPI MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param hspi: SPI handle pointer
+ * @retval None
+ */
+void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hspi->Instance==SPI1)
+  if (hspi->Instance == SPI1)
   {
     /* USER CODE BEGIN SPI1_MspInit 0 */
 
@@ -266,7 +264,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
+    GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -288,7 +286,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
       Error_Handler();
     }
 
-    __HAL_LINKDMA(hspi,hdmatx,hdma_spi1_tx);
+    __HAL_LINKDMA(hspi, hdmatx, hdma_spi1_tx);
 
     /* SPI1 interrupt Init */
     HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
@@ -296,20 +294,18 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     /* USER CODE BEGIN SPI1_MspInit 1 */
 
     /* USER CODE END SPI1_MspInit 1 */
-
   }
-
 }
 
 /**
-  * @brief SPI MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param hspi: SPI handle pointer
-  * @retval None
-  */
-void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
+ * @brief SPI MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param hspi: SPI handle pointer
+ * @retval None
+ */
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
-  if(hspi->Instance==SPI1)
+  if (hspi->Instance == SPI1)
   {
     /* USER CODE BEGIN SPI1_MspDeInit 0 */
 
@@ -325,7 +321,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_15);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5);
 
     /* SPI1 DMA DeInit */
     HAL_DMA_DeInit(hspi->hdmatx);
@@ -336,19 +332,18 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 
     /* USER CODE END SPI1_MspDeInit 1 */
   }
-
 }
 
 /**
-  * @brief TIM_Base MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param htim_base: TIM_Base handle pointer
-  * @retval None
-  */
-void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
+ * @brief TIM_Base MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param htim_base: TIM_Base handle pointer
+ * @retval None
+ */
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(htim_base->Instance==TIM1)
+  if (htim_base->Instance == TIM1)
   {
     /* USER CODE BEGIN TIM1_MspInit 0 */
 
@@ -362,7 +357,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     PA9     ------> TIM1_CH2
     PA10     ------> TIM1_CH3
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10;
+    GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -378,7 +373,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM1_MspInit 1 */
   }
-  else if(htim_base->Instance==TIM3)
+  else if (htim_base->Instance == TIM3)
   {
     /* USER CODE BEGIN TIM3_MspInit 0 */
 
@@ -389,7 +384,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM3_MspInit 1 */
   }
-  else if(htim_base->Instance==TIM4)
+  else if (htim_base->Instance == TIM4)
   {
     /* USER CODE BEGIN TIM4_MspInit 0 */
 
@@ -410,18 +405,17 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM4_MspInit 1 */
   }
-
 }
 
 /**
-  * @brief TIM_Base MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param htim_base: TIM_Base handle pointer
-  * @retval None
-  */
-void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
+ * @brief TIM_Base MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param htim_base: TIM_Base handle pointer
+ * @retval None
+ */
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim_base)
 {
-  if(htim_base->Instance==TIM1)
+  if (htim_base->Instance == TIM1)
   {
     /* USER CODE BEGIN TIM1_MspDeInit 0 */
 
@@ -434,7 +428,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
     PA9     ------> TIM1_CH2
     PA10     ------> TIM1_CH3
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10);
 
     /* TIM1 interrupt DeInit */
     HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
@@ -444,7 +438,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM1_MspDeInit 1 */
   }
-  else if(htim_base->Instance==TIM3)
+  else if (htim_base->Instance == TIM3)
   {
     /* USER CODE BEGIN TIM3_MspDeInit 0 */
 
@@ -455,7 +449,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM3_MspDeInit 1 */
   }
-  else if(htim_base->Instance==TIM4)
+  else if (htim_base->Instance == TIM4)
   {
     /* USER CODE BEGIN TIM4_MspDeInit 0 */
 
@@ -472,7 +466,6 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 
     /* USER CODE END TIM4_MspDeInit 1 */
   }
-
 }
 
 /* USER CODE BEGIN 1 */

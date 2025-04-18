@@ -1,7 +1,13 @@
 ../Core/Src/CurrentControl.c:19:6:curr_control_init	4
 ../Core/Src/CurrentControl.c:45:7:get_I_meas	1
+<<<<<<< HEAD
+../Core/Src/CurrentControl.c:50:7:get_I	1
+../Core/Src/CurrentControl.c:55:6:set_I	3
+../Core/Src/CurrentControl.c:66:6:HAL_ADC_ConvCpltCallback	4
+=======
 ../Core/Src/CurrentControl.c:50:7:get_I_float	1
 ../Core/Src/CurrentControl.c:54:10:get_I_int	1
 ../Core/Src/CurrentControl.c:58:6:set_I_float	3
 ../Core/Src/CurrentControl.c:67:6:set_I_int	2
 ../Core/Src/CurrentControl.c:71:6:HAL_ADC_ConvCpltCallback	4
+>>>>>>> 3d4e69e16e3d861dda4a0c62773c1923932ebc68
