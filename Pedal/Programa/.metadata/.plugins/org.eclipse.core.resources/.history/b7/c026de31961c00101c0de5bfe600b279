@@ -1,0 +1,28 @@
+/*
+ * command_control.C
+ *
+ *  Created on: Feb 28, 2025
+ *      Author: gullino18
+ */
+
+#include "command_control.h"
+#include "CurrentControl.h"
+#include "BLDCcontrol.h"
+
+#include "usbd_cdc_if.h"
+
+#include "stdio.h"
+#include "string.h"
+
+void command_I(uint8_t *buff){
+	static float i;
+	i = = (uint32_t) buff / 4095.0f
+	set_I_float(i);
+}
+
+void command_S(uint8_t *buff){
+	static uint32_t speed_setpoint; //from 0 to 4095
+	memcpy(&speed_setpoint, buff, sizeof(uint32_t));
+}
+
+

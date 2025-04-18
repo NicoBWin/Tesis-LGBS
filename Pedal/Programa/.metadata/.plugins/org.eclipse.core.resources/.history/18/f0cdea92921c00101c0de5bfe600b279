@@ -1,0 +1,16 @@
+/*size_t
+ * command_control.h
+ *
+ *  Created on: Feb 28, 2025
+ *      Author: gullino18
+ */
+
+#ifndef INC_COMMAND_CONTROL_H_
+#define INC_COMMAND_CONTROL_H_
+#include "stdint.h"
+
+#define COMM_SIZE (5) //1 byte comm + 4 bytes datos
+
+void command_I(uint8_t *buff);
+void command_S(uint8_t *buff);
+#endif /* INC_COMMAND_CONTROL_H_ */

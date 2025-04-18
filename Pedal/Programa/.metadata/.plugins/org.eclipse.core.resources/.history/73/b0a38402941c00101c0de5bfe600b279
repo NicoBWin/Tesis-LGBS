@@ -1,0 +1,46 @@
+/*
+ * command_control.C
+ *
+ *  Created on: Feb 28, 2025
+ *      Author: gullino18
+ */
+
+#include "command_control.h"
+#include "CurrentControl.h"
+#include "BLDCcontrol.h"
+
+#include "usbd_cdc_if.h"
+
+#include "stdio.h"
+#include "string.h"
+
+
+void command_I(uint8_t *buff){
+	static float i;
+	if (buff[1] == '?')
+	{
+		gcvt(get_I_float(), 3, buff);
+		buff[4] = '\n';
+		CDC_Transmit_FS(buff, 5);
+	}
+	else if (buff[1] == '=')
+	{
+		i = atof(&buff[2]);
+		set_I_float(i);
+	}
+	else if (buff[1] == 'm')
+	{
+		gcvt(get_I_meas(), 3, buff);
+		buff[4] = '\n';
+		CDC_Transmit_FS(buff, 5);
+	}
+	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
+}
+
+void command_S(uint8_t *buff){
+
+	static float value;
+	memcpy(&value, buff, sizeof(float));
+}
+
+

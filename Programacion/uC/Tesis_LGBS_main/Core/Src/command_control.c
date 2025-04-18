@@ -14,52 +14,15 @@
 #include "stdio.h"
 #include "string.h"
 
-
-void command_I(uint8_t *buff, uint16_t size){
+void command_I(uint8_t *buff){
 	static float i;
-	if (buff[1] == '?')
-	{
-		gcvt(get_I_float(), 3, buff);
-		buff[4] = '\n';
-		CDC_Transmit_FS(buff, 5);
-	}
-	else if (buff[1] == '=')
-	{
-		i = atof(&buff[2]);
-		set_I_float(i);
-	}
-	else if (buff[1] == 'm')
-	{
-		gcvt(get_I_meas(), 3, buff);
-		buff[4] = '\n';
-		CDC_Transmit_FS(buff, 5);
-	}
-	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
+	i = (uint32_t) buff / 4095.0f;
+	set_I_float(i);
 }
 
-void command_S(uint8_t *buff, uint16_t size){
-	static uint16_t data;
-	if (buff[1] == '?')
-	{
-		gcvt(get_speed(), 2, buff);
-		auto len = strlen(buff);
-		buff[len] = '\n';
-		CDC_Transmit_FS(buff, len + 1);
-	}
-	else if (buff[1] == '=')
-	{
-		data = atof(&buff[2]);
-		set_speed(data);
-	}
-	else if (buff[1] == 'm')
-	{
-		float speed = (float)get_speed_meas();
-		gcvt(speed, 2, buff);
-		auto len = strlen(buff);
-		buff[len] = '\n';
-		CDC_Transmit_FS(buff, len + 1);
-	}
-	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
+void command_S(uint8_t *buff){
+	static uint32_t speed_setpoint; //from 0 to 4095
+	memcpy(&speed_setpoint, buff, sizeof(uint32_t));
 }
 
 

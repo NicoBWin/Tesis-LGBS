@@ -49,6 +49,8 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
+CAN_HandleTypeDef hcan;
+
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_tx;
 
@@ -57,11 +59,9 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-uint8_t msg[64];
-uint16_t rx_usb_amount;
 
 //CAN_TxHeaderTypeDef TxHeader;
-//CAN_RxHeaderTypeDef RxHeader;
+CAN_RxHeaderTypeDef rxHeader;
 //CAN_FilterTypeDef CANFilter;
 uint32_t txMail = 0;
 uint32_t res = 0;
@@ -77,6 +77,7 @@ static void MX_ADC1_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_CAN_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -122,7 +123,10 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM1_Init();
   MX_TIM4_Init();
+  MX_CAN_Init();
   /* USER CODE BEGIN 2 */
+
+  uint8_t pedalCommand[MSG_SIZE];
 
   //curr_control_init(&hadc1, &htim3);
   //init_LUT_comms(&hspi1);
@@ -138,20 +142,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (CDC_data_recieved())
+	  if (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
 	  {
-		  rx_usb_amount = CDC_Receive_data(msg, 64);
-		  switch ((int)msg[0])
+		  //Leemos el dato de CAN y lo guardamos en el command
+		  HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &rxHeader, pedalCommand);
+		  uint8_t command = pedalCommand[0];
+		  uint8_t* data = &pedalCommand[1];
+
+		  switch (command)
 		  {
 		  	  case 'I':
-		  		  command_I(msg, rx_usb_amount);
+		  		  command_I(data);
 		  		  break;
-		  	  case 'S':
-		  		  command_S(msg, rx_usb_amount);
-		  		  break;
-		  	  default:
-		  		  CDC_Transmit_FS("\nNo reconocido\n", 15);
-		  		  while (CDC_Transmit_FS(msg, rx_usb_amount) == USBD_BUSY);
 		  }
 	  }
   }
@@ -249,6 +251,43 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief CAN Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CAN_Init(void)
+{
+
+  /* USER CODE BEGIN CAN_Init 0 */
+
+  /* USER CODE END CAN_Init 0 */
+
+  /* USER CODE BEGIN CAN_Init 1 */
+
+  /* USER CODE END CAN_Init 1 */
+  hcan.Instance = CAN1;
+  hcan.Init.Prescaler = 16;
+  hcan.Init.Mode = CAN_MODE_NORMAL;
+  hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_2TQ;
+  hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
+  hcan.Init.TimeTriggeredMode = DISABLE;
+  hcan.Init.AutoBusOff = DISABLE;
+  hcan.Init.AutoWakeUp = DISABLE;
+  hcan.Init.AutoRetransmission = DISABLE;
+  hcan.Init.ReceiveFifoLocked = DISABLE;
+  hcan.Init.TransmitFifoPriority = DISABLE;
+  if (HAL_CAN_Init(&hcan) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CAN_Init 2 */
+
+  /* USER CODE END CAN_Init 2 */
 
 }
 
@@ -527,22 +566,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB12 PB13 PB14 PB15
-                           PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15
-                          |GPIO_PIN_9;
+  /*Configure GPIO pins : PB12 PB13 PB14 PB15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PB8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure peripheral I/O remapping */
-  __HAL_AFIO_REMAP_CAN1_2();
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
   /* USER CODE END MX_GPIO_Init_2 */

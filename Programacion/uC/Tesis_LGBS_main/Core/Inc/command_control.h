@@ -9,8 +9,8 @@
 #define INC_COMMAND_CONTROL_H_
 #include "stdint.h"
 
+#define MSG_SIZE (5) //1 byte comm + 4 bytes datos
 
-
-void command_I(uint8_t *buff, uint16_t size);
-void command_S(uint8_t *buff, uint16_t size);
+void command_I(uint8_t *buff);
+void command_S(uint8_t *buff);
 #endif /* INC_COMMAND_CONTROL_H_ */
