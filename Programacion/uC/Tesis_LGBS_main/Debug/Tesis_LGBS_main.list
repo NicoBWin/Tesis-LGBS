@@ -2754,8 +2754,8 @@ static void MX_GPIO_Init(void)
  80018f2:	605a      	str	r2, [r3, #4]
  80018f4:	609a      	str	r2, [r3, #8]
  80018f6:	60da      	str	r2, [r3, #12]
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
@@ -2850,8 +2850,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
  8001990:	2300      	movs	r3, #0
  8001992:	613b      	str	r3, [r7, #16]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
- 8001994:	2300      	movs	r3, #0
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+ 8001994:	2301      	movs	r3, #1
  8001996:	617b      	str	r3, [r7, #20]
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
  8001998:	f107 030c 	add.w	r3, r7, #12
@@ -2912,8 +2912,8 @@ static void MX_GPIO_Init(void)
  80019fa:	69fb      	ldr	r3, [r7, #28]
  80019fc:	6053      	str	r3, [r2, #4]
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
  80019fe:	bf00      	nop
  8001a00:	3720      	adds	r7, #32
@@ -3019,10 +3019,10 @@ void HAL_MspInit(void)
  8001a84:	40010000 	.word	0x40010000
 
 08001a88 <HAL_ADC_MspInit>:
-* This function configures the hardware resources used in this example
-* @param hadc: ADC handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param hadc: ADC handle pointer
+  * @retval None
+  */
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
  8001a88:	b580      	push	{r7, lr}
@@ -3043,9 +3043,9 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
  8001aa4:	4293      	cmp	r3, r2
  8001aa6:	d129      	bne.n	8001afc <HAL_ADC_MspInit+0x74>
   {
-  /* USER CODE BEGIN ADC1_MspInit 0 */
+    /* USER CODE BEGIN ADC1_MspInit 0 */
 
-  /* USER CODE END ADC1_MspInit 0 */
+    /* USER CODE END ADC1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
  8001aa8:	4b17      	ldr	r3, [pc, #92]	@ (8001b08 <HAL_ADC_MspInit+0x80>)
@@ -3095,7 +3095,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
  8001af6:	2012      	movs	r0, #18
  8001af8:	f001 f817 	bl	8002b2a <HAL_NVIC_EnableIRQ>
 
-  /* USER CODE END ADC1_MspInit 1 */
+    /* USER CODE END ADC1_MspInit 1 */
 
   }
 
@@ -3109,10 +3109,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
  8001b0c:	40010800 	.word	0x40010800
 
 08001b10 <HAL_SPI_MspInit>:
-* This function configures the hardware resources used in this example
-* @param hspi: SPI handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param hspi: SPI handle pointer
+  * @retval None
+  */
 void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 {
  8001b10:	b580      	push	{r7, lr}
@@ -3133,9 +3133,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  8001b2c:	4293      	cmp	r3, r2
  8001b2e:	f040 8087 	bne.w	8001c40 <HAL_SPI_MspInit+0x130>
   {
-  /* USER CODE BEGIN SPI1_MspInit 0 */
+    /* USER CODE BEGIN SPI1_MspInit 0 */
 
-  /* USER CODE END SPI1_MspInit 0 */
+    /* USER CODE END SPI1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_SPI1_CLK_ENABLE();
  8001b32:	4b46      	ldr	r3, [pc, #280]	@ (8001c4c <HAL_SPI_MspInit+0x13c>)
@@ -3298,7 +3298,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  8001c3a:	2023      	movs	r0, #35	@ 0x23
  8001c3c:	f000 ff75 	bl	8002b2a <HAL_NVIC_EnableIRQ>
 
-  /* USER CODE END SPI1_MspInit 1 */
+    /* USER CODE END SPI1_MspInit 1 */
 
   }
 
@@ -3316,10 +3316,10 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
  8001c60:	40020030 	.word	0x40020030
 
 08001c64 <HAL_TIM_Base_MspInit>:
-* This function configures the hardware resources used in this example
-* @param htim_base: TIM_Base handle pointer
-* @retval None
-*/
+  * This function configures the hardware resources used in this example
+  * @param htim_base: TIM_Base handle pointer
+  * @retval None
+  */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
  8001c64:	b480      	push	{r7}
@@ -3333,9 +3333,9 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
  8001c72:	4293      	cmp	r3, r2
  8001c74:	d10b      	bne.n	8001c8e <HAL_TIM_Base_MspInit+0x2a>
   {
-  /* USER CODE BEGIN TIM3_MspInit 0 */
+    /* USER CODE BEGIN TIM3_MspInit 0 */
 
-  /* USER CODE END TIM3_MspInit 0 */
+    /* USER CODE END TIM3_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_TIM3_CLK_ENABLE();
  8001c76:	4b09      	ldr	r3, [pc, #36]	@ (8001c9c <HAL_TIM_Base_MspInit+0x38>)
@@ -3349,7 +3349,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
  8001c8a:	60fb      	str	r3, [r7, #12]
  8001c8c:	68fb      	ldr	r3, [r7, #12]
 
-  /* USER CODE END TIM3_MspInit 1 */
+    /* USER CODE END TIM3_MspInit 1 */
 
   }
 
