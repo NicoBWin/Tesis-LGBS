@@ -3,6 +3,8 @@
 	<item key="hasShownOverlayPopupBefore" value="true"/>
 	<item key="replaceBarOpen" value="false"/>
 	<list key="searchhistory">
+		<item value="HAL_ADC"/>
+		<item value="DWT"/>
 		<item value="hadc"/>
 		<item value="hadc1"/>
 	</list>

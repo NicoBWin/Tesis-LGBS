@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdint.h>
+#include "potentiometer.h"
 
 /* USER CODE END Includes */
 
@@ -41,10 +43,11 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-
 CAN_HandleTypeDef hcan;
+CAN_TxHeaderTypeDef txHandler;
 
 /* USER CODE BEGIN PV */
+
 
 /* USER CODE END PV */
 
@@ -93,50 +96,34 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_CAN_Init();
-
   /* USER CODE BEGIN 2 */
+
+	uint8_t TxData[2] = {0};
+	uint32_t TxMailbox = 0;
 	uint16_t speed = 0;
-	uint32_t last_cycle = DWT->CYCCNT;
-	uint32_t freq = HAL_RCC_GetHCLKFreq(); // System clock freq
-	uint32_t delay_cycles = freq / 10000;  // 10kHz = 100µs
 
-	CAN_TxHeaderTypeDef TxHeader;
-	uint8_t TxData[2];
-	uint32_t TxMailbox;
 
-	TxHeader.DLC = 2; // 2 bytes
-	TxHeader.IDE = CAN_ID_STD;
-	TxHeader.RTR = CAN_RTR_DATA;
-	TxHeader.StdId = 0x321; // Arbitrary ID
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	 if ((DWT->CYCCNT - last_cycle) >= delay_cycles)
-	 {
-	   last_cycle = DWT->CYCCNT;
 
-	   HAL_ADC_Start(&hadc1);
-	   if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
-	   {
-		 uint16_t speed = HAL_ADC_GetValue(&hadc1);
+		speed = read_pote(&hadc1);
 
-		 // Pack 16-bit ADC value into CAN message
-		 TxData[0] = speed >> 8;
-		 TxData[1] = speed & 0xFF;
+		// Pack 16-bit ADC value into CAN message
+		TxData[0] = speed >> 8;
+		TxData[1] = speed & 0xFF;
 
-		 if (HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-		 {
-		   Error_Handler(); // Transmission error
-		 }
-	   }
-	 }
-  }
+		if (HAL_CAN_AddTxMessage(&hcan, &txHandler, TxData, &TxMailbox) != HAL_OK)
+		{
+			Error_Handler(); // Transmission error
+		}
+	}
   /* USER CODE END 3 */
 }
 
@@ -208,7 +195,7 @@ static void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -228,6 +215,9 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+
+  HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_ADC_Start(&hadc1);
 
   /* USER CODE END ADC1_Init 2 */
 
@@ -266,7 +256,7 @@ static void MX_CAN_Init(void)
   }
   /* USER CODE BEGIN CAN_Init 2 */
 
-  	// Start CAN peripheral
+	// Start CAN peripheral
 	HAL_CAN_Start(&hcan);
 
 	// Configure CAN filter
@@ -287,10 +277,10 @@ static void MX_CAN_Init(void)
 	  Error_Handler();
 	}
 
-	// Timer-based delay config: use DWT cycle counter
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-	DWT->CYCCNT = 0;
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+	txHandler.DLC = 2; // 2 bytes
+	txHandler.IDE = CAN_ID_STD;
+	txHandler.RTR = CAN_RTR_DATA;
+	txHandler.StdId = 0x321; // Arbitrary ID
 
   /* USER CODE END CAN_Init 2 */
 
@@ -327,11 +317,11 @@ static void MX_GPIO_Init(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
