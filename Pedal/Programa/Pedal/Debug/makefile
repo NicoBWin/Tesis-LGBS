@@ -52,6 +52,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Pedal.list \
 
+OBJCOPY_HEX += \
+Pedal.hex \
+
+OBJCOPY_BIN += \
+Pedal.bin \
+
 
 # All Target
 all: main-build
@@ -75,12 +81,22 @@ Pedal.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Pedal.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "Pedal.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+Pedal.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Pedal.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Pedal.elf Pedal.list Pedal.map default.size.stdout
+	-$(RM) Pedal.bin Pedal.elf Pedal.hex Pedal.list Pedal.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
