@@ -1,0 +1,21 @@
+/*
+ * potentiometer.c
+ *
+ *  Created on: Apr 17, 2025
+ *      Author: Gonzalo
+ */
+
+#include "potentiometer.h"
+
+ADC_HandleTypeDef hadc1;
+
+uint16_t read_pote(ADC_HandleTypeDef *hadc1){
+
+	uint16_t value = 0;
+
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
+	{
+		value = HAL_ADC_GetValue(&hadc1);
+	}
+	return value;
+}

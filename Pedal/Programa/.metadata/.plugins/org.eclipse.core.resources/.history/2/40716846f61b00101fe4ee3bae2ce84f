@@ -1,0 +1,13 @@
+/*
+ * potentiometer.c
+ *
+ *  Created on: Apr 17, 2025
+ *      Author: Gonzalo
+ */
+
+#include "potentiometer.h"
+
+uint16_t read_potentiometer(){
+
+	return value;
+}

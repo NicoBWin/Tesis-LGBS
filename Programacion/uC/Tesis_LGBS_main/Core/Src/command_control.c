@@ -7,7 +7,7 @@
 
 #include "command_control.h"
 #include "CurrentControl.h"
-#include "LUT_comms.h"
+#include "BLDCcontrol.h"
 
 #include "usbd_cdc_if.h"
 
@@ -19,14 +19,14 @@ void command_I(uint8_t *buff, uint16_t size){
 	static float i;
 	if (buff[1] == '?')
 	{
-		gcvt(get_I(), 3, buff);
+		gcvt(get_I_float(), 3, buff);
 		buff[4] = '\n';
 		CDC_Transmit_FS(buff, 5);
 	}
 	else if (buff[1] == '=')
 	{
 		i = atof(&buff[2]);
-		set_I(i);
+		set_I_float(i);
 	}
 	else if (buff[1] == 'm')
 	{
@@ -37,19 +37,27 @@ void command_I(uint8_t *buff, uint16_t size){
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }
 
-void command_O(uint8_t *buff, uint16_t size){
+void command_S(uint8_t *buff, uint16_t size){
 	static uint16_t data;
 	if (buff[1] == '?')
 	{
-		itoa(get_offset(), buff, 10);
+		gcvt(get_speed(), 2, buff);
 		auto len = strlen(buff);
 		buff[len] = '\n';
 		CDC_Transmit_FS(buff, len + 1);
 	}
 	else if (buff[1] == '=')
 	{
-		data = atoi(&buff[2]);
-		set_offset(data);
+		data = atof(&buff[2]);
+		set_speed(data);
+	}
+	else if (buff[1] == 'm')
+	{
+		float speed = (float)get_speed_meas();
+		gcvt(speed, 2, buff);
+		auto len = strlen(buff);
+		buff[len] = '\n';
+		CDC_Transmit_FS(buff, len + 1);
 	}
 	while (CDC_Transmit_FS('\n', 1) == USBD_BUSY);
 }
