@@ -128,8 +128,6 @@ int main(void)
 
   uint8_t pedalCommand[MSG_SIZE];
 
-  uint8_t pedalCommand[MSG_SIZE];
-
   // curr_control_init(&hadc1, &htim3);
   // init_LUT_comms(&hspi1);
   HAL_TIMEx_HallSensor_Start_IT(&htim1);
