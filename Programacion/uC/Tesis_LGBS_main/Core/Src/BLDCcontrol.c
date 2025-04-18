@@ -7,6 +7,7 @@
 #include "math.h"
 #include "stdlib.h"
 #include "BLDCcontrol.h"
+#include "LUT_comms.h"
 
 uint32_t mot_speed_count = 0;
 uint32_t last_mot_speed_count = 0;
@@ -30,6 +31,8 @@ float get_speed_meas(void)
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	static int32_t p, i, aux_i, out_pi, err;
+	static uint16_t state = 0;
+	static GPIO_PinState hall_A, hall_B, hall_C;
 
 	// Speed is in the order of 100k cnts per 1/18 revolution
 	// current is in the order of 500 per amp
@@ -40,14 +43,44 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
 	mot_speed_count += htim->Instance->CCR1;
 
-	err = mot_speed_setpoint - mot_speed_count;
+	hall_A = HAL_GPIO_ReadPin(HALL_PORT, HALL_A);
+	hall_B = HAL_GPIO_ReadPin(HALL_PORT, HALL_B);
+	hall_C = HAL_GPIO_ReadPin(HALL_PORT, HALL_C);
 
-	p = Kp * err;
-	aux_i = i + Ki * err ;
-	i = abs(aux_i) < SATURATION_INT ? aux_i : i;
+	state = (hall_A << 2) + (hall_B << 1) + hall_C;
 
-	out_pi = p + i;
-	set_I_int(out_pi);
+	switch (state) {
+		case 0b001:
+			set_spi_data(LUT_SIZE/6*0-1);
+			break;
+		case 0b101:
+			set_spi_data(LUT_SIZE/6*1-1);
+			break;
+		case 0b100:
+			set_spi_data(LUT_SIZE/6*2-1);
+			break;
+		case 0b110:
+			set_spi_data(LUT_SIZE/6*3-1);
+			break;
+		case 0b010:
+			set_spi_data(LUT_SIZE/6*4-1);
+			break;
+		case 0b011:
+			set_spi_data(LUT_SIZE/6*5-1);
+			break;
+
+		default:
+			set_spi_data(LUT_SIZE/6*0-1);
+			break;
+	}
+//	err = mot_speed_setpoint - mot_speed_count;
+//
+//	p = Kp * err;
+//	aux_i = i + Ki * err ;
+//	i = abs(aux_i) < SATURATION_INT ? aux_i : i;
+//
+//	out_pi = p + i;
+//	set_I_int(out_pi);
 	last_mot_speed_count = mot_speed_count;
 	mot_speed_count = 0;
 }

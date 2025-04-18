@@ -8,7 +8,7 @@
 
 #include "LUT_comms.h"
 
-uint16_t offset = 50;
+uint16_t offset = 0;
 uint16_t spi_data = 0;
 
 

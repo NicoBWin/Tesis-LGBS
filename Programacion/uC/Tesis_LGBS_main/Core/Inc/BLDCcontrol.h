@@ -15,6 +15,11 @@
 #define Ki 0.001
 #define SATURATION_INT (MAX_CURR*SENS_SENSITIVITY)
 
+#define HALL_PORT GPIOA
+#define HALL_A GPIO_PIN_8
+#define HALL_B GPIO_PIN_9
+#define HALL_C GPIO_PIN_10
+
 float get_speed_meas(void);
 float get_speed(void);
 void set_speed(float value);
