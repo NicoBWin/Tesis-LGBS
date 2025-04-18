@@ -72,6 +72,7 @@ module top(
     wire clk24;
 
     wire shoot = gpio_26;
+    reg last_shoot_value = 0;
 
     assign gpio_46 = g1_c;
     assign gpio_45 = g1_b;
@@ -204,14 +205,17 @@ module top(
                 end
             end
             WAIT_SHOOT: begin
-                if (shoot) begin
-                    state <= WAIT_VALUE_1;
+                if (last_shoot_value != shoot) begin
+                    last_shoot_value <= shoot;
+                    if (shoot) begin
+                        state <= WAIT_VALUE_1;
+                    end
                 end
             end
             WAIT_VALUE_1: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        uart_msg[15:8] <= data_received;
+                        uart_msg[7:0] <= data_received;
                         state <= DELAY;
                     end
                     else begin
@@ -227,7 +231,7 @@ module top(
             WAIT_VALUE_2: begin
                 if (rx_done) begin
                     if (!parity_error) begin
-                        uart_msg[7:0] <= data_received;
+                        uart_msg[15:8] <= data_received;
                         state <= WAIT_SHOOT;
                     end
                     else begin
@@ -242,5 +246,4 @@ module top(
 
         endcase
     end
-
 endmodule
