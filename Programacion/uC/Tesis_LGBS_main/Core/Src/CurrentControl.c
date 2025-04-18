@@ -10,9 +10,9 @@
 
 
 static int16_t adc_value;
-static float i_ref_float = 0.0;
 static int16_t i_ref_int = 0;
 static int16_t i_offset = 0;
+static int16_t max_curr = 0;
 static bool calibrated = false;
 
 
@@ -47,32 +47,44 @@ float get_I_meas()
 	return (float)(adc_value-i_offset)/(float)SENS_SENSITIVITY;
 }
 
-float get_I()
+float get_I_float()
 {
-	return i_ref_float;
+	return (float)(i_ref_int-i_offset)/(float)SENS_SENSITIVITY;
 }
-
-void set_I(float i)
+uint16_t get_I_int()
+{
+	return i_ref_int - i_offset;
+}
+void set_I_float(float i)
 {
 	if (i > MAX_CURR || i < 0.0)
 	{
-		return;
+		i = MAX_CURR;
 	}
-	i_ref_float = i;
 	i_ref_int = i * SENS_SENSITIVITY + i_offset;
 }
 
-
+void set_I_int(uint16_t i)
+{
+	i_ref_int = i > SENS_SENSITIVITY * MAX_CURR ? max_curr : i + i_offset;
+}
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	adc_value = HAL_ADC_GetValue(hadc);
 	if (!calibrated)
 	{
 		i_offset = adc_value;
+		max_curr = MAX_CURR * SENS_SENSITIVITY + i_offset;
 		calibrated = true;
 	}
 	else
 	{
+		if (i_ref_int == i_offset)
+		{
+			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_1_A, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_2_A, GPIO_PIN_SET);
+			return;
+		}
 		if (adc_value > i_ref_int)
 		{
 			HAL_GPIO_WritePin(H_BRIDGE_GPIO_PORT, H_BRIDGE_1_A, GPIO_PIN_RESET);

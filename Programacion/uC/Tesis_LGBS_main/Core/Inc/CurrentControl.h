@@ -9,7 +9,7 @@
 #define INC_CURRENTCONTROL_H_
 #include "stm32f1xx_hal.h"
 
-#define MAX_CURR 5.0
+#define MAX_CURR 3.0
 
 #define SENS_SENSITIVITY 496	// ADC Units per Ampere = 400mV/A
 
@@ -21,7 +21,9 @@
 
 void curr_control_init(ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim);
 float get_I_meas();
-float get_I();
-void set_I(float);
+float get_I_float();
+uint16_t get_I_int();
+void set_I_float(float);
+void set_I_int(uint16_t);
 
 #endif /* INC_CURRENTCONTROL_H_ */

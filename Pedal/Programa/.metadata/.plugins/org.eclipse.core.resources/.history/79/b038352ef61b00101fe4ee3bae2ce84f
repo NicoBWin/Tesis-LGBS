@@ -1,0 +1,11 @@
+/*
+ * potentiometer.c
+ *
+ *  Created on: Apr 17, 2025
+ *      Author: Gonzalo
+ */
+
+uint16_t read_potentiometer(){
+
+	return value;
+}

@@ -1,0 +1,13 @@
+/*
+ * potentiometer.h
+ *
+ *  Created on: Apr 17, 2025
+ *      Author: Gonzalo
+ */
+
+#ifndef SRC_POTENTIOMETER_H_
+#define SRC_POTENTIOMETER_H_
+
+uint16_t read_pote()
+
+#endif /* SRC_POTENTIOMETER_H_ */

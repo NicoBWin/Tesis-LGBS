@@ -36,9 +36,9 @@ module SPI_request_data (
     wire transfer_done;
     wire [7:0] data_received;
 
-    // Extraer sin_index (12 MSB) y uart_id (4 LSB)
-    assign sin_index = data_rx[15:4]; // 12-bit sin_index
-    assign uart_id = data_rx[3:0];    // 4-bit uart_id
+    // Extraer sin_index (12 LSB) y uart_id (4 MSB)
+    assign sin_index = data_rx[11:0]; // 12-bit sin_index
+    assign uart_id = data_rx[15:12];    // 4-bit uart_id
 
     // Instanciación del master SPI (no se usa TX aquí)
     SPI_Master_With_Single_CS u_spi (
@@ -92,7 +92,7 @@ module SPI_request_data (
                     // Si se completo la transferencia
                     if (transfer_done) begin
                         state <= TRANSF_RESET;
-                        data_rx[7:0] <= data_received;    // Almacenar primer byte
+                        data_rx[7:0] <= data_received;    // Almacenar segundo byte
                         data_valid <= 1;
 
                     end

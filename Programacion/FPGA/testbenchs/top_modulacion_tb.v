@@ -35,7 +35,7 @@ always #1 clk = ~clk;
 *   External Modules declarations   *
 *************************************
 */
-    modulator #( .MODULE_ID(0) ) modulacion (
+    modulator modulacion (
         .clk(clk),
         .clk24(clk),
         .reset(reset),

@@ -26,7 +26,10 @@ module top(
     output wire gpio_2,
     output wire gpio_28,
     output wire gpio_38,
-    output wire gpio_42
+    output wire gpio_42,
+
+    // Debugging
+    output wire gpio_4 
 );
 
 /*
@@ -95,14 +98,14 @@ module top(
     reg [2:0]state = INIT;
     reg reset = 0;
     reg [15:0] uart_msg = 16'h0000;
-    assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; 
+    assign {gpio_28, gpio_38, gpio_42} = uart_msg[2:0]; //TODO: Me
     // UART
     reg start_tx;
     reg [7:0] data_to_tx;
     wire [7:0] data_received; 
     wire tx_busy; 
     wire rx_done; 
-    wire parity_error; 
+    wire parity_error; assign gpio_4 = parity_error; //TODO: Borrar
     wire tx = tx_uart_1; 
     wire rx = rx_uart_1; 
 
@@ -162,8 +165,7 @@ module top(
         .led_blue(led_blue)
     );
 
-    modulator #(.MODULE_ID(`MODULE_ID))
-    modulator_u
+    modulator modulator_u
     (
         .clk(clk),
         .clk24(clk24),
@@ -188,10 +190,12 @@ module top(
         case (state)
             INIT: begin
                 if (done_1_sec) begin
-                    reset <= 0;
-                    start_1_sec <= 0;
-                    led_b <= ON;
-                    state <= WAIT_VALUE_1;
+                    if (shoot) begin
+                        reset <= 0;
+                        start_1_sec <= 0;
+                        led_b <= ON;
+                        state <= WAIT_VALUE_1;
+                    end
                 end
                 else begin
                     reset <= 1;
@@ -211,7 +215,9 @@ module top(
                 end
             end
             DELAY: begin
+                
                 state <= WAIT_VALUE_2;
+                
             end
             WAIT_VALUE_2: begin
                 if (rx_done) begin

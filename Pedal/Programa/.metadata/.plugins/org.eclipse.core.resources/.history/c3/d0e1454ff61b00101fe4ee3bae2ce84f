@@ -1,0 +1,18 @@
+/*
+ * potentiometer.c
+ *
+ *  Created on: Apr 17, 2025
+ *      Author: Gonzalo
+ */
+
+#include "potentiometer.h"
+
+uint16_t read_potentiometer(){
+	uint16_t speed;
+
+	if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK)
+	{
+		speed = HAL_ADC_GetValue(&hadc1);
+	}
+	return value;
+}
