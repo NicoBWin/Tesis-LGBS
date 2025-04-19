@@ -48,7 +48,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	 */
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
 	mot_speed_count = htim->Instance->CCR1;
-	if (mot_speed_count < 12000){
+	if (mot_speed_count < 2000){
 		mot_speed_count = last_mot_speed_count;
 	}
 	hall_A = HAL_GPIO_ReadPin(HALL_PORT, HALL_A);
