@@ -9,9 +9,16 @@
 #include "BLDCcontrol.h"
 #include "LUT_comms.h"
 
+
+#define SQUARE 0
+#define SINE 1
+
+extern TIM_HandleTypeDef htim4;
 uint32_t mot_speed_count = 0;
 uint32_t last_mot_speed_count = 0;
 uint32_t mot_speed_setpoint = 0;
+uint8_t overflow_detected = 1;
+uint8_t output_mode = SINE; // 0: square, 1: Sinewave
 void set_speed(float value)
 {
 	mot_speed_setpoint = 27.7778e3f/(value);
@@ -30,8 +37,7 @@ float get_speed_meas(void)
 // Input compare
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-	static int32_t p, i, aux_i, out_pi, err;
-	static uint16_t state = 0;
+	static uint16_t state = 0, freq;
 	static GPIO_PinState hall_A, hall_B, hall_C;
 
 	// Speed is in the order of 100k cnts per 1/18 revolution
@@ -41,46 +47,58 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 	 * ESTO SALIO A OJO, NO HAY MATEMATICA
 	 */
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
-	mot_speed_count += htim->Instance->CCR1;
-
+	mot_speed_count = htim->Instance->CCR1;
+	if (mot_speed_count < 12000){
+		mot_speed_count = last_mot_speed_count;
+	}
 	hall_A = HAL_GPIO_ReadPin(HALL_PORT, HALL_A);
 	hall_B = HAL_GPIO_ReadPin(HALL_PORT, HALL_B);
 	hall_C = HAL_GPIO_ReadPin(HALL_PORT, HALL_C);
 
 	state = (hall_A << 2) + (hall_B << 1) + hall_C;
 
-	switch (state) {
-		case 0b001:
-			set_spi_data(LUT_SIZE/6*0-1);
-			break;
-		case 0b101:
-			set_spi_data(LUT_SIZE/6*1-1);
-			break;
-		case 0b100:
-			set_spi_data(LUT_SIZE/6*2-1);
-			break;
-		case 0b110:
-			set_spi_data(LUT_SIZE/6*3-1);
-			break;
-		case 0b010:
-			set_spi_data(LUT_SIZE/6*4-1);
-			break;
-		case 0b011:
-			set_spi_data(LUT_SIZE/6*5-1);
-			break;
+	htim4.Instance->CNT = 0;
+	// HAL_TIM_Base_Start(&htim4);
+//	if (overflow_detected){
+//		output_mode = SQUARE;
+//		overflow_detected = 0;
+//	}
+//	else {
+//		output_mode = SINE;
+//	}
 
-		default:
-			set_spi_data(LUT_SIZE/6*0-1);
-			break;
+	switch (state) {
+			case 0b001:
+				set_spi_data(3072);
+				break;
+			case 0b101:
+				set_spi_data(3755);
+				break;
+			case 0b100:
+				set_spi_data(341);
+				break;
+			case 0b110:
+				set_spi_data(1024);
+				break;
+			case 0b010:
+				set_spi_data(1707);
+				break;
+			case 0b011:
+				set_spi_data(2391);
+				break;
+
+			default:
+				set_spi_data(3072);
+				break;
+		}
+	if (output_mode == SINE){
+		freq = 1000000/mot_speed_count;
+		set_offset(freq/2);
 	}
-//	err = mot_speed_setpoint - mot_speed_count;
-//
-//	p = Kp * err;
-//	aux_i = i + Ki * err ;
-//	i = abs(aux_i) < SATURATION_INT ? aux_i : i;
-//
-//	out_pi = p + i;
-//	set_I_int(out_pi);
+	else {
+		set_offset(0);
+		overflow_detected = 0;
+	}
 	last_mot_speed_count = mot_speed_count;
 	mot_speed_count = 0;
 }
@@ -88,5 +106,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 // Overflow
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	HAL_TIM_Base_Stop(htim);
+	overflow_detected = 1;
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 }

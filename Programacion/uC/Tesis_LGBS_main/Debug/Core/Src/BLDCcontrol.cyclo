@@ -1,5 +1,5 @@
-../Core/Src/BLDCcontrol.c:15:6:set_speed	1
-../Core/Src/BLDCcontrol.c:20:7:get_speed	1
-../Core/Src/BLDCcontrol.c:25:7:get_speed_meas	1
-../Core/Src/BLDCcontrol.c:31:6:HAL_TIM_IC_CaptureCallback	7
-../Core/Src/BLDCcontrol.c:89:6:HAL_TIM_PeriodElapsedCallback	1
+../Core/Src/BLDCcontrol.c:22:6:set_speed	1
+../Core/Src/BLDCcontrol.c:27:7:get_speed	1
+../Core/Src/BLDCcontrol.c:32:7:get_speed_meas	1
+../Core/Src/BLDCcontrol.c:38:6:HAL_TIM_IC_CaptureCallback	9
+../Core/Src/BLDCcontrol.c:107:6:HAL_TIM_PeriodElapsedCallback	1
